@@ -42,7 +42,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { actioncolumns } from "./ActionColumns"
+import { actioncolumns, DropDownComponent } from "./ActionColumns"
+import { Delete, Edit, MoreHorizontal } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -50,6 +51,7 @@ interface DataTableProps<TData, TValue> {
     props?: {
         edit: boolean
         delete: boolean
+        page:string;
     }
 }
 
@@ -66,6 +68,24 @@ export function DataTable<TData, TValue>({
     )
 
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+
+    // action columns
+    const actioncolumns: ColumnDef<any>[] = [
+
+        {
+            id: "actions",
+            cell: ({ row }) => {
+                return (
+                  <DropDownComponent row={row} props={{
+                    edit:props?.edit as boolean,
+                    delete:props?.delete as boolean,
+                    page:props?.page as string
+                  }}/>
+                )
+            },
+        },
+
+    ]
 
 
     const table = useReactTable({
@@ -122,7 +142,7 @@ export function DataTable<TData, TValue>({
                 </div>
                 <DataTableViewOptions table={table} />
             </div>
-            
+
             <div className="overflow-x-auto w-full">
                 <Table className="w-full">
                     <TableHeader>
@@ -165,7 +185,7 @@ export function DataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
-            
+
 
             <div>
                 <DataTablePagination table={table} />

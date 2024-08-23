@@ -46,7 +46,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { DataTable } from "../reusables/DataGrid"
-import { columns, products } from "../Inventory/columns"
+import { columns} from "../Inventory/columns"
 
 export default function PageView() {
   return (
@@ -124,40 +124,42 @@ export default function PageView() {
               <ShoppingCart className="h-4 w-4 text-primary500" />
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-2 gap-2 my-2">
-                    <div className="flex flex-col gap-4 items-center">
-                        <p className="font-semibold text-green-400">200</p>
-                        <p>Quantity at hand</p>
-                    </div>
-                    <div className="flex flex-col gap-4 items-center">
-                        <p className="text-red-500 font-semibold">200</p>
-                        <p>low stock</p>
-                    </div>
+              <div className="grid grid-cols-2 gap-2 my-2">
+                <div className="flex flex-col gap-4 items-center">
+                  <p className="font-semibold text-green-400">200</p>
+                  <p>Quantity at hand</p>
                 </div>
-              
+                <div className="flex flex-col gap-4 items-center">
+                  <p className="text-red-500 font-semibold">200</p>
+                  <p>low stock</p>
+                </div>
+              </div>
+
             </CardContent>
           </Card>
         </div>
+
         <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-2">
-          <Card
-            className="xl:col-span-1" x-chunk="dashboard-01-chunk-4"
-          >
-            <CardHeader className="flex flex-row items-center">
-              <div className="grid gap-2">
-                <CardTitle>Top Selling Stock</CardTitle>
-                <CardDescription>
-                  mode of sold stocks in the store.
-                </CardDescription>
-              </div>
-              <Button asChild size="sm" className="ml-auto gap-1">
-                <Link href="/sales" className=" text-primary600 hover:text-white transition-all duration-300 bg-white border hover:bg-primary600 border-primary800">
-                  make a sale
-                  <ArrowUpRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {/* <Table>
+          <div className="overflow-x-scroll col-span-1">
+            <Card
+              className="xl:col-span-1" x-chunk="dashboard-01-chunk-4"
+            >
+              <CardHeader className="flex flex-row items-center">
+                <div className="grid gap-2">
+                  <CardTitle>Top Selling Stock</CardTitle>
+                  <CardDescription>
+                    mode of sold stocks in the store.
+                  </CardDescription>
+                </div>
+                <Button asChild size="sm" className="ml-auto gap-1">
+                  <Link href="/sales" className=" text-primary600 hover:text-white transition-all duration-300 bg-white border hover:bg-primary600 border-primary800">
+                    make a sale
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {/* <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Customer</TableHead>
@@ -276,9 +278,10 @@ export default function PageView() {
                   </TableRow>
                 </TableBody>
               </Table> */}
-              <DataTable data={products} columns={columns}/>
-            </CardContent>
-          </Card>
+                {/* <DataTable data={inventory} columns={columns} /> */}
+              </CardContent>
+            </Card>
+          </div>
           <Card className="col-span-1">
             <CardHeader>
               <CardTitle>Recent Sales</CardTitle>
@@ -362,6 +365,8 @@ export default function PageView() {
             </CardContent>
           </Card>
         </div>
+
+
       </main>
     </div>
   )

@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Inventory {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String   @db.ObjectId
+  quantity    Int
+  buyingprice Float  @default(0.00)
+  price       Float
+  threshold   Int
+  credited    Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+
+  Sales Sales[]
+
+  LowStockSummary LowStockSummary[]
+
+  CreditedSummary CreditedSummary[]
+}
+
+model Sales {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  inventory    Inventory @relation(fields: [inventoryId], references: [id])
+  inventoryId  String    @db.ObjectId
+  kindeId      String
+  quantitySold Int
+  priceSold    Float
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @default(now())
+}
+
+model Expenses {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  kindeId     String
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String   @db.ObjectId
+  amount      Float
+  description String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+}
+
+model Services {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  kindeId    String
+  name       String
+  price      Float
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+model SalesSummary {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  totalSales  Int
+  totalProfit Float
+  periodType  PeriodType @default(DAY)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @default(now())
+}
+
+model ExpenseSummary {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  totalExpenses Float
+  periodType    PeriodType @default(DAY)
+  created_at    DateTime   @default(now())
+}
+
+model LowStockSummary {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  inventory   Inventory @relation(fields: [inventoryId], references: [id])
+  inventoryId String    @db.ObjectId
+  quantity    Int
+  alertDate   DateTime  @default(now())
+}
+
+model ServiceSummary {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  totalServices Float
+  date          DateTime   @default(now())
+  periodType    PeriodType @default(DAY)
+}
+
+model CreditedSummary {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  inventory     Inventory  @relation(fields: [inventoryId], references: [id])
+  inventoryId   String     @db.ObjectId
+  totalCredited Float
+  creditDate    DateTime   @default(now())
+  status        Status     @default(PENDING)
+  periodType    PeriodType @default(DAY)
+  toWho         String
+}
+
+model Category {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  name       String       @unique
+  type       CategoryType @default(INVENTORY)
+  created_at DateTime     @default(now())
+  updated_at DateTime     @default(now())
+
+  Inventory Inventory[]
+  Expenses  Expenses[]
+}
+
+enum PeriodType {
+  DAY
+  WEEK
+  MONTH
+}
+
+enum Status {
+  PENDING
+  PAID
+  RETURNED
+}
+
+enum CategoryType {
+  EXPENSE
+  INVENTORY
+}

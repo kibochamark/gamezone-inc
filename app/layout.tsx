@@ -7,6 +7,9 @@ import { Toaster } from 'react-hot-toast';
 import { ReactQueryProvider } from "./QueryClientProvider";
 import SideBar from "@/components/layout/SideBar";
 import Navbar from "@/components/layout/NavBar";
+import { KindeProvider } from "@kinde-oss/kinde-auth-nextjs";
+import { KindeAuthProvider } from "./KindeAuthProvider";
+import { ReduxProvider } from "./ReduxProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -25,41 +28,45 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn("min-h-screen relative bg-primary50", montserrat.className)}>
         <main className="text-bodyLarge">
-          <Toaster
-            position="top-right"
-            reverseOrder={false}
-            gutter={8}
-            containerClassName=""
-            containerStyle={{}}
-            toastOptions={{
-              // Define default options
-              className: '',
-              duration: 5000,
-              style: {
-                background: '#EFF0FE',
-                color: '#fff',
-              },
+          <KindeAuthProvider>
+            <ReduxProvider>
+              <Toaster
+                position="top-right"
+                reverseOrder={false}
+                gutter={8}
+                containerClassName=""
+                containerStyle={{}}
+                toastOptions={{
+                  // Define default options
+                  className: '',
+                  duration: 5000,
+                  style: {
+                    background: '#EFF0FE',
+                    color: '#000',
+                  },
 
-              // Default options for specific types
-              success: {
-                duration: 3000,
-              },
-            }}
-          />
-          <ReactQueryProvider>
-            <div className="flex w-full">
-              <div className="">
-                <div className="fixed lg:w-[280px] md:w-[220px]">
-                  <SideBar />
+                  // Default options for specific types
+                  success: {
+                    duration: 3000,
+                  },
+                }}
+              />
+              <ReactQueryProvider>
+                <div className="flex w-full">
+                  <div className="">
+                    <div className="fixed lg:w-[280px] md:w-[220px]">
+                      <SideBar />
+                    </div>
+                  </div>
+
+                  <Navbar>
+                    {children}
+                  </Navbar>
+
                 </div>
-              </div>
-              
-              <Navbar>
-                {children}
-              </Navbar>
-
-            </div>
-          </ReactQueryProvider>
+              </ReactQueryProvider>
+            </ReduxProvider>
+          </KindeAuthProvider>
         </main>
       </body>
     </html>

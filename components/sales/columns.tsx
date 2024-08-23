@@ -8,8 +8,8 @@ import { DataTableColumnHeader } from "../reusables/ColumnHeader"
 export type Product = {
     id: string
     name: string
-    price: number
-    buyingprice: number
+    unit_price: number
+    buying_price: number
     quantity: number
     threshold: number
     created_at: Date
@@ -77,14 +77,14 @@ export const columns: ColumnDef<Product>[] = [
         },
     },
     {
-        accessorKey: "buyingprice",
+        accessorKey: "buying_price",
         header: ({ column }) => {
             return (
                 <DataTableColumnHeader className="text-justify" column={column} title="Buying Price" />
             )
         },
         cell: ({ row }) => {
-            const amount = parseFloat(row.getValue("buyingprice"))
+            const amount = parseFloat(row.getValue("buying_price"))
             const formatted = new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "KES",
@@ -96,14 +96,14 @@ export const columns: ColumnDef<Product>[] = [
 
     },
     {
-        accessorKey: "price",
+        accessorKey: "unit_price",
         header: ({ column }) => {
             return (
                 <DataTableColumnHeader column={column} title="Selling Price" />
             )
         },
         cell: ({ row }) => {
-            const amount = parseFloat(row.getValue("price"))
+            const amount = parseFloat(row.getValue("unit_price"))
             const formatted = new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "KES",
@@ -136,4 +136,53 @@ export const columns: ColumnDef<Product>[] = [
     },    
 ];
 
+
+
+export const products: Product[] = [
+    {
+        id: "1",
+        name: "Smartphone",
+        unit_price: 45000,
+        buying_price: 40000,
+        quantity: 30,
+        threshold: 10,
+        created_at: new Date("2024-01-15T09:00:00Z"),
+    },
+    {
+        id: "2",
+        name: "Laptop",
+        unit_price: 150000,
+        buying_price: 140000,
+        quantity: 15,
+        threshold: 5,
+        created_at: new Date("2024-02-10T11:30:00Z"),
+    },
+    {
+        id: "3",
+        name: "Headphones",
+        unit_price: 5000,
+        buying_price: 4000,
+        quantity: 10,
+        threshold: 20,
+        created_at: new Date("2024-03-05T14:45:00Z"),
+    },
+    {
+        id: "4",
+        name: "Smartwatch",
+        unit_price: 20000,
+        buying_price: 18000,
+        quantity: 50,
+        threshold: 15,
+        created_at: new Date("2024-04-20T08:15:00Z"),
+    },
+    {
+        id: "5",
+        name: "Bluetooth Speaker",
+        unit_price: 7500,
+        buying_price: 6500,
+        quantity: 80,
+        threshold: 25,
+        created_at: new Date("2024-05-30T10:00:00Z"),
+    },
+];
 

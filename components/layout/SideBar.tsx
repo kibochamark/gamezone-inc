@@ -1,3 +1,4 @@
+"use client"
 import React from 'react'
 import Link from "next/link"
 import {
@@ -10,6 +11,7 @@ import {
     Menu,
     Package,
     Package2,
+    PieChart,
     Search,
     ShoppingCart,
     Users,
@@ -34,9 +36,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { usePathname } from 'next/navigation'
+import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components'
 
 
 const SideBar = () => {
+    const path= usePathname()
     return (
         <>
             <div className="hidden h-screen bg-background shadow-md border-r-2 md:block ">
@@ -54,15 +59,15 @@ const SideBar = () => {
                     <div className="flex-1">
                         <nav className=" space-y-4 py-4 grid items-start px-2 text-sm font-medium lg:px-4">
                             <Link
-                                href="#"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                                href="/dashboard"
+                                className={`flex items-center gap-3 ${path.includes("dashboard") && "dark:bg-primary100 text-primary bg-primary50 "} rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
                             >
                                 <Home className="h-4 w-4" />
                                 Dashboard
                             </Link>
                             <Link
-                                href="#"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                                href="/sales"
+                                className={`flex items-center gap-3 ${path.includes("sales") && "dark:bg-primary100 text-primary bg-primary50 "} rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
                             >
                                 <ShoppingCart className="h-4 w-4" />
                                 Sales
@@ -71,36 +76,37 @@ const SideBar = () => {
                                 </Badge>
                             </Link>
                             <Link
-                                href="#"
-                                className="flex items-center gap-3 rounded-lg dark:bg-primary100 bg-primary50 px-3 py-2 text-primary transition-all hover:text-primary"
+                                href="/inventory"
+                                className={`flex items-center gap-3 ${path.includes("inventory") && "dark:bg-primary100 text-primary bg-primary50 "}rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
                             >
                                 <Package className="h-4 w-4" />
                                 Inventory{" "}
                             </Link>
+                      
                             <Link
-                                href="#"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-                            >
-                                <Users className="h-4 w-4" />
-                                Users
-                            </Link>
-                            <Link
-                                href="#"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                                href="/services"
+                                className={`flex items-center gap-3 rounded-lg ${path.includes("services") && "dark:bg-primary100 text-primary bg-primary50 "} px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
                             >
                                 <HandCoins className="h-4 w-4" />
                                 Services
                             </Link>
                             <Link
-                                href="#"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                                href="/expenses"
+                                className={`flex items-center gap-3 rounded-lg ${path.includes("expenses") && "dark:bg-primary100 text-primary bg-primary50 "} px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
                             >
                                 <CircleDollarSign className="h-4 w-4" />
                                 Expenses
                             </Link>
                             <Link
+                                href="/managecategories"
+                                className={`flex items-center gap-3 rounded-lg ${path.includes("managecategories") && "dark:bg-primary100 text-primary bg-primary50 "} px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
+                            >
+                                <PieChart className="h-4 w-4" />
+                                Manage categories
+                            </Link>
+                            <Link
                                 href="#"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                                className={`flex items-center gap-3 ${path.includes("reports") && "dark:bg-primary100 text-primary bg-primary50 "} rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
                             >
                                 <LineChart className="h-4 w-4" />
                                 Reports
@@ -110,7 +116,7 @@ const SideBar = () => {
                     <div className="mt-auto p-4">
 
                         <Button size="sm" className="w-full bg-primary800 hover:bg-primary700">
-                            logout
+                        <LogoutLink>Log out</LogoutLink>
                         </Button>
 
                     </div>

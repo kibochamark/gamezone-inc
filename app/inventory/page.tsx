@@ -1,12 +1,84 @@
 import PageView from '@/components/Inventory/PageView'
 import { Button } from '@/components/ui/button'
-import React from 'react'
+import { prisma } from '@/lib/prismaClient'
+import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
+import { $Enums } from '@prisma/client'
+import React, { Suspense } from 'react'
 
-const page = () => {
+async function getCatgeories() {
+    let category: any = []
+    try {
+        category = await prisma.category.findMany({
+            where: {
+                type: "INVENTORY"
+            }
+        }) ?? []
+    } catch (e: any) {
+        console.log(e.message)
+    }
+
+
+    return category
+}
+async function getInventory() {
+    let inventory: any
+    try {
+        inventory = await prisma.inventory.findMany() ?? []
+    } catch (e: any) {
+        console.log(e.message)
+    }
+
+
+    return inventory
+}
+async function getLowStockSummary() {
+    let inventory: any
+    try {
+        inventory = await prisma.lowStockSummary.aggregate({
+            _count: {
+                id: true,
+            }
+        }) ?? 0
+    } catch (e: any) {
+        console.log(e.message)
+    }
+
+
+    return inventory
+}
+async function getRevenueSummary() {
+    let inventory: any
+    try {
+        inventory = await prisma.salesSummary.findMany({
+            select:{
+                totalSales:true
+            }
+        }) ?? 0
+
+        
+    } catch (e: any) {
+        console.log(e.message)
+    }
+
+
+    return inventory
+}
+
+const page = async () => {
+    const {isAuthenticated, getPermissions} = await getKindeServerSession()
+    const inventory = await getInventory()
+    const category = await getCatgeories()
+    const lowStockSummary = await getLowStockSummary()
+    const revenue = await getRevenueSummary()
+
+    const permissions = await getPermissions()
+
     return (
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
-                <PageView />
+                <Suspense fallback="...loading">
+                    <PageView inventory={inventory} category={category} lowStockSummary={lowStockSummary} revenue={revenue} permissions={permissions?.permissions}/>
+                </Suspense>
             </div>
 
         </div>
