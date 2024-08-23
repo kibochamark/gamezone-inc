@@ -1,5 +1,5 @@
 "use client"
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from "next/link"
 import {
     Bell,
@@ -38,10 +38,21 @@ import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { usePathname } from 'next/navigation'
 import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components'
+import { prisma } from '@/lib/prismaClient'
 
 
 const SideBar = () => {
     const path= usePathname()
+    // const [sales, setSales]= useState(0)
+    // useEffect(()=>{
+    //     const number = async()=>{
+    //         const count = await prisma.sales.count()
+    //         setSales(count ?? 0)
+    //     }
+
+    //     number()
+
+    // },[path])
     return (
         <>
             <div className="hidden h-screen bg-background shadow-md border-r-2 md:block ">
@@ -71,9 +82,9 @@ const SideBar = () => {
                             >
                                 <ShoppingCart className="h-4 w-4" />
                                 Sales
-                                <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                                    6
-                                </Badge>
+                                {/* <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                                    {sales}
+                                </Badge> */}
                             </Link>
                             <Link
                                 href="/inventory"

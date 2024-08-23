@@ -16,6 +16,9 @@ export type Product = {
 }
 
 import { FilterFn } from "@tanstack/react-table";
+import { Button } from "../ui/button"
+import { useDispatch } from "react-redux"
+import { handleSale } from "@/redux/DatatbaleSlice"
 
 const dateFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
     const rowValue = row.getValue(columnId) as Date;
@@ -134,6 +137,37 @@ export const columns: ColumnDef<Product>[] = [
         sortingFn: "datetime",
         filterFn: dateFilterFn, // or another appropriate filter function
     },    
+    {
+        id:"Sale",
+        header: ({ column }) => {
+            return (
+                <DataTableColumnHeader column={column} title="Sell" />
+            )
+        },
+        cell: ({ row }) => {
+    
+            return <div className="text-justify font-medium">
+                <HandleButtonSell row={row}/>
+            </div>
+        },
+        
+         
+    },    
 ];
 
+
+
+
+const HandleButtonSell = ({row}:{row:{original:any}})=>{
+    const dispatch =useDispatch()
+    return(
+        <Button onClick={()=>{
+            dispatch(handleSale({
+                data:row.original,
+                issale:true,
+                page:"inventory"
+            }))
+        }} size={"sm"} className="text-green-500 bg-white hover:bg-green-500 transition-all duration-300 hover:text-white border border-green-500 text-titleSmall">sell</Button>
+    )
+}
 

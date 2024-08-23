@@ -14,17 +14,18 @@ datasource db {
 }
 
 model Inventory {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String   @unique
-  category    Category @relation(fields: [categoryId], references: [id])
-  categoryId  String   @db.ObjectId
-  quantity    Int
-  buyingprice Float  @default(0.00)
-  price       Float
-  threshold   Int
-  credited    Boolean  @default(false)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @default(now())
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String   @unique
+  category      Category @relation(fields: [categoryId], references: [id])
+  categoryId    String   @db.ObjectId
+  quantity      Int
+  buyingprice   Float    @default(0.00)
+  price         Float
+  threshold     Int
+  frequencySold Int      @default(0)
+  credited      Boolean  @default(false)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
 
   Sales Sales[]
 
@@ -57,8 +58,9 @@ model Expenses {
 
 model Services {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  kindeId    String
-  name       String
+  kindeId    String   @db.String
+  kindeName  String   @db.String
+  name       String   @db.String
   price      Float
   created_at DateTime @default(now())
   updated_at DateTime @default(now())

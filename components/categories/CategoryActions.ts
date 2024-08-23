@@ -8,7 +8,7 @@ import { CategoryType } from "@prisma/client";
 
 
 export const createCategory =async(category:{name:string; type:string;})=>{
-    const {isAuthenticated} = getKindeServerSession()
+    const {isAuthenticated} = await getKindeServerSession()
     const auth = await isAuthenticated()
     
 
@@ -36,7 +36,7 @@ export const createCategory =async(category:{name:string; type:string;})=>{
 
 }
 export const updateCategory =async(category:{name:string; type:string; id:string})=>{
-    const {isAuthenticated} = getKindeServerSession()
+    const {isAuthenticated} = await getKindeServerSession()
     const auth = await isAuthenticated()
     
 
@@ -67,7 +67,7 @@ export const updateCategory =async(category:{name:string; type:string; id:string
 
 }
 export const deleteCategory =async(id:string)=>{
-    const {isAuthenticated} = getKindeServerSession()
+    const {isAuthenticated} = await getKindeServerSession()
     const auth = await isAuthenticated()
     
 

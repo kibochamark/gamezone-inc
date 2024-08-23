@@ -48,7 +48,7 @@ import {
 import { DataTable } from "../reusables/DataGrid"
 import { columns} from "../Inventory/columns"
 
-export default function PageView() {
+export default function PageView({inventory}:{inventory:any}) {
   return (
     <div className="flex min-h-screen w-full flex-col p-4 gap-2">
       <h2 className="text-titleLarge font-bold mb-4">Dashboard</h2>
@@ -140,7 +140,7 @@ export default function PageView() {
         </div>
 
         <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-2">
-          <div className="overflow-x-scroll col-span-1">
+          <div className="overflow-x-scroll md:overflow-hidden col-span-1">
             <Card
               className="xl:col-span-1" x-chunk="dashboard-01-chunk-4"
             >
@@ -278,7 +278,7 @@ export default function PageView() {
                   </TableRow>
                 </TableBody>
               </Table> */}
-                {/* <DataTable data={inventory} columns={columns} /> */}
+                <DataTable data={inventory} columns={columns} />
               </CardContent>
             </Card>
           </div>

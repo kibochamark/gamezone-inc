@@ -85,11 +85,16 @@ import AddInventory from './AddInventory'
 import EditInventory from './EditInventory'
 import DeleteItems from '../reusables/DeleteItems'
 import { deleteInventory } from './InventoryActions'
+import MakeSale from './MakeSale'
+import { handleSale } from '@/redux/DatatbaleSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/redux/store'
 
 
 
 const PageView = ({ inventory, permissions, category, lowStockSummary, revenue }: { inventory: any; permissions: any; category: any; lowStockSummary: any, revenue: any }) => {
-
+    const dispatch=useDispatch()
+    const issale = useSelector((state:RootState)=>state.datatable.issale)
 
     return (
         <>
@@ -200,9 +205,30 @@ const PageView = ({ inventory, permissions, category, lowStockSummary, revenue }
                                                         </DialogContent>
                                                     </Dialog>
 
-                                                    <EditInventory categories={category}/>
+                                                    <EditInventory categories={category} />
                                                     <DeleteItems path={'/invenrtory'} deletefunc={deleteInventory} />
 
+                                                    <Dialog open={issale} onOpenChange={()=>{
+                                                        dispatch(handleSale({
+                                                            page:"",
+                                                            data:{},
+                                                            issale:false
+
+                                                        }))
+                                                    }}>
+                                                        
+                                                        <DialogContent>
+                                                            <DialogHeader>
+
+                                                                <DialogDescription>
+                                                                    <MakeSale />
+
+
+                                                                </DialogDescription>
+                                                            </DialogHeader>
+                                                        </DialogContent>
+                                                    </Dialog>
+                                                    
                                                 </div>
                                             </div>
                                             <TabsContent value={'all'} >
