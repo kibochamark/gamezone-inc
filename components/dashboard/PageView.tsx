@@ -312,7 +312,7 @@ export default function PageView({ inventory, recentsales }: { inventory: any; r
                     <div className="ml-auto font-medium">{new Intl.NumberFormat("en-US", {
                       style: "currency",
                       currency: "KES",
-                    }).format(sale.quantitySold)}</div>
+                    }).format(sale.priceSold)}</div>
                   </div>
                 )
               }) : <p className="flex items-center justify-center">No recent sales at the moment</p>}
