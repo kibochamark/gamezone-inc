@@ -10,6 +10,7 @@ import Navbar from "@/components/layout/NavBar";
 import { KindeProvider } from "@kinde-oss/kinde-auth-nextjs";
 import { KindeAuthProvider } from "./KindeAuthProvider";
 import { ReduxProvider } from "./ReduxProvider";
+import Footer from "@/components/layout/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -61,6 +62,9 @@ export default function RootLayout({
 
                   <Navbar>
                     {children}
+
+                    <Footer />
+
                   </Navbar>
 
                 </div>
