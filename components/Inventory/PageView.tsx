@@ -255,7 +255,7 @@ const PageView = ({ inventory, permissions, category, lowStockSummary, revenue }
                                                     <DataTable data={inventory} columns={columns} props={
                                                         {
                                                             edit: permissions?.includes("edit:access") || false,
-                                                            delete: permissions?.includes("delete:access") || true,
+                                                            delete: permissions?.includes("delete:access") || false,
                                                             page: "inventory"
                                                         }
                                                     } />
@@ -272,7 +272,7 @@ const PageView = ({ inventory, permissions, category, lowStockSummary, revenue }
                                                     }) ?? []} columns={columns} props={
                                                         {
                                                             edit: permissions?.includes("edit:access") || false,
-                                                            delete: permissions?.includes("delete:access") || true,
+                                                            delete: permissions?.includes("delete:access") || false,
                                                             page: "inventory"
                                                         }
                                                     } />

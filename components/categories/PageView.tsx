@@ -131,7 +131,7 @@ export default function PageView({category, permissions}:{category:any; permissi
                                 <DataTable data={category} columns={columns} props={
                                     {
                                         edit:permissions?.includes("edit:access") || false,
-                                        delete:permissions?.includes("delete:access") || true,
+                                        delete:permissions?.includes("delete:access") || false,
                                         page:"category"
                                     }
                                 } />

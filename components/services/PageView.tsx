@@ -152,7 +152,7 @@ const PageView = ({ services, permissions }: { services: any; permissions: any }
                                             <DataTable data={services} columns={columns} props={
                                                 {
                                                     edit: permissions?.includes("edit:access") || false,
-                                                    delete: permissions?.includes("delete:access") || true,
+                                                    delete: permissions?.includes("delete:access") || false,
                                                     page: "services"
                                                 }
                                             } />
