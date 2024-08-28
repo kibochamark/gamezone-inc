@@ -16,8 +16,8 @@ datasource db {
 model Inventory {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   name          String   @unique
-  category      Category @relation(fields: [categoryId], references: [id])
-  categoryId    String   @db.ObjectId
+  category      Category? @relation(fields: [categoryId], references: [id])
+  categoryId    String?   @db.ObjectId
   quantity      Int
   buyingprice   Float    @default(0.00)
   price         Float

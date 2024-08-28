@@ -2,11 +2,12 @@
 
 import { prisma } from "@/lib/prismaClient"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
+import { revalidatePath } from "next/cache";
+
+export type Inventory = { name: string; price: number, buyingprice: number; threshold: number; quantity: number; categoryId?: string }
 
 
-
-
-export const createInventory = async (inventory: { name: string; price: number, buyingprice: number; threshold: number; quantity: number; categoryId: string }) => {
+export const createInventory = async (inventory: Inventory) => {
     const { isAuthenticated } = await getKindeServerSession()
     const auth = await isAuthenticated()
 
@@ -136,7 +137,7 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
                     where: {
                         id: sale.inventoryId
                     },
-                    data:{
+                    data: {
                         frequencySold: {
                             increment: 1
                         }
@@ -148,6 +149,31 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
 
 
 
+        } catch (e: any) {
+            console.log(e.message)
+            return new Error(e.message)
+        }
+    } else {
+        return new Error("not authenticated")
+    }
+
+}
+
+
+
+
+export const createBulkInventory = async (inventory: Inventory[]) => {
+    const { isAuthenticated } = await getKindeServerSession()
+    const auth = await isAuthenticated()
+
+
+    if (auth) {
+
+        try {
+            for (const item of inventory) {
+                await createInventory(item)
+            }
+            revalidatePath("/inventory")
         } catch (e: any) {
             console.log(e.message)
             return new Error(e.message)

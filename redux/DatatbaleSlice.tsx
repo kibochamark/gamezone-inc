@@ -1,3 +1,4 @@
+import { Inventory } from "@/components/Inventory/InventoryActions";
 import { createSlice } from "@reduxjs/toolkit"
 
 
@@ -7,7 +8,10 @@ export interface DataTableSlice {
     delete: boolean;
     page: string;
     issale: boolean;
-    data: any
+    data: any;
+    isbulk:boolean;
+    isbulkloading:boolean;
+    exceldata:any
 }
 
 // Define the initial state using that type
@@ -16,7 +20,10 @@ const initialState: DataTableSlice = {
     delete: false,
     page: "",
     data: {},
-    issale: false
+    issale: false,
+    isbulk: false,
+    isbulkloading: false,
+    exceldata: []
 }
 
 export const datatableSlice = createSlice({
@@ -38,11 +45,22 @@ export const datatableSlice = createSlice({
             state.page = action.payload.page
             state.issale = action.payload.issale
             state.data = action.payload.data
+        },
+        handleBulk:(state, action)=>{
+            state.page = action.payload.page
+            state.isbulk = action.payload.isbulk
+        },
+        handleExcelData:(state, action)=>{
+            state.exceldata = action.payload
+        },
+        handleLoading:(state)=>{
+            state.isbulkloading =!state.isbulkloading
         }
+
     }
 })
 
-export const { handleDelete, handleEdit, handleSale } = datatableSlice.actions
+export const { handleDelete, handleEdit, handleSale, handleBulk, handleExcelData, handleLoading } = datatableSlice.actions
 
 
 export const DatatableReducer = datatableSlice.reducer

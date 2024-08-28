@@ -8,6 +8,7 @@ import {
     Home,
     LineChart,
     ListFilter,
+    Loader,
     MoreHorizontal,
     Package,
     Package2,
@@ -17,6 +18,7 @@ import {
     Search,
     Settings,
     ShoppingCart,
+    Upload,
     Users2,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -86,15 +88,18 @@ import EditInventory from './EditInventory'
 import DeleteItems from '../reusables/DeleteItems'
 import { deleteInventory } from './InventoryActions'
 import MakeSale from './MakeSale'
-import { handleSale } from '@/redux/DatatbaleSlice'
+import { handleBulk, handleSale } from '@/redux/DatatbaleSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
+import BulkUpload from '../reusables/BulkInputDialog'
 
 
 
 const PageView = ({ inventory, permissions, category, lowStockSummary, revenue }: { inventory: any; permissions: any; category: any; lowStockSummary: any, revenue: any }) => {
-    const dispatch=useDispatch()
-    const issale = useSelector((state:RootState)=>state.datatable.issale)
+    const dispatch = useDispatch()
+    const issale = useSelector((state: RootState) => state.datatable.issale)
+    const isbulkloading = useSelector((state: RootState) => state.datatable.isbulkloading)
+
 
     return (
         <>
@@ -185,6 +190,17 @@ const PageView = ({ inventory, permissions, category, lowStockSummary, revenue }
 
                                                 </TabsList>
                                                 <div className="ml-auto flex items-center gap-2">
+                                                    <Button size="sm" className="h-8 gap-1" onClick={() => {
+                                                        dispatch(handleBulk({
+                                                            page: "inventory",
+                                                            isbulk: true
+                                                        }))
+                                                    }}>
+                                                        <Upload className="h-3.5 w-3.5" />
+                                                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                                                            Bulk Upload
+                                                        </span>
+                                                    </Button>
                                                     <Dialog>
                                                         <DialogTrigger>
 
@@ -204,19 +220,20 @@ const PageView = ({ inventory, permissions, category, lowStockSummary, revenue }
                                                             </DialogHeader>
                                                         </DialogContent>
                                                     </Dialog>
+                                                    <BulkUpload />
 
                                                     <EditInventory categories={category} />
                                                     <DeleteItems path={'/invenrtory'} deletefunc={deleteInventory} />
 
-                                                    <Dialog open={issale} onOpenChange={()=>{
+                                                    <Dialog open={issale} onOpenChange={() => {
                                                         dispatch(handleSale({
-                                                            page:"",
-                                                            data:{},
-                                                            issale:false
+                                                            page: "",
+                                                            data: {},
+                                                            issale: false
 
                                                         }))
                                                     }}>
-                                                        
+
                                                         <DialogContent>
                                                             <DialogHeader>
 
@@ -228,30 +245,38 @@ const PageView = ({ inventory, permissions, category, lowStockSummary, revenue }
                                                             </DialogHeader>
                                                         </DialogContent>
                                                     </Dialog>
-                                                    
+
                                                 </div>
                                             </div>
                                             <TabsContent value={'all'} >
+                                                {isbulkloading ? (
+                                                    <Loader className="w-6 h-6 animate animate-spin text-primary600 flex items-center justify-center" />
+                                                ) : (
+                                                    <DataTable data={inventory} columns={columns} props={
+                                                        {
+                                                            edit: permissions?.includes("edit:access") || false,
+                                                            delete: permissions?.includes("delete:access") || true,
+                                                            page: "inventory"
+                                                        }
+                                                    } />
+                                                )}
 
-                                                <DataTable data={inventory} columns={columns} props={
-                                                    {
-                                                        edit: permissions?.includes("edit:access") || false,
-                                                        delete: permissions?.includes("delete:access") || true,
-                                                        page: "inventory"
-                                                    }
-                                                } />
+
                                             </TabsContent>
                                             <TabsContent value={'lowstock'} >
-
-                                                <DataTable data={inventory.filter((product: any) => {
-                                                    return product.quantity < product.threshold
-                                                }) ?? []} columns={columns} props={
-                                                    {
-                                                        edit: permissions?.includes("edit:access") || false,
-                                                        delete: permissions?.includes("delete:access") || true,
-                                                        page: "inventory"
-                                                    }
-                                                } />
+                                                {isbulkloading ? (
+                                                    <Loader className="w-6 h-6 animate animate-spin text-primary600 flex items-center justify-center" />
+                                                ) : (
+                                                    <DataTable data={inventory.filter((product: any) => {
+                                                        return product.quantity < product.threshold
+                                                    }) ?? []} columns={columns} props={
+                                                        {
+                                                            edit: permissions?.includes("edit:access") || false,
+                                                            delete: permissions?.includes("delete:access") || true,
+                                                            page: "inventory"
+                                                        }
+                                                    } />
+                                                )}
 
 
 
@@ -275,19 +300,33 @@ const PageView = ({ inventory, permissions, category, lowStockSummary, revenue }
                         <p className="text-sm text-muted-foreground">
                             You can start selling as soon as you add a product.
                         </p>
-                        <Dialog>
-                            <DialogTrigger>
-                                <Button className="mt-4 bg-primary500 hover:bg-primary800 transition-all duration-300 text-white">Add Product</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
+                        <div className='flex items-center justify-center gap-4'>
+                            <Button size="sm" className="h-8 gap-1" onClick={() => {
+                                dispatch(handleBulk({
+                                    page: "inventory",
+                                    isbulk: true
+                                }))
+                            }}>
+                                <Upload className="h-3.5 w-3.5" />
+                                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                                    Bulk Upload
+                                </span>
+                            </Button>
+                            <Dialog>
+                                <DialogTrigger>
+                                    <Button className="mt-4 bg-primary500 hover:bg-primary800 transition-all duration-300 text-white">Add Product</Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
 
-                                    <DialogDescription>
-                                        <AddInventory categories={category} />
-                                    </DialogDescription>
-                                </DialogHeader>
-                            </DialogContent>
-                        </Dialog>
+                                        <DialogDescription >
+                                            <AddInventory categories={category} />
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
+
+                        </div>
 
                     </div>
                 </div>
