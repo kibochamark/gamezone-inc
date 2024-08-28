@@ -116,7 +116,7 @@ const PageView = ({ services, permissions }: { services: any; permissions: any }
                                 </CardContent>
                             </Card>
 
-                            <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-2">
+                            <div className="grid lg:col-span-4 md:col-span-2 gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-2">
                                 <div className="overflow-x-scroll md:overflow-hidden col-span-2">
                                     <Card
                                         className="xl:col-span-2" x-chunk="dashboard-01-chunk-4"
@@ -131,7 +131,7 @@ const PageView = ({ services, permissions }: { services: any; permissions: any }
                                             <div className="ml-auto">
                                                 <Dialog>
                                                     <DialogTrigger>
-                                                        <Button className="mt-4 bg-primary500 hover:bg-primary800 transition-all duration-300 text-white">Add Product</Button>
+                                                        <Button className="mt-4 bg-primary500 hover:bg-primary800 transition-all duration-300 text-white">Add Service</Button>
                                                     </DialogTrigger>
                                                     <DialogContent>
                                                         <DialogHeader>
@@ -144,7 +144,7 @@ const PageView = ({ services, permissions }: { services: any; permissions: any }
                                                 </Dialog>
                                             </div>
                                             <Editservice />
-                                            <DeleteItems path={"/services"} deletefunc={deleteService} /> *
+                                            <DeleteItems path={"/services"} deletefunc={deleteService} />
 
                                         </CardHeader>
                                         <CardContent>

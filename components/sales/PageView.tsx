@@ -161,7 +161,7 @@ const PageView = ({sales, permissions}:{sales:any; permissions:any}) => {
 
 
                 <div
-                    className="flex flex-1 p-6 items-center mt-6 justify-center rounded-lg h-[] border border-dashed shadow-sm" x-chunk="dashboard-02-chunk-1"
+                    className="flex flex-1 p-6 items-center mt-6 bg-background justify-center rounded-lg h-[] border border-dashed shadow-sm" x-chunk="dashboard-02-chunk-1"
                 >
                     <div className="flex flex-col items-center gap-1 text-center">
                         <h3 className="text-2xl font-bold tracking-tight">

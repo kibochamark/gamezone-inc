@@ -25,6 +25,7 @@ const DeleteItems = ({path, deletefunc}:{path: string, deletefunc: (id: string) 
     const isdelete = useSelector((state: RootState) => state.datatable.delete)
     const page = useSelector((state: RootState) => state.datatable.page)
 
+
     const handleItemDelete = async () => {
         try {
             const res = await deletefunc(data?.id);

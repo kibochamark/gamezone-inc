@@ -48,6 +48,8 @@ model Sales {
 model Expenses {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   kindeId     String
+  kindeName   String
+  expensename String
   category    Category @relation(fields: [categoryId], references: [id])
   categoryId  String   @db.ObjectId
   amount      Float
