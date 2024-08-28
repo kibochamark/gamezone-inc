@@ -288,14 +288,15 @@ export default function PageView({ inventory, recentsales }: { inventory: any; r
             </CardHeader>
             <CardContent className="grid gap-8 w-full">
               {recentsales.length > 0 ? recentsales.map((sale: {
+                id:any;
                 inventory: {
                   name: string;
                 },
                 priceSold: number;
                 quantitySold: number;
-              }) => {
+              }, idx:number) => {
                 return (
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4" key={idx}>
                     <Avatar className="hidden h-9 w-9 sm:flex">
                       <AvatarImage src="/avatars/01.png" alt="Avatar" />
                       <AvatarFallback>{sale.inventory?.name.charAt(0).toUpperCase()}</AvatarFallback>

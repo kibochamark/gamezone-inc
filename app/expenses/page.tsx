@@ -32,6 +32,7 @@ async function getExpenses() {
                 kindeName: true,
                 category: {
                     select: {
+                        id:true,
                         name: true
                     }
                 },

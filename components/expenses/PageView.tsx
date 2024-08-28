@@ -84,6 +84,7 @@ import {
 import AddExpense from './AddExpense'
 import { deleteExpense } from './ExpenseActions'
 import DeleteItems from '../reusables/DeleteItems'
+import EditExpense from './EditExpense'
 
 
 const PageView = ({ category, expenses, permissions }: { category: any; expenses: any; permissions: any }) => {
@@ -142,7 +143,7 @@ const PageView = ({ category, expenses, permissions }: { category: any; expenses
                                                 </DialogContent>
                                             </Dialog>
                                         </div>
-                                        {/* <Editservice />*/}
+                                        <EditExpense categories={category} />
                                         <DeleteItems path={"/expenses"} deletefunc={deleteExpense} />
 
                                     </CardHeader>

@@ -38,6 +38,41 @@ export const createExpense = async (expense: { name:string; amount: number; desc
     }
 
 }
+export const updateExpense = async (expense: { id:string;name:string; amount: number; description: string, categoryId:string }) => {
+    const { isAuthenticated, getUser } = await getKindeServerSession()
+    const auth = await isAuthenticated()
+    const user = await getUser()
+
+
+    if (auth && user) {
+
+        try {
+            const newexpense = await prisma.expenses.update({
+                where:{
+                    id:expense.id
+                },
+                data: {
+                    amount:expense.amount,
+                    expensename:expense.name,
+                    description:expense.description,
+                    categoryId:expense.categoryId,
+                    // kindeId: user?.id as string,
+                    // kindeName: user?.given_name as string
+                },
+                select: {
+                    id: true
+                }
+            })
+
+        } catch (e: any) {
+            console.log(e.message)
+            return new Error(e.message)
+        }
+    } else {
+        return new Error("not authenticated")
+    }
+
+}
 
 
 // export const updateService = async (service: { id: string; name: string; price: number }) => {
