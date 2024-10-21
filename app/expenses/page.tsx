@@ -67,7 +67,7 @@ async function getExpenseSummary() {
         })
 
         expenses={
-            revenue :totalexpenses?.totalExpenses
+            revenue :totalexpenses?.totalExpenses || 0
         }
 
     } catch (e) {

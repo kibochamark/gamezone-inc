@@ -39,7 +39,7 @@ async function getServicesSummary() {
         })
 
         services={
-            revenue :totalservices?.totalServices
+            revenue :totalservices?.totalServices || 0
         }
 
     } catch (e) {
