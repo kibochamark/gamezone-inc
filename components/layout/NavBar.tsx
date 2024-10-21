@@ -35,7 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 import { usePathname } from 'next/navigation'
 import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components'
 import { useKindeAuth } from "@kinde-oss/kinde-auth-nextjs";
@@ -81,6 +81,8 @@ const Navbar = ({ children }: { children: ReactNode }) => {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
+                                      <SheetClose asChild>
+
               <nav className="grid space-y-4 py-4 gap-2 text-lg font-medium">
                 <Link
                   href="/dashboard"
@@ -141,6 +143,8 @@ const Navbar = ({ children }: { children: ReactNode }) => {
                   Logout
                 </Button>
               </div>
+                                      </SheetClose>
+
             </SheetContent>
           </Sheet>
           <div className="w-full flex-1">
