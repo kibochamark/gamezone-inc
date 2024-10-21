@@ -47,7 +47,7 @@ async function getLowStockSummary() {
     return inventory
 }
 
-async function getLowStock() {
+export async function getLowStock() {
     let inventory: any
     try {
         inventory = await prisma.lowStockSummary.findMany({

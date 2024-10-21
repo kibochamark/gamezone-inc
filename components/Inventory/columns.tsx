@@ -185,7 +185,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
             )
         },
         cell: ({ row }) => {
-            const quantity = row.getValue("quantity") as number;
+            const quantity = row.getValue("inventory.quantity") as number;
             const threshold = row.original.inventory.threshold;
 
             const status = quantity < threshold ? "Low on Stock" : "In Stock";
