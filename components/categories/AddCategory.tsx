@@ -40,7 +40,7 @@ const AddCategory = () => {
         },
         validationSchema: Yup.object().shape({
 
-            name: Yup.string().required().max(10),
+            name: Yup.string().required().max(50),
             type: Yup.string().required()
 
         }),
