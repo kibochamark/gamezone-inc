@@ -86,7 +86,7 @@ const BulkUpload = () => {
             }))
             dispatch(handleExcelData([]))
         }}>
-            <DialogContent>
+            <DialogContent className="overflow-x-scroll">
                 <DialogHeader>
                     <DialogTitle></DialogTitle>
 
