@@ -194,6 +194,14 @@ export const createBulkInventory = async (inventory: Inventory[]) => {
                             id: true
                         }
                     })
+                    if(item.quantity < item.threshold){
+                        await prisma.lowStockSummary.create({
+                            data:{
+                                inventoryId:newinventory.id,
+                                quantity:item.quantity,
+                            }
+                        })
+                    }
                 })
                 // await createInventory(item)
             }

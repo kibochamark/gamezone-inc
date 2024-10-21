@@ -74,7 +74,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { DataTable } from '../reusables/DataGrid'
-import { columns } from './columns'
+import { columns, lowstockcolumns } from './columns'
 import {
     Dialog,
     DialogContent,
@@ -95,7 +95,7 @@ import BulkUpload from '../reusables/BulkInputDialog'
 
 
 
-const PageView = ({ inventory, permissions, category, lowStockSummary, revenue }: { inventory: any; permissions: any; category: any; lowStockSummary: any, revenue: any }) => {
+const PageView = ({ inventory, permissions, category, lowstock, lowStockSummary, revenue }: { inventory: any; lowstock:any; permissions: any; category: any; lowStockSummary: any, revenue: any }) => {
     const dispatch = useDispatch()
     const issale = useSelector((state: RootState) => state.datatable.issale)
     const isbulkloading = useSelector((state: RootState) => state.datatable.isbulkloading)
@@ -267,9 +267,7 @@ const PageView = ({ inventory, permissions, category, lowStockSummary, revenue }
                                                 {isbulkloading ? (
                                                     <Loader className="w-6 h-6 animate animate-spin text-primary600 flex items-center justify-center" />
                                                 ) : (
-                                                    <DataTable data={inventory.filter((product: any) => {
-                                                        return product.quantity < product.threshold
-                                                    }) ?? []} columns={columns} props={
+                                                    <DataTable data={lowstock ?? []} columns={lowstockcolumns} props={
                                                         {
                                                             edit: permissions?.includes("edit:access") || false,
                                                             delete: permissions?.includes("delete:access") || false,
