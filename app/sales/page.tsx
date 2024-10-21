@@ -5,29 +5,29 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import React from 'react'
 
 
-async function getSales(){
-    let sales:any=[]
-    try{
+async function getSales() {
+    let sales: any = []
+    try {
         sales = await prisma.sales.findMany({
-            select:{
-                id:true,
-                inventory:{
-                    select:{
-                        name:true,
-                        threshold:true,
-                        id:true
+            select: {
+                id: true,
+                inventory: {
+                    select: {
+                        name: true,
+                        threshold: true,
+                        id: true
                     }
                 },
-                quantitySold:true,
-                priceSold:true,
-                status:true,
-                type:true,
-                vendor:true,
-                created_at:true
+                quantitySold: true,
+                priceSold: true,
+                status: true,
+                type: true,
+                vendor: true,
+                created_at: true
             }
         })
 
-    }catch(e){
+    } catch (e) {
 
     }
 
@@ -37,38 +37,41 @@ async function getSales(){
 
 
 async function getSalesSummary() {
-    let salesSummary:any=[]
-    try{
+    let salesSummary;
+
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set time to 00:00:00
+
         salesSummary = await prisma.sales.aggregate({
-            where:{
-                created_at:new Date()
+            where: {
+                created_at: {
+                    gte: today,
+                    lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                }
             },
-            _sum:{
-                priceSold:true
+            _sum: {
+                priceSold: true
             }
-            
-        })
-
-    
-
-    }catch(e){
-
+        });
+    } catch (e) {
+        console.error(e); // Log the error for debugging
     }
 
-    return salesSummary
+    return salesSummary;
 }
 
-const page = async() => {
-    const {isAuthenticated, getPermissions} = await getKindeServerSession()
+const page = async () => {
+    const { isAuthenticated, getPermissions } = await getKindeServerSession()
     const sales = await getSales()
     const salesSummary = await getSalesSummary()
-    
+
     const permissions = await getPermissions()
-   
+
     return (
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
-                <PageView sales={sales} salesSummary={salesSummary} permissions={permissions?.permissions}/>
+                <PageView sales={sales} salesSummary={salesSummary} permissions={permissions?.permissions} />
             </div>
 
         </div>
