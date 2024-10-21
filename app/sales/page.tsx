@@ -40,6 +40,9 @@ async function getSalesSummary() {
     let salesSummary:any=[]
     try{
         salesSummary = await prisma.sales.aggregate({
+            where:{
+                created_at:new Date()
+            },
             _sum:{
                 priceSold:true
             }
