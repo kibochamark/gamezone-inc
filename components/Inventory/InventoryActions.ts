@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prismaClient"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
+import { ProductStatus, SaleType } from "@prisma/client";
 import { AwardIcon } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
@@ -221,6 +222,74 @@ export const createSale = async (sale: {
 
 
 
+                }
+            }
+            )
+        } catch (e: any) {
+            console.log(e.message)
+            return new Error(e.message)
+        }
+    } else {
+        return new Error("not authenticated")
+    }
+
+}
+
+
+export const updateSale = async (sale: {
+    id:string;
+    price: number, 
+    quantity: number;
+    threshold: number;
+    saletype: string;
+    status?:string;
+    vendor?: string;
+}) => {
+    const { isAuthenticated, getUser } = await getKindeServerSession()
+    const auth = await isAuthenticated()
+    const user = await getUser()
+
+
+
+
+    if (auth && user) {
+
+        try {
+            await prisma.$transaction(async (tx) => {
+                if (sale.quantity > 0) {
+                    if(sale.saletype =="DEBIT"){
+                        const newinventory = await tx.sales.update({
+                            where:{
+                                id:sale.id
+                            },
+                            data: {
+                                quantitySold: sale.quantity,
+                                priceSold: sale.price,
+                                status:sale.status as ProductStatus,
+                                type:sale.saletype
+                            },
+    
+                            select: {
+                                id: true
+                            }
+                        })
+                    }else{
+                        const newinventory = await tx.sales.update({
+                            where:{
+                                id:sale.id
+                            },
+                            data: {
+                                quantitySold: sale.quantity,
+                                priceSold: sale.price,
+                                vendor:sale.vendor,
+                                type:sale.saletype as SaleType,
+                                status:sale.status as ProductStatus
+                            },
+                            select: {
+                                id: true
+                            }
+                        })
+                    }
                 }
             }
             )

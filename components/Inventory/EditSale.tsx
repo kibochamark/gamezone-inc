@@ -20,7 +20,7 @@ import { redirect, useRouter } from 'next/navigation'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
-import { createInventory, createSale, updateInventory } from './InventoryActions'
+import { createInventory, createSale, updateInventory, updateSale } from './InventoryActions'
 import { Revalidate } from '@/lib/Revalidate'
 import toast from 'react-hot-toast'
 import { handleEdit } from '@/redux/DatatbaleSlice'
@@ -50,7 +50,7 @@ const EditSale = () => {
     // setup our form initial values as well as validation schema
     const formik = useFormik({
         initialValues: {
-            inventoryId: "",
+            id:'',
             price: 0,
             quantity: 1,
             threshold: 0,
@@ -61,7 +61,6 @@ const EditSale = () => {
         },
         validationSchema: Yup.object().shape({
             price: Yup.number().required(),
-            quantity: Yup.number().required().min(1),
             saletype: Yup.string().oneOf(["DEBIT", "CREDIT"]).required(),
             vendor: Yup.string().optional(),
             status:Yup.string().oneOf(["CREDITED", "RETURNED", "SOLD"]).required()
@@ -70,7 +69,7 @@ const EditSale = () => {
             // console.log(values)
             try {
 
-                const res = await createSale({ ...values });
+                const res = await updateSale({ ...values });
                 // console.log(JSON.stringify(res));
 
                 if (res instanceof Error) {
@@ -79,10 +78,10 @@ const EditSale = () => {
 
                 Revalidate("/inventory");
                 Revalidate("/sales");
-                toast.success("Sale created successfully!");
+                toast.success("Sale updated successfully!");
             } catch (error) {
                 // console.error("Error creating category:", error);
-                toast.error("Failed to create sale. Please try again.");
+                toast.error("Failed to update sale. Please try again.");
             }
 
         },
@@ -94,7 +93,7 @@ const EditSale = () => {
     useEffect(() => {
         if (isedit && page === "sales") {
             formik.setValues({
-                inventoryId: editdata?.inventory?.id,
+                id: editdata?.id,
                 price: editdata?.priceSold,
                 quantity: editdata?.quantitySold,
                 threshold: editdata?.inventory?.threshold,
@@ -128,15 +127,7 @@ const EditSale = () => {
                         <DialogDescription className='my-6'>
 
                             <form className="grid gap-4 my-4" method='POST' onSubmit={formik.handleSubmit}>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="quantity mb-2">Sold By</Label>
-                                    <Input
-                                        type="text"
-                                        readOnly
-                                        className='bg-gray-200 text-black'
-                                        required
-                                    />
-                                </div>
+                                
                                 <div className="grid gap-2">
                                     <Label htmlFor="quantity mb-2">Quantity</Label>
                                     {formik.touched.quantity && formik.errors.quantity && (
@@ -146,11 +137,13 @@ const EditSale = () => {
                                         id="quantity"
                                         name='quantity'
                                         type="number"
+                                        readOnly
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
                                         disabled={formik.isSubmitting}
                                         defaultValue={formik.values.quantity}
                                         placeholder=""
+                                        className='bg-gray-100'
                                         required
                                     />
                                 </div>
@@ -164,6 +157,7 @@ const EditSale = () => {
                                         id="price"
                                         name='price'
                                         type="number"
+                                        readOnly
                                         onChange={formik.handleChange}
                                         defaultValue={formik.values.price}
                                         onBlur={formik.handleBlur}
@@ -184,7 +178,7 @@ const EditSale = () => {
                                         <option value="">select a sale type</option>
 
                                         <option value={"DEBIT"}>Debit</option>
-                                        <option value={"CREDIT"}>CREDIT</option>
+                                        <option value={"CREDIT"}>Credit</option>
 
 
                                     </select>
