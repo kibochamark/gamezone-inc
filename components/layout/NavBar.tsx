@@ -8,6 +8,7 @@ import {
   HandCoins,
   Home,
   LineChart,
+  Loader,
   Menu,
   Package,
   Package2,
@@ -40,6 +41,8 @@ import { usePathname } from 'next/navigation'
 import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components'
 import { useKindeAuth } from "@kinde-oss/kinde-auth-nextjs";
 import Image from 'next/image'
+import { useQuery } from '@tanstack/react-query'
+import { prisma } from '@/lib/prismaClient'
 
 const Navbar = ({ children }: { children: ReactNode }) => {
   const path = usePathname()
@@ -59,6 +62,18 @@ const Navbar = ({ children }: { children: ReactNode }) => {
     isAuthenticated,
     error
   } = useKindeAuth();
+
+  const {data, isLoading:Loading, error:queryError} = useQuery({
+    queryKey:["getsalescount"],
+    queryFn:async()=>{
+      let today = new Date()
+      const salecount = await prisma.sales.count({
+        where:{
+          created_at:today
+        }
+      })
+    }
+  })
 
   // if (isLoading) return <div>Loading...</div>;
 
@@ -97,9 +112,12 @@ const Navbar = ({ children }: { children: ReactNode }) => {
                   >
                     <ShoppingCart className="h-4 w-4" />
                     Sales
-                    <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                      6
+                    {Loading ? (<Loader className="bg-primary800 animate animate-spin"/>) : (
+                      <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                    {data ? data :""}
                     </Badge>
+                    )}
+                    
                   </Link>
                   <Link
                     href="/inventory"

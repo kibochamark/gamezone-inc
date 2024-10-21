@@ -17,7 +17,7 @@ const montserrat = Montserrat({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Dantech solutions",
-  description: "we offer cutting edging solutions as well a vast variety of technoloy products to suit your needs",
+  description: "we offer cutting edging solutions as well a vast variety of technology products to suit your needs",
 };
 
 export default function RootLayout({
@@ -25,6 +25,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <html lang="en">
       <body className={cn("min-h-screen relative bg-primary50", montserrat.className)}>
