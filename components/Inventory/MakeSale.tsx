@@ -40,6 +40,7 @@ const MakeSale = () => {
             inventoryId:"",
             price: 0,
             quantity: 1,
+            threshold:0
         },
         validationSchema: Yup.object().shape({
             price: Yup.number().required(),
@@ -71,6 +72,7 @@ const MakeSale = () => {
     useEffect(()=>{
         if(issale && page === "inventory"){
             formik.setFieldValue("inventoryId", data?.id)
+            formik.setFieldValue("threshold", data?.threshold)
         }
     }, [data, issale, page])
     return (

@@ -134,7 +134,7 @@ export const deleteInventory = async (id: string) => {
 }
 
 
-export const createSale = async (sale: { price: number, inventoryId: string; quantity: number }) => {
+export const createSale = async (sale: { price: number, inventoryId: string; quantity: number; threshold:number; }) => {
     const { isAuthenticated, getUser } = await getKindeServerSession()
     const auth = await isAuthenticated()
     const user = await getUser()
@@ -160,69 +160,51 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
                         }
                     })
 
-                    const soldinventory = await tx.inventory.findUnique({
+
+
+                    await tx.inventory.update({
                         where: {
-                            id: newinventory.id
+                            id: sale.inventoryId
                         },
-                        select:{
-                            id:true,
-                            quantity:true,
-                            threshold:true
+                        data: {
+                            frequencySold: {
+                                increment: 1
+                            },
+                            quantity: {
+                                decrement:sale.quantity
+                            }
                         }
                     })
 
-                    if(soldinventory){
-                        let quantity = soldinventory.quantity - sale.quantity
 
-                        await tx.inventory.update({
-                            where: {
-                                id: sale.inventoryId
-                            },
-                            data: {
-                                frequencySold: {
-                                    increment: 1
-                                },
-                                quantity: quantity
+                    if(sale.quantity < sale.threshold){
+                        await tx.lowStockSummary.create({
+                            data:{
+                                inventoryId:sale.inventoryId,
+                                quantity:sale.quantity
                             }
                         })
-    
-                        const lowstock = await tx.lowStockSummary.findFirst({
-                            where: {
-                                inventoryId: soldinventory.id
-                            }
-                        })
-    
-                        if ((quantity < soldinventory.threshold) && !lowstock) {
-    
-    
-                            await tx.lowStockSummary.create({
-                                data: {
-                                    inventoryId: soldinventory.id,
-                                    quantity: quantity
-                                }
-                            })
-    
-    
-                        }
                     }
 
-                  
+
+
                 }
 
 
-            })
+            }
+            )
 
 
 
 
 
 
-        } catch (e: any) {
-            console.log(e.message)
-            return new Error(e.message)
-        }
-    } else {
-        return new Error("not authenticated")
+    } catch (e: any) {
+        console.log(e.message)
+        return new Error(e.message)
+    }
+} else {
+    return new Error("not authenticated")
     }
 
 }
