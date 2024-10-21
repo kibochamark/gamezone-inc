@@ -39,7 +39,7 @@ async function SalesCount(){
 
   // console.log(salecount?._count, 'sal')
 
-  return salecount?._count || 0
+  return salecount?._count?.inventoryId || 0
 }
 
 export default async function RootLayout({
@@ -84,11 +84,11 @@ export default async function RootLayout({
                 <div className="flex w-full">
                   <div className="">
                     <div className="fixed lg:w-[280px] md:w-[220px]">
-                      <SideBar  salecount={salescount}/>
+                      <SideBar  salescount={salescount}/>
                     </div>
                   </div>
 
-                  <Navbar>
+                  <Navbar salescount={salescount}>
                     {children}
 
                     <Footer />
