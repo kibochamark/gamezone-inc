@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prismaClient"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
+import { AwardIcon } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
 export type Inventory = { name: string; price: number, buyingprice: number; threshold: number; quantity: number; categoryId?: string }
@@ -49,22 +50,32 @@ export const updateInventory = async (inventory: { id: string; name: string; pri
     if (auth) {
 
         try {
-            const newinventory = await prisma.inventory.update({
-                where: {
-                    id: inventory.id
-                },
-                data: {
-                    name: inventory.name,
-                    categoryId: inventory.categoryId,
-                    quantity: inventory.quantity,
-                    price: inventory.price,
-                    buyingprice: inventory.buyingprice,
-                    threshold: inventory.threshold
-                },
-                select: {
-                    id: true
+            await prisma.$transaction(async(tx)=>{
+                if(inventory.quantity > inventory.threshold ){
+                    await tx.lowStockSummary.deleteMany({
+                        where:{
+                            inventoryId:inventory.id
+                        }
+                    })
                 }
+                await tx.inventory.update({
+                    where: {
+                        id: inventory.id
+                    },
+                    data: {
+                        name: inventory.name,
+                        categoryId: inventory.categoryId,
+                        quantity: inventory.quantity,
+                        price: inventory.price,
+                        buyingprice: inventory.buyingprice,
+                        threshold: inventory.threshold
+                    },
+                    select: {
+                        id: true
+                    }
+                })
             })
+            
 
 
 

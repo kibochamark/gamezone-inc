@@ -101,6 +101,10 @@ const PageView = ({ inventory, permissions, category, lowstock, lowStockSummary,
     const isbulkloading = useSelector((state: RootState) => state.datatable.isbulkloading)
 
 
+
+    console.log(lowstock, "lowstock")
+
+
     return (
         <>
             {inventory?.length > 0 ? (
