@@ -22,7 +22,8 @@ async function getSales(){
                 priceSold:true,
                 status:true,
                 type:true,
-                vendor:true
+                vendor:true,
+                created_at:true
             }
         })
 

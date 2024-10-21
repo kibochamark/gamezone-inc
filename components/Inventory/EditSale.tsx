@@ -106,7 +106,6 @@ const EditSale = () => {
 
 
 
-    console.log(editdata, "editdT")
 
     return (
         <Dialog open={isedit && page === "sales"} onOpenChange={() => {
