@@ -81,69 +81,69 @@ const Navbar = ({ children }: { children: ReactNode }) => {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
-                                      <SheetClose asChild>
+              <SheetClose>
 
-              <nav className="grid space-y-4 py-4 gap-2 text-lg font-medium">
-                <Link
-                  href="/dashboard"
-                  className={`flex items-center gap-3 ${path.includes("dashboard") && "dark:bg-primary100 text-primary bg-primary50 "} rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
-                >
-                  <Home className="h-4 w-4" />
-                  Dashboard
-                </Link>
-                <Link
-                  href="/sales"
-                  className={`flex items-center gap-3 ${path.includes("sales") && "dark:bg-primary100 text-primary bg-primary50 "} rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
-                >
-                  <ShoppingCart className="h-4 w-4" />
-                  Sales
-                  <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                    6
-                  </Badge>
-                </Link>
-                <Link
-                  href="/inventory"
-                  className={`flex items-center gap-3 ${path.includes("inventory") && "dark:bg-primary100 text-primary bg-primary50 "}rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
-                >
-                  <Package className="h-4 w-4" />
-                  Inventory{" "}
-                </Link>
+                <nav className="grid space-y-4 py-4 gap-2 text-lg font-medium">
+                  <Link
+                    href="/dashboard"
+                    className={`flex items-center gap-3 ${path.includes("dashboard") && "dark:bg-primary100 text-primary bg-primary50 "} rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
+                  >
+                    <Home className="h-4 w-4" />
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/sales"
+                    className={`flex items-center gap-3 ${path.includes("sales") && "dark:bg-primary100 text-primary bg-primary50 "} rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    Sales
+                    <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                      6
+                    </Badge>
+                  </Link>
+                  <Link
+                    href="/inventory"
+                    className={`flex items-center gap-3 ${path.includes("inventory") && "dark:bg-primary100 text-primary bg-primary50 "}rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
+                  >
+                    <Package className="h-4 w-4" />
+                    Inventory{" "}
+                  </Link>
 
-                <Link
-                  href="/services"
-                  className={`flex items-center gap-3 rounded-lg ${path.includes("services") && "dark:bg-primary100 text-primary bg-primary50 "} px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
-                >
-                  <HandCoins className="h-4 w-4" />
-                  Services
-                </Link>
-                <Link
-                  href="/expenses"
-                  className={`flex items-center gap-3 rounded-lg ${path.includes("expenses") && "dark:bg-primary100 text-primary bg-primary50 "} px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
-                >
-                  <CircleDollarSign className="h-4 w-4" />
-                  Expenses
-                </Link>
-                <Link
-                  href="/managecategories"
-                  className={`flex items-center gap-3 rounded-lg ${path.includes("managecategories") && "dark:bg-primary100 text-primary bg-primary50 "} px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
-                >
-                  <PieChart className="h-4 w-4" />
-                  Manage categories
-                </Link>
-                <Link
-                  href="#"
-                  className={`flex items-center gap-3 ${path.includes("reports") && "dark:bg-primary100 text-primary bg-primary50 "} rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
-                >
-                  <LineChart className="h-4 w-4" />
-                  Reports
-                </Link>
-              </nav>
-              <div className="mt-auto">
-                <Button size="sm" className="w-full bg-primary800 hover:bg-primary700">
-                  Logout
-                </Button>
-              </div>
-                                      </SheetClose>
+                  <Link
+                    href="/services"
+                    className={`flex items-center gap-3 rounded-lg ${path.includes("services") && "dark:bg-primary100 text-primary bg-primary50 "} px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
+                  >
+                    <HandCoins className="h-4 w-4" />
+                    Services
+                  </Link>
+                  <Link
+                    href="/expenses"
+                    className={`flex items-center gap-3 rounded-lg ${path.includes("expenses") && "dark:bg-primary100 text-primary bg-primary50 "} px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
+                  >
+                    <CircleDollarSign className="h-4 w-4" />
+                    Expenses
+                  </Link>
+                  <Link
+                    href="/managecategories"
+                    className={`flex items-center gap-3 rounded-lg ${path.includes("managecategories") && "dark:bg-primary100 text-primary bg-primary50 "} px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
+                  >
+                    <PieChart className="h-4 w-4" />
+                    Manage categories
+                  </Link>
+                  <Link
+                    href="#"
+                    className={`flex items-center gap-3 ${path.includes("reports") && "dark:bg-primary100 text-primary bg-primary50 "} rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
+                  >
+                    <LineChart className="h-4 w-4" />
+                    Reports
+                  </Link>
+                </nav>
+                <div className="mt-auto">
+                  <Button size="sm" className="w-full bg-primary800 hover:bg-primary700">
+                    Logout
+                  </Button>
+                </div>
+              </SheetClose>
 
             </SheetContent>
           </Sheet>
