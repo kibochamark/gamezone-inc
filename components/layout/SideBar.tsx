@@ -73,6 +73,8 @@ const SideBar = () => {
             return salecount
         }
     })
+
+    console.log(data, "salecount")
     return (
         <>
             <div className="hidden h-screen bg-background shadow-md border-r-2 md:block ">
