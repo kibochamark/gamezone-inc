@@ -96,8 +96,8 @@ const SideBar = () => {
                             >
                                 <ShoppingCart className="h-4 w-4" />
                                 Sales
-                                {Loading ? (<Loader className="bg-primary800 animate animate-spin" />) : (
-                                    <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                                {Loading ? (<Loader className="bg-primary800 animate animate-spin rounded-full" />) : (
+                                    <Badge className="ml- bg-primary800 text-white flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                                         {data ? data : ""}
                                     </Badge>
                                 )}

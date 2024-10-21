@@ -134,7 +134,7 @@ export const deleteInventory = async (id: string) => {
 }
 
 
-export const createSale = async (sale: { price: number, inventoryId: string; quantity: number; threshold:number; }) => {
+export const createSale = async (sale: { price: number, inventoryId: string; quantity: number; threshold: number; }) => {
     const { isAuthenticated, getUser } = await getKindeServerSession()
     const auth = await isAuthenticated()
     const user = await getUser()
@@ -171,17 +171,17 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
                                 increment: 1
                             },
                             quantity: {
-                                decrement:sale.quantity
+                                decrement: sale.quantity
                             }
                         }
                     })
 
 
-                    if(sale.quantity < sale.threshold){
+                    if (sale.quantity < sale.threshold) {
                         await tx.lowStockSummary.create({
-                            data:{
-                                inventoryId:sale.inventoryId,
-                                quantity:sale.quantity
+                            data: {
+                                inventoryId: sale.inventoryId,
+                                quantity: sale.quantity
                             }
                         })
                     }
@@ -189,22 +189,14 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
 
 
                 }
-
-
             }
             )
-
-
-
-
-
-
-    } catch (e: any) {
-        console.log(e.message)
-        return new Error(e.message)
-    }
-} else {
-    return new Error("not authenticated")
+        } catch (e: any) {
+            console.log(e.message)
+            return new Error(e.message)
+        }
+    } else {
+        return new Error("not authenticated")
     }
 
 }
