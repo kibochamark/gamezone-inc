@@ -99,7 +99,7 @@ const PageView = ({ sales, permissions, salesSummary }: { sales: any; permission
                                     <DollarSign className="h-4 w-4 text-primary500" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold text-primary600">
+                                    <div className="md:text-2xl text-md font-bold text-primary600">
                                         {new Intl.NumberFormat("en-US", {
                                             style: "currency",
                                             currency: "KES",
@@ -119,7 +119,7 @@ const PageView = ({ sales, permissions, salesSummary }: { sales: any; permission
                                     <DollarSign className="h-4 w-4 text-primary500" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold text-primary600">$45,231.89</div>
+                                    <div className="md:text-2xl text-md font-bold text-primary600">$45,231.89</div>
                                     <p className="text-xs text-muted-foreground">
                                         today
                                     </p>
