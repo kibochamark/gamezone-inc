@@ -58,6 +58,12 @@ async function getSalesSummary() {
         });
 
         const buyingprice = await prisma.sales.findMany({
+            where: {
+                created_at: {
+                    gte: today,
+                    lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                }
+            },
             select: {
                 inventory: {
                     select: {
