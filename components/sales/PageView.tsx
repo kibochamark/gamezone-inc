@@ -75,6 +75,7 @@ import { DataTable } from '../reusables/DataGrid'
 import { columns } from './columns'
 import DeleteItems from '../reusables/DeleteItems'
 import { deleteSale } from './SalesActions'
+import EditSale from '../Inventory/EditSale'
 
 
 
@@ -144,6 +145,7 @@ const PageView = ({ sales, permissions, salesSummary }: { sales: any; permission
                                         </div>
                                         {/* <AddCategory />
                                      <EditCategory/> */}
+                                        <EditSale />
                                         <DeleteItems path={"/sales"} deletefunc={deleteSale} />
 
                                     </CardHeader>
