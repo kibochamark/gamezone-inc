@@ -60,11 +60,17 @@ const SideBar = () => {
         queryKey: ["getsalescount"],
         queryFn: async () => {
             let today = new Date()
+            today.setHours(0,0,0)
             const salecount = await prisma.sales.count({
                 where: {
-                    created_at: today
+                    created_at: {
+                        gte: today,
+                        lt: new Date(today.getTime() + 86400000)
+                    }
                 }
             })
+
+            return salecount
         }
     })
     return (
@@ -96,7 +102,7 @@ const SideBar = () => {
                             >
                                 <ShoppingCart className="h-4 w-4" />
                                 Sales
-                                {Loading ? (<Loader className="bg-primary800 animate animate-spin rounded-full" />) : (
+                                {Loading ? (<Loader className="text-white animate animate-spin rounded-full" />) : (
                                     <Badge className="ml- bg-primary800 text-white flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                                         {data ? data : ""}
                                     </Badge>
