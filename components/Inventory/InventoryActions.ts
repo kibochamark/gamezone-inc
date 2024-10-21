@@ -16,7 +16,7 @@ export const createInventory = async (inventory: Inventory) => {
     if (auth) {
 
         try {
-            await prisma.$transaction(async(tx)=>{
+            await prisma.$transaction(async (tx) => {
                 const newinventory = await tx.inventory.create({
                     data: {
                         name: inventory.name,
@@ -31,16 +31,16 @@ export const createInventory = async (inventory: Inventory) => {
                     }
                 })
 
-                if(inventory.quantity < inventory.threshold){
+                if (inventory.quantity < inventory.threshold) {
                     await tx.lowStockSummary.create({
-                        data:{
-                            inventoryId:newinventory.id,
-                            quantity:inventory.quantity
+                        data: {
+                            inventoryId: newinventory.id,
+                            quantity: inventory.quantity
                         }
                     })
                 }
             })
-            
+
 
 
 
@@ -62,11 +62,11 @@ export const updateInventory = async (inventory: { id: string; name: string; pri
     if (auth) {
 
         try {
-            await prisma.$transaction(async(tx)=>{
-                if(inventory.quantity > inventory.threshold ){
+            await prisma.$transaction(async (tx) => {
+                if (inventory.quantity > inventory.threshold) {
                     await tx.lowStockSummary.deleteMany({
-                        where:{
-                            inventoryId:inventory.id
+                        where: {
+                            inventoryId: inventory.id
                         }
                     })
                 }
@@ -87,7 +87,7 @@ export const updateInventory = async (inventory: { id: string; name: string; pri
                     }
                 })
             })
-            
+
 
 
 
@@ -109,17 +109,17 @@ export const deleteInventory = async (id: string) => {
     if (auth) {
 
         try {
-            await prisma.$transaction(async(tx)=>{
+            await prisma.$transaction(async (tx) => {
                 const newinventory = await prisma.inventory.delete({
                     where: {
                         id
                     },
-                    
-    
+
+
                 })
                 await tx.lowStockSummary.deleteMany({
-                    where:{
-                        inventoryId:id
+                    where: {
+                        inventoryId: id
                     }
                 })
             })
@@ -145,32 +145,63 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
     if (auth && user) {
 
         try {
-            const newinventory = await prisma.sales.create({
-                data: {
-                    inventoryId: sale.inventoryId,
-                    quantitySold: sale.quantity,
-                    kindeId: user?.id,
-                    priceSold: sale.price
-                },
+            await prisma.$transaction(async (tx) => {
+                if (sale.quantity > 0) {
+                    const newinventory = await tx.sales.create({
+                        data: {
+                            inventoryId: sale.inventoryId,
+                            quantitySold: sale.quantity,
+                            kindeId: user?.id,
+                            priceSold: sale.price
+                        },
 
-                select: {
-                    id: true
+                        select: {
+                            id: true
+                        }
+                    })
+
+                    const soldinventory = await tx.inventory.findUnique({
+                        where: {
+                            id: newinventory.id
+                        }
+                    })
+
+
+                    await tx.inventory.update({
+                        where: {
+                            id: sale.inventoryId
+                        },
+                        data: {
+                            frequencySold: {
+                                increment: 1
+                            },
+                            quantity: ((soldinventory?.quantity as number) - sale.quantity)
+                        }
+                    })
+
+                    const lowstock = await tx.lowStockSummary.findFirst({
+                        where: {
+                            inventoryId: soldinventory?.id
+                        }
+                    })
+
+                    if ((((soldinventory?.quantity as number) - sale.quantity) < (soldinventory?.threshold as number)) && !lowstock) {
+
+
+                        await tx.lowStockSummary.create({
+                            data: {
+                                inventoryId: soldinventory?.id as string,
+                                quantity: ((soldinventory?.quantity as number) - sale.quantity)
+                            }
+                        })
+
+
+                    }
                 }
+
+
             })
 
-            if (newinventory.id) {
-
-                await prisma.inventory.update({
-                    where: {
-                        id: sale.inventoryId
-                    },
-                    data: {
-                        frequencySold: {
-                            increment: 1
-                        }
-                    }
-                })
-            }
 
 
 
@@ -190,12 +221,12 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
 
 
 export const createBulkInventory = async (inventory: {
-    Name:string;
-    BuyingPrice:number;
-    SellingPrice:number;
-    Quantity:number;
-    Threshold:number;
-    Category:string;
+    Name: string;
+    BuyingPrice: number;
+    SellingPrice: number;
+    Quantity: number;
+    Threshold: number;
+    Category: string;
 }[]) => {
     const { isAuthenticated } = await getKindeServerSession()
     const auth = await isAuthenticated()
@@ -205,13 +236,13 @@ export const createBulkInventory = async (inventory: {
 
         try {
             for (const item of inventory) {
-                await prisma.$transaction(async(tx)=>{
+                await prisma.$transaction(async (tx) => {
                     const category = await tx.category.findUnique({
-                        where:{
-                            name:item.Category
+                        where: {
+                            name: item.Category
                         },
-                        select:{
-                            id:true
+                        select: {
+                            id: true
                         }
                     })
 
@@ -228,11 +259,11 @@ export const createBulkInventory = async (inventory: {
                             id: true
                         }
                     })
-                    if(item.Quantity < item.Threshold){
+                    if (item.Quantity < item.Threshold) {
                         await prisma.lowStockSummary.create({
-                            data:{
-                                inventoryId:newinventory.id,
-                                quantity:item.Quantity,
+                            data: {
+                                inventoryId: newinventory.id,
+                                quantity: item.Quantity,
                             }
                         })
                     }

@@ -8,6 +8,7 @@ import {
     HandCoins,
     Home,
     LineChart,
+    Loader,
     Menu,
     Package,
     Package2,
@@ -39,10 +40,11 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { usePathname } from 'next/navigation'
 import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components'
 import { prisma } from '@/lib/prismaClient'
+import { useQuery } from '@tanstack/react-query'
 
 
 const SideBar = () => {
-    const path= usePathname()
+    const path = usePathname()
     // const [sales, setSales]= useState(0)
     // useEffect(()=>{
     //     const number = async()=>{
@@ -53,6 +55,18 @@ const SideBar = () => {
     //     number()
 
     // },[path])
+
+    const { data, isLoading: Loading, error: queryError } = useQuery({
+        queryKey: ["getsalescount"],
+        queryFn: async () => {
+            let today = new Date()
+            const salecount = await prisma.sales.count({
+                where: {
+                    created_at: today
+                }
+            })
+        }
+    })
     return (
         <>
             <div className="hidden h-screen bg-background shadow-md border-r-2 md:block ">
@@ -82,6 +96,11 @@ const SideBar = () => {
                             >
                                 <ShoppingCart className="h-4 w-4" />
                                 Sales
+                                {Loading ? (<Loader className="bg-primary800 animate animate-spin" />) : (
+                                    <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                                        {data ? data : ""}
+                                    </Badge>
+                                )}
                                 {/* <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                                     {sales}
                                 </Badge> */}
@@ -93,7 +112,7 @@ const SideBar = () => {
                                 <Package className="h-4 w-4" />
                                 Inventory{" "}
                             </Link>
-                      
+
                             <Link
                                 href="/services"
                                 className={`flex items-center gap-3 rounded-lg ${path.includes("services") && "dark:bg-primary100 text-primary bg-primary50 "} px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
@@ -127,7 +146,7 @@ const SideBar = () => {
                     <div className="mt-auto p-4">
 
                         <Button size="sm" className="w-full bg-primary800 hover:bg-primary700">
-                        <LogoutLink>Log out</LogoutLink>
+                            <LogoutLink>Log out</LogoutLink>
                         </Button>
 
                     </div>
