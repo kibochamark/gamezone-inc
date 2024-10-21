@@ -163,6 +163,10 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
                     const soldinventory = await tx.inventory.findUnique({
                         where: {
                             id: newinventory.id
+                        },
+                        select:{
+                            id:true,
+                            quantity:true
                         }
                     })
 
