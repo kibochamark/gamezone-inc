@@ -38,7 +38,10 @@ async function getSalesSummary() {
             _sum:{
                 priceSold:true
             }
+            
         })
+
+    
 
     }catch(e){
 
