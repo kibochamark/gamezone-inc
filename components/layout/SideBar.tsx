@@ -70,6 +70,9 @@ const SideBar = () => {
                 }
             })
 
+
+            console.log(salecount, 'sal')
+
             return salecount
         }
     })
