@@ -287,7 +287,9 @@ const HandleButtonSell = ({row}:{row:{original:any}})=>{
                 issale:true,
                 page:"inventory"
             }))
-        }} size={"sm"} className="text-green-500 bg-white hover:bg-green-500 transition-all duration-300 hover:text-white border border-green-500 text-titleSmall">sell</Button>
+        }}
+        disabled={row.original.quantity == 0}
+        size={"sm"} className="text-green-500 bg-white disabled:bg-gray-300 disabled:text-black hover:bg-green-500 transition-all duration-300 hover:text-white border border-green-500 text-titleSmall">sell</Button>
     )
 }
 
@@ -300,7 +302,9 @@ const HandleButtonSellLowStock = ({row}:{row:{original:any}})=>{
                 issale:true,
                 page:"inventory"
             }))
-        }} size={"sm"} className="text-green-500 bg-white hover:bg-green-500 transition-all duration-300 hover:text-white border border-green-500 text-titleSmall">sell</Button>
+        }}
+        disabled={row.original.quantity == 0}
+        size={"sm"} className="text-green-500 bg-white disabled:bg-gray-300 disabled:text-black hover:bg-green-500 transition-all duration-300 hover:text-white border border-green-500 text-titleSmall">sell</Button>
     )
 }
 
