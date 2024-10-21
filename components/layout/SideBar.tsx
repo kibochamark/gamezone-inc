@@ -61,19 +61,22 @@ const SideBar = () => {
         queryFn: async () => {
             let today = new Date()
             today.setHours(0,0,0)
-            const salecount = await prisma.sales.count({
+            const salecount = await prisma.sales.aggregate({
                 where: {
                     created_at: {
                         gte: today,
                         lt: new Date(today.getTime() + 86400000)
                     }
+                },
+                _count:{
+                    inventoryId:true
                 }
             })
 
 
-            console.log(salecount, 'sal')
+            console.log(salecount?._count, 'sal')
 
-            return salecount
+            return salecount?._count
         }
     })
 
