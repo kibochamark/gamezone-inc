@@ -314,55 +314,61 @@ export const createBulkInventory = async (inventory: {
     Threshold: number;
     Category: string;
 }[]) => {
-    const { isAuthenticated } = await getKindeServerSession()
-    const auth = await isAuthenticated()
-
+    const { isAuthenticated } = await getKindeServerSession();
+    const auth = await isAuthenticated();
 
     if (auth) {
-
         try {
-            for (const item of inventory) {
-                await prisma.$transaction(async (tx) => {
-                    const category = await tx.category.findUnique({
-                        where: {
-                            name: item.Category
-                        },
-                        select: {
-                            id: true
-                        }
-                    })
+            // Set batch size
+            const batchSize = 10; // Adjust based on your environment
+            for (let i = 0; i < inventory.length; i += batchSize) {
+                const batch = inventory.slice(i, i + batchSize);
 
-                    const newinventory = await tx.inventory.create({
-                        data: {
-                            name: item.Name,
-                            categoryId: category?.id,
-                            quantity: item.Quantity,
-                            price: item.BuyingPrice,
-                            buyingprice: item.SellingPrice,
-                            threshold: item.Threshold
-                        },
-                        select: {
-                            id: true
-                        }
-                    })
-                    if (item.Quantity < item.Threshold) {
-                        await prisma.lowStockSummary.create({
-                            data: {
-                                inventoryId: newinventory.id,
-                                quantity: item.Quantity,
+                // Use Promise.all to handle the batch concurrently
+                await Promise.all(batch.map(async (item) => {
+                    await prisma.$transaction(async (tx) => {
+                        const category = await tx.category.findUnique({
+                            where: {
+                                name: item.Category
+                            },
+                            select: {
+                                id: true
                             }
-                        })
-                    }
-                })
-                // await createInventory(item)
+                        });
+
+                        const newInventory = await tx.inventory.create({
+                            data: {
+                                name: item.Name,
+                                categoryId: category?.id,
+                                quantity: item.Quantity,
+                                price: item.BuyingPrice,
+                                buyingprice: item.SellingPrice,
+                                threshold: item.Threshold
+                            },
+                            select: {
+                                id: true
+                            }
+                        });
+
+                        if (item.Quantity < item.Threshold) {
+                            await tx.lowStockSummary.create({
+                                data: {
+                                    inventoryId: newInventory.id,
+                                    quantity: item.Quantity,
+                                }
+                            });
+                        }
+                    });
+                }));
             }
-            revalidatePath("/inventory")
+
+            // Revalidate after all batches are done
+            revalidatePath("/inventory");
         } catch (e: any) {
-            console.log(e.message)
-            return new Error(e.message)
+            console.log(e.message);
+            return new Error(e.message);
         }
     } else {
-        return new Error("not authenticated")
+        return new Error("Not authenticated");
     }
-
-}
+};
