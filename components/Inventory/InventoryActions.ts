@@ -171,37 +171,42 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
                         }
                     })
 
+                    if(soldinventory){
+                        let quantity = soldinventory.quantity - sale.quantity
 
-                    await tx.inventory.update({
-                        where: {
-                            id: sale.inventoryId
-                        },
-                        data: {
-                            frequencySold: {
-                                increment: 1
+                        await tx.inventory.update({
+                            where: {
+                                id: sale.inventoryId
                             },
-                            quantity: ((soldinventory?.quantity as number) - sale.quantity)
-                        }
-                    })
-
-                    const lowstock = await tx.lowStockSummary.findFirst({
-                        where: {
-                            inventoryId: soldinventory?.id
-                        }
-                    })
-
-                    if ((((soldinventory?.quantity as number) - sale.quantity) < (soldinventory?.threshold as number)) && !lowstock) {
-
-
-                        await tx.lowStockSummary.create({
                             data: {
-                                inventoryId: soldinventory?.id as string,
-                                quantity: ((soldinventory?.quantity as number) - sale.quantity)
+                                frequencySold: {
+                                    increment: 1
+                                },
+                                quantity: quantity
                             }
                         })
-
-
+    
+                        const lowstock = await tx.lowStockSummary.findFirst({
+                            where: {
+                                inventoryId: soldinventory.id
+                            }
+                        })
+    
+                        if ((quantity < soldinventory.threshold) && !lowstock) {
+    
+    
+                            await tx.lowStockSummary.create({
+                                data: {
+                                    inventoryId: soldinventory.id,
+                                    quantity: quantity
+                                }
+                            })
+    
+    
+                        }
                     }
+
+                  
                 }
 
 
