@@ -16,19 +16,31 @@ export const createInventory = async (inventory: Inventory) => {
     if (auth) {
 
         try {
-            const newinventory = await prisma.inventory.create({
-                data: {
-                    name: inventory.name,
-                    categoryId: inventory.categoryId,
-                    quantity: inventory.quantity,
-                    price: inventory.price,
-                    buyingprice: inventory.buyingprice,
-                    threshold: inventory.threshold
-                },
-                select: {
-                    id: true
+            await prisma.$transaction(async(tx)=>{
+                const newinventory = await tx.inventory.create({
+                    data: {
+                        name: inventory.name,
+                        categoryId: inventory.categoryId,
+                        quantity: inventory.quantity,
+                        price: inventory.price,
+                        buyingprice: inventory.buyingprice,
+                        threshold: inventory.threshold
+                    },
+                    select: {
+                        id: true
+                    }
+                })
+
+                if(inventory.quantity < inventory.threshold){
+                    await tx.lowStockSummary.create({
+                        data:{
+                            inventoryId:newinventory.id,
+                            quantity:inventory.quantity
+                        }
+                    })
                 }
             })
+            
 
 
 
@@ -97,16 +109,20 @@ export const deleteInventory = async (id: string) => {
     if (auth) {
 
         try {
-            const newinventory = await prisma.inventory.delete({
-                where: {
-                    id
-                },
-
+            await prisma.$transaction(async(tx)=>{
+                const newinventory = await prisma.inventory.delete({
+                    where: {
+                        id
+                    },
+                    
+    
+                })
+                await tx.lowStockSummary.deleteMany({
+                    where:{
+                        inventoryId:id
+                    }
+                })
             })
-
-
-
-
         } catch (e: any) {
             console.log(e.message)
             return new Error(e.message)
