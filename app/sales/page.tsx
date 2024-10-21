@@ -29,16 +29,35 @@ async function getSales(){
     return sales
 }
 
+
+
+async function getSalesSummary() {
+    let salesSummary:any=[]
+    try{
+        salesSummary = await prisma.sales.aggregate({
+            _sum:{
+                priceSold:true
+            }
+        })
+
+    }catch(e){
+
+    }
+
+    return salesSummary
+}
+
 const page = async() => {
     const {isAuthenticated, getPermissions} = await getKindeServerSession()
     const sales = await getSales()
+    const salesSummary = await getSalesSummary()
     
     const permissions = await getPermissions()
    
     return (
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
-                <PageView sales={sales} permissions={permissions?.permissions}/>
+                <PageView sales={sales} salesSummary={salesSummary} permissions={permissions?.permissions}/>
             </div>
 
         </div>

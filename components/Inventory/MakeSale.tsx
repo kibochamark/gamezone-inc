@@ -50,8 +50,9 @@ const MakeSale = () => {
         onSubmit: async (values, formikHelpers) => {
             // console.log(values)
             try {
+                
                 const res = await createSale({ ...values });
-                console.log(JSON.stringify(res));
+                // console.log(JSON.stringify(res));
 
                 if (res instanceof Error) {
                     throw res;

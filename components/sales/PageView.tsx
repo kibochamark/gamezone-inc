@@ -78,7 +78,7 @@ import { deleteSale } from './SalesActions'
 
 
 
-const PageView = ({sales, permissions}:{sales:any; permissions:any}) => {
+const PageView = ({ sales, permissions, salesSummary }: { sales: any; permissions: any; salesSummary: any }) => {
 
 
     return (
@@ -97,7 +97,13 @@ const PageView = ({sales, permissions}:{sales:any; permissions:any}) => {
                                     <DollarSign className="h-4 w-4 text-primary500" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold text-primary600">$45,231.89</div>
+                                    <div className="text-2xl font-bold text-primary600">$45,231.89
+                                        {new Intl.NumberFormat("en-US", {
+                                            style: "currency",
+                                            currency: "KES",
+                                        }).format(parseFloat(salesSummary))}
+
+                                    </div>
                                     <p className="text-xs text-muted-foreground">
                                         today
                                     </p>
@@ -137,7 +143,7 @@ const PageView = ({sales, permissions}:{sales:any; permissions:any}) => {
                                         </div>
                                         {/* <AddCategory />
                                      <EditCategory/> */}
-                                     <DeleteItems path={"/sales"} deletefunc={deleteSale} />
+                                        <DeleteItems path={"/sales"} deletefunc={deleteSale} />
 
                                     </CardHeader>
                                     <CardContent>
@@ -170,7 +176,7 @@ const PageView = ({sales, permissions}:{sales:any; permissions:any}) => {
                         <p className="text-sm text-muted-foreground">
                             You can start selling as soon as you add a product.
                         </p>
-                        <Link  href="/inventory" className="mt-4 bg-primary500 p-2 rounded-md hover:bg-primary800 transition-all duration-300 text-white">make a sale</Link>
+                        <Link href="/inventory" className="mt-4 bg-primary500 p-2 rounded-md hover:bg-primary800 transition-all duration-300 text-white">make a sale</Link>
                     </div>
                 </div>
 
