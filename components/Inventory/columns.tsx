@@ -185,8 +185,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
             )
         },
         cell: ({ row }) => {
-            console.log(row.original, row.getValue("quantity"), row.getValue("inventory.quantity"), "columns")
-            const quantity = row.getValue("inventory.quantity") as number;
+            const quantity = row.original.inventory.quantity;
             const threshold = row.original.inventory.threshold;
 
             const status = quantity < threshold ? "Low on Stock" : "In Stock";
@@ -210,7 +209,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
             )
         },
         cell: ({ row }) => {
-            const amount = parseFloat(row.getValue("inventory.buyingprice"))
+            const amount = parseFloat((row.original.inventory.buyingprice).toString())
             const formatted = new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "KES",
@@ -229,7 +228,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
             )
         },
         cell: ({ row }) => {
-            const amount = parseFloat(row.getValue("inventory.price"))
+            const amount = parseFloat(row.original.inventory.price.toString())
             const formatted = new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "KES",
@@ -248,7 +247,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
             )
         },
         cell: ({ row }) => {
-            const createdAt = new Date(row.getValue("inventory.created_at"));
+            const createdAt = new Date(row.original.inventory.created_at);
             const formattedDate = createdAt.toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
