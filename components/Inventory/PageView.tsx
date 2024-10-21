@@ -102,7 +102,6 @@ const PageView = ({ inventory, permissions, category, lowstock, lowStockSummary,
 
 
 
-    console.log(lowstock, "lowstock")
 
 
     return (
