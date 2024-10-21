@@ -162,7 +162,14 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
 
 
 
-export const createBulkInventory = async (inventory: Inventory[]) => {
+export const createBulkInventory = async (inventory: {
+    Name:string;
+    BuyingPrice:number;
+    SellingPrice:number;
+    Quantity:number;
+    Threshold:number;
+    Category:string;
+}[]) => {
     const { isAuthenticated } = await getKindeServerSession()
     const auth = await isAuthenticated()
 
@@ -174,7 +181,7 @@ export const createBulkInventory = async (inventory: Inventory[]) => {
                 await prisma.$transaction(async(tx)=>{
                     const category = await tx.category.findUnique({
                         where:{
-                            name:item.categoryId
+                            name:item.Category
                         },
                         select:{
                             id:true
@@ -183,22 +190,22 @@ export const createBulkInventory = async (inventory: Inventory[]) => {
 
                     const newinventory = await tx.inventory.create({
                         data: {
-                            name: item.name,
+                            name: item.Name,
                             categoryId: category?.id,
-                            quantity: item.quantity,
-                            price: item.price,
-                            buyingprice: item.buyingprice,
-                            threshold: item.threshold
+                            quantity: item.Quantity,
+                            price: item.BuyingPrice,
+                            buyingprice: item.SellingPrice,
+                            threshold: item.Threshold
                         },
                         select: {
                             id: true
                         }
                     })
-                    if(item.quantity < item.threshold){
+                    if(item.Quantity < item.Threshold){
                         await prisma.lowStockSummary.create({
                             data:{
                                 inventoryId:newinventory.id,
-                                quantity:item.quantity,
+                                quantity:item.Quantity,
                             }
                         })
                     }

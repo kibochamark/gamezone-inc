@@ -64,7 +64,14 @@ const BulkUpload = () => {
         try {
             if (data.length > 0) {
                 console.log(data)
-                await createBulkInventory(data as Inventory[])
+                await createBulkInventory(data as {
+                    Name:string;
+                    BuyingPrice:number;
+                    SellingPrice:number;
+                    Quantity:number;
+                    Threshold:number;
+                    Category:string;
+                }[])
                 toast.success("data uploaded successfully")
             }
 
