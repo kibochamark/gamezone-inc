@@ -79,7 +79,7 @@ import { deleteSale } from './SalesActions'
 
 
 const PageView = ({ sales, permissions, salesSummary }: { sales: any; permissions: any; salesSummary: any }) => {
-    console.log(salesSummary,"sales")
+
 
 
     return (

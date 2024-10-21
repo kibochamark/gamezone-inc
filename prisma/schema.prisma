@@ -14,18 +14,18 @@ datasource db {
 }
 
 model Inventory {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  name          String   @unique
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String    @unique
   category      Category? @relation(fields: [categoryId], references: [id])
   categoryId    String?   @db.ObjectId
   quantity      Int
-  buyingprice   Float    @default(0.00)
+  buyingprice   Float     @default(0.00)
   price         Float
   threshold     Int
-  frequencySold Int      @default(0)
-  credited      Boolean  @default(false)
-  created_at    DateTime @default(now())
-  updated_at    DateTime @default(now())
+  frequencySold Int       @default(0)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 
   Sales Sales[]
 
@@ -34,15 +34,31 @@ model Inventory {
   CreditedSummary CreditedSummary[]
 }
 
+enum ProductStatus {
+  SOLD
+  RETURNED
+  CREDITED
+}
+
+enum SaleType {
+  DEBIT
+  CREDIT
+}
+
 model Sales {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  inventory    Inventory @relation(fields: [inventoryId], references: [id])
-  inventoryId  String    @db.ObjectId
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  inventory    Inventory     @relation(fields: [inventoryId], references: [id])
+  inventoryId  String        @db.ObjectId
   kindeId      String
   quantitySold Int
   priceSold    Float
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @default(now())
+  // credit columns
+  type         SaleType      @default(DEBIT)
+  status       ProductStatus @default(SOLD)
+  vendor       String? //person credited to
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
 }
 
 model Expenses {

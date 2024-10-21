@@ -22,6 +22,7 @@ import { Revalidate } from '@/lib/Revalidate'
 import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
+import { SaleType } from '@prisma/client'
 
 
 
@@ -29,28 +30,32 @@ import { RootState } from '@/redux/store'
 const MakeSale = () => {
     const router = useRouter()
 
-    const data= useSelector((state:RootState)=> state.datatable.data)
-    const issale= useSelector((state:RootState)=> state.datatable.issale)
-    const page= useSelector((state:RootState)=> state.datatable.page)
+    const data = useSelector((state: RootState) => state.datatable.data)
+    const issale = useSelector((state: RootState) => state.datatable.issale)
+    const page = useSelector((state: RootState) => state.datatable.page)
 
 
     // setup our form initial values as well as validation schema
     const formik = useFormik({
         initialValues: {
-            inventoryId:"",
+            inventoryId: "",
             price: 0,
             quantity: 1,
-            threshold:0
+            threshold: 0,
+            saletype:'',
+            vendor:''
+
         },
         validationSchema: Yup.object().shape({
             price: Yup.number().required(),
             quantity: Yup.number().required().min(1),
-           
+            saletype: Yup.string().oneOf(["DEBIT", "CREDIT"]).required(),
+            vendor:Yup.string().optional()
         }),
         onSubmit: async (values, formikHelpers) => {
             // console.log(values)
             try {
-                
+
                 const res = await createSale({ ...values });
                 // console.log(JSON.stringify(res));
 
@@ -70,8 +75,8 @@ const MakeSale = () => {
 
     })
 
-    useEffect(()=>{
-        if(issale && page === "inventory"){
+    useEffect(() => {
+        if (issale && page === "inventory") {
             formik.setFieldValue("inventoryId", data?.id)
             formik.setFieldValue("threshold", data?.threshold)
         }
@@ -119,9 +124,49 @@ const MakeSale = () => {
                     required
                 />
             </div>
-           
-            
-            
+
+
+            <div>
+                <Label htmlFor="categoryId mb-2">Sale Type</Label>
+                {formik.touched.saletype && formik.errors.saletype && (
+                    <p className='text-sm text-red-600 tracking-tight leading-tight'>{formik.errors.saletype}</p>
+                )}
+                <select id="categoryId" name='categoryId' defaultValue={formik.values.saletype} onChange={formik.handleChange} onBlur={formik.handleBlur} disabled={formik.isSubmitting} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <option value="">select a sale type</option>
+
+                    <option value={"DEBIT"}>Debit</option>
+                    <option value={"CREDIT"}>CREDIT</option>
+
+
+                </select>
+            </div>
+
+
+            {formik.values.saletype === "CREDIT" && (
+                <div className="grid gap-2">
+                    <Label htmlFor="vendor">Vendor Name</Label>
+                    {formik.touched.vendor && formik.errors.vendor && (
+                        <p className='text-sm text-red-600 tracking-tight leading-tight'>{formik.errors.vendor}</p>
+                    )}
+                    <Input
+                        id="vendor"
+                        name='vendor'
+                        type="text"
+                        onChange={formik.handleChange}
+                        defaultValue={formik.values.vendor}
+                        className='space-x-2'
+                        onBlur={formik.handleBlur}
+                        disabled={formik.isSubmitting}
+
+                        placeholder=""
+                        required
+                    />
+                </div>
+
+            )}
+
+
+
 
             <Button type="submit" className="w-full flex  items-center justify-center" disabled={formik.isSubmitting}>
                 {formik.isSubmitting ? <Loader className='animate animate-spin text-primary500' /> : "create sale"}

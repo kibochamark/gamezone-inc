@@ -134,7 +134,12 @@ export const deleteInventory = async (id: string) => {
 }
 
 
-export const createSale = async (sale: { price: number, inventoryId: string; quantity: number; threshold: number; }) => {
+export const createSale = async (sale: {
+    price: number, inventoryId: string; quantity: number; threshold: number;
+
+    saletype: string;
+    vendor?: string;
+}) => {
     const { isAuthenticated, getUser } = await getKindeServerSession()
     const auth = await isAuthenticated()
     const user = await getUser()
@@ -147,18 +152,37 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
         try {
             await prisma.$transaction(async (tx) => {
                 if (sale.quantity > 0) {
-                    const newinventory = await tx.sales.create({
-                        data: {
-                            inventoryId: sale.inventoryId,
-                            quantitySold: sale.quantity,
-                            kindeId: user?.id,
-                            priceSold: sale.price
-                        },
-
-                        select: {
-                            id: true
-                        }
-                    })
+                    if(sale.saletype =="DEBIT"){
+                        const newinventory = await tx.sales.create({
+                            data: {
+                                inventoryId: sale.inventoryId,
+                                quantitySold: sale.quantity,
+                                kindeId: user?.id,
+                                priceSold: sale.price,
+                                type:"DEBIT"
+                            },
+    
+                            select: {
+                                id: true
+                            }
+                        })
+                    }else{
+                        const newinventory = await tx.sales.create({
+                            data: {
+                                inventoryId: sale.inventoryId,
+                                quantitySold: sale.quantity,
+                                kindeId: user?.id,
+                                priceSold: sale.price,
+                                type:"CREDIT",
+                                vendor:sale.vendor
+                            },
+    
+                            select: {
+                                id: true
+                            }
+                        })
+                    }
+                    
 
 
 
@@ -178,13 +202,13 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
 
 
                     if (sale.quantity < sale.threshold) {
-                        let lowstock =await tx.lowStockSummary.findUnique({
-                            where:{
-                                id:sale.inventoryId
+                        let lowstock = await tx.lowStockSummary.findUnique({
+                            where: {
+                                id: sale.inventoryId
                             }
                         })
 
-                        if(!lowstock){
+                        if (!lowstock) {
                             await tx.lowStockSummary.create({
                                 data: {
                                     inventoryId: sale.inventoryId,
@@ -192,7 +216,7 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
                                 }
                             })
                         }
-                       
+
                     }
 
 
