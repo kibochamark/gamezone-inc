@@ -24,24 +24,22 @@ async function getServicesSummary() {
     try {
         const today = new Date();
         today.setHours(0, 0, 0, 0); 
-        let totalservices = await prisma.services.aggregate({
+        let totalservices = await prisma.serviceSummary.findFirst({
             where:{
-                created_at:{
+                date:{
                     gte:today,
                     lt: new Date(today.getTime() + 86400000)
 
                 }
             },
-            _sum:{
-                price:true
+            select:{
+                totalServices:true
             },
-            
-            
-
+                
         })
 
         services={
-            revenue :totalservices?._sum?.price
+            revenue :totalservices?.totalServices
         }
 
     } catch (e) {

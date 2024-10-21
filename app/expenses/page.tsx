@@ -49,12 +49,42 @@ async function getExpenses() {
 }
 
 
+async function getExpenseSummary() {
+    let expenses
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); 
+        let totalexpenses = await prisma.expenseSummary.findFirst({
+            where:{
+                created_at:{
+                    gte:today,
+                    lt: new Date(today.getTime() + 86400000)
+                }
+            },
+            select:{
+                totalExpenses:true
+            }
+        })
+
+        expenses={
+            revenue :totalexpenses?.totalExpenses
+        }
+
+    } catch (e) {
+
+    }
+
+    return expenses
+}
+
+
 
 const page = async () => {
     const { isAuthenticated, getPermissions } = await getKindeServerSession()
 
     const category = await getCatgeories() ?? []
     const expenses = await getExpenses() ?? []
+    const expensesSummary = await getExpenseSummary()
     const permissions = await getPermissions()
 
 
@@ -62,7 +92,7 @@ const page = async () => {
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
                 <Suspense fallback={<Loader className='animate animate-spin flex items-center justify-center' />}>
-                    <PageView category={category} expenses={expenses} permissions={permissions?.permissions} />
+                    <PageView category={category} expenses={expenses} expensesSummary={expensesSummary} permissions={permissions?.permissions} />
                 </Suspense>
             </div>
 

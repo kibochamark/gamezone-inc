@@ -87,7 +87,7 @@ import DeleteItems from '../reusables/DeleteItems'
 import EditExpense from './EditExpense'
 
 
-const PageView = ({ category, expenses, permissions }: { category: any; expenses: any; permissions: any }) => {
+const PageView = ({ category, expenses, permissions, expensesSummary }: { category: any; expenses: any; permissions: any; expensesSummary: any }) => {
 
 
     return (
@@ -106,7 +106,10 @@ const PageView = ({ category, expenses, permissions }: { category: any; expenses
                                     <DollarSign className="h-4 w-4 text-primary500" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold text-primary600">$45,231.89</div>
+                                    <div className="text-2xl font-bold text-primary600">   {new Intl.NumberFormat("en-US", {
+                                        style: "currency",
+                                        currency: "KES",
+                                    }).format(parseFloat(expensesSummary["revenue"]))}</div>
                                     <p className="text-xs text-muted-foreground">
                                         today
                                     </p>
