@@ -55,14 +55,16 @@ const EditSale = () => {
             quantity: 1,
             threshold: 0,
             saletype: '',
-            vendor: ''
+            vendor: '',
+            status:''
 
         },
         validationSchema: Yup.object().shape({
             price: Yup.number().required(),
             quantity: Yup.number().required().min(1),
             saletype: Yup.string().oneOf(["DEBIT", "CREDIT"]).required(),
-            vendor: Yup.string().optional()
+            vendor: Yup.string().optional(),
+            status:Yup.string().oneOf(["CREDITED", "RETURNED", "SOLD"]).required()
         }),
         onSubmit: async (values, formikHelpers) => {
             // console.log(values)
@@ -92,12 +94,13 @@ const EditSale = () => {
     useEffect(() => {
         if (isedit && page === "sales") {
             formik.setValues({
-                inventoryId: "",
-                price: 0,
-                quantity: 1,
-                threshold: 0,
-                saletype: '',
-                vendor: ''
+                inventoryId: editdata?.inventory?.id,
+                price: editdata?.priceSold,
+                quantity: editdata?.quantitySold,
+                threshold: editdata?.inventory?.threshold,
+                saletype: editdata?.inventory?.type,
+                vendor:editdata?.vendor,
+                status:editdata?.status
             })
         }
     }, [isedit, page, editdata])
@@ -182,6 +185,21 @@ const EditSale = () => {
 
                                         <option value={"DEBIT"}>Debit</option>
                                         <option value={"CREDIT"}>CREDIT</option>
+
+
+                                    </select>
+                                </div>
+                                <div>
+                                    <Label htmlFor="categoryId mb-2">Sale Status</Label>
+                                    {formik.touched.status && formik.errors.status && (
+                                        <p className='text-sm text-red-600 tracking-tight leading-tight'>{formik.errors.status}</p>
+                                    )}
+                                    <select id="" name='status' defaultValue={formik.values.status} onChange={formik.handleChange} onBlur={formik.handleBlur} disabled={formik.isSubmitting} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                        <option value="">select a sale status</option>
+
+                                        <option value={"CREDITED"}>Credited</option>
+                                        <option value={"SOLD"}>Sold</option>
+                                        <option value={"RETURNED"}>Returned</option>
 
 
                                     </select>

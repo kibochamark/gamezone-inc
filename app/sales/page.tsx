@@ -13,12 +13,16 @@ async function getSales(){
                 id:true,
                 inventory:{
                     select:{
-                        name:true
+                        name:true,
+                        threshold:true,
+                        id:true
                     }
                 },
                 quantitySold:true,
                 priceSold:true,
-                created_at:true
+                status:true,
+                type:true,
+                vendor:true
             }
         })
 

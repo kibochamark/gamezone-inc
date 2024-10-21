@@ -235,7 +235,7 @@ const EditInventory = ({ categories }: { categories: any }) => {
                                 </div>
 
                                 <Button type="submit" className="w-full flex  items-center justify-center" disabled={formik.isSubmitting}>
-                                    {formik.isSubmitting ? <Loader className='animate animate-spin text-primary500' /> : "create Inventory"}
+                                    {formik.isSubmitting ? <Loader className='animate animate-spin text-primary500' /> : "Update Inventory"}
 
                                 </Button>
 

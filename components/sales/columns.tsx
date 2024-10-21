@@ -12,7 +12,11 @@ export type Product = {
     };
     priceSold:number;
     quantitySold: number;
-    created_at: Date
+    created_at: Date,
+    status:string,
+    vendor:string,
+    type:string
+
 }
 
 import { FilterFn } from "@tanstack/react-table";
