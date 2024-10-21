@@ -104,7 +104,7 @@ const SideBar = () => {
                                 Sales
                                 {Loading ? (<Loader className="text-white animate animate-spin rounded-full" />) : (
                                     <Badge className="ml- bg-primary800 text-white flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                                        {data ? data : ""}
+                                        {data ? data : "0"}
                                     </Badge>
                                 )}
                                 {/* <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
