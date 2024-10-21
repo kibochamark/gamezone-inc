@@ -171,7 +171,17 @@ export const createBulkInventory = async (inventory: Inventory[]) => {
 
         try {
             for (const item of inventory) {
-                await createInventory(item)
+                
+                    const category = await prisma.category.findUnique({
+                        where:{
+                            name:item.categoryId
+                        },
+                        select:{
+                            id:true
+                        }
+                    })
+            
+                await createInventory({...item, categoryId:category?.id})
             }
             revalidatePath("/inventory")
         } catch (e: any) {
