@@ -166,7 +166,8 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
                         },
                         select:{
                             id:true,
-                            quantity:true
+                            quantity:true,
+                            threshold:true
                         }
                     })
 
