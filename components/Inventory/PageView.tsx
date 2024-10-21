@@ -270,7 +270,7 @@ const PageView = ({ inventory, permissions, category, lowstock, lowStockSummary,
                                                 {isbulkloading ? (
                                                     <Loader className="w-6 h-6 animate animate-spin text-primary600 flex items-center justify-center" />
                                                 ) : (
-                                                    <DataTable data={lowstock ?? []} columns={lowstockcolumns} props={
+                                                    <DataTable data={inventory.filter((inv:any)=> inv.quantity < inv.threshold)} columns={columns} props={
                                                         {
                                                             edit: permissions?.includes("edit:access") || false,
                                                             delete: permissions?.includes("delete:access") || false,
