@@ -103,7 +103,7 @@ const PageView = ({ sales, permissions, salesSummary }: { sales: any; permission
                                         {new Intl.NumberFormat("en-US", {
                                             style: "currency",
                                             currency: "KES",
-                                        }).format(parseFloat(salesSummary["_sum"]["priceSold"]))}
+                                        }).format(parseFloat(salesSummary["revenue"]))}
 
                                     </div>
                                     <p className="text-xs text-muted-foreground">
@@ -119,7 +119,12 @@ const PageView = ({ sales, permissions, salesSummary }: { sales: any; permission
                                     <DollarSign className="h-4 w-4 text-primary500" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="md:text-2xl text-md font-bold text-primary600">$45,231.89</div>
+                                    <div className="md:text-2xl text-md font-bold text-primary600">
+                                    {new Intl.NumberFormat("en-US", {
+                                            style: "currency",
+                                            currency: "KES",
+                                        }).format(parseFloat(salesSummary["profit"]))}
+                                    </div>
                                     <p className="text-xs text-muted-foreground">
                                         today
                                     </p>

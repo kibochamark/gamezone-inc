@@ -36,14 +36,16 @@ async function getSales() {
 
 
 
+
+
 async function getSalesSummary() {
-    let salesSummary;
+    let salesSummary: { revenue: number; profit: number } | null = null;
 
     try {
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Set time to 00:00:00
 
-        salesSummary = await prisma.sales.aggregate({
+        const revenue = await prisma.sales.aggregate({
             where: {
                 created_at: {
                     gte: today,
@@ -51,15 +53,39 @@ async function getSalesSummary() {
                 }
             },
             _sum: {
-                priceSold: true
-            }
+                priceSold: true,
+            },
         });
+
+        const buyingprice = await prisma.sales.findMany({
+            select: {
+                inventory: {
+                    select: {
+                        buyingprice: true,
+                    },
+                },
+            },
+        });
+
+        const totalBuyingPrice = buyingprice.reduce((total, item) => {
+            return total + (item.inventory?.buyingprice || 0);
+        }, 0);
+
+        const totalRevenue = revenue._sum?.priceSold || 0;
+        const profit = totalRevenue - totalBuyingPrice;
+
+        salesSummary = {
+            revenue: totalRevenue,
+            profit: profit,
+        };
+
     } catch (e) {
         console.error(e); // Log the error for debugging
     }
 
     return salesSummary;
 }
+
 
 const page = async () => {
     const { isAuthenticated, getPermissions } = await getKindeServerSession()
