@@ -11,6 +11,7 @@ import { KindeProvider } from "@kinde-oss/kinde-auth-nextjs";
 import { KindeAuthProvider } from "./KindeAuthProvider";
 import { ReduxProvider } from "./ReduxProvider";
 import Footer from "@/components/layout/Footer";
+import { prisma } from "@/lib/prismaClient";
 
 const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -20,11 +21,37 @@ export const metadata: Metadata = {
   description: "we offer cutting edging solutions as well a vast variety of technology products to suit your needs",
 };
 
-export default function RootLayout({
+async function SalesCount(){
+  let today = new Date()
+  today.setHours(0,0,0)
+  const salecount = await prisma.sales.aggregate({
+      where: {
+          created_at: {
+              gte: today,
+              lt: new Date(today.getTime() + 86400000)
+          }
+      },
+      _count:{
+          inventoryId:true
+      }
+  })
+
+
+  // console.log(salecount?._count, 'sal')
+
+  return salecount?._count || 0
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+
+  const salescount= await SalesCount() 
+
+
   
   return (
     <html lang="en">
@@ -57,7 +84,7 @@ export default function RootLayout({
                 <div className="flex w-full">
                   <div className="">
                     <div className="fixed lg:w-[280px] md:w-[220px]">
-                      <SideBar />
+                      <SideBar  salecount={salescount}/>
                     </div>
                   </div>
 
