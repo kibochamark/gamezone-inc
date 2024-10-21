@@ -178,12 +178,21 @@ export const createSale = async (sale: { price: number, inventoryId: string; qua
 
 
                     if (sale.quantity < sale.threshold) {
-                        await tx.lowStockSummary.create({
-                            data: {
-                                inventoryId: sale.inventoryId,
-                                quantity: sale.quantity
+                        let lowstock =await tx.lowStockSummary.findUnique({
+                            where:{
+                                id:sale.inventoryId
                             }
                         })
+
+                        if(!lowstock){
+                            await tx.lowStockSummary.create({
+                                data: {
+                                    inventoryId: sale.inventoryId,
+                                    quantity: sale.quantity
+                                }
+                            })
+                        }
+                       
                     }
 
 
