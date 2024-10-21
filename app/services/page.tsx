@@ -19,11 +19,43 @@ async function getServices() {
 
     return services
 }
+async function getServicesSummary() {
+    let services
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); 
+        let totalservices = await prisma.services.aggregate({
+            where:{
+                created_at:{
+                    gte:today,
+                    lt: new Date(today.getTime() + 86400000)
+
+                }
+            },
+            _sum:{
+                price:true
+            },
+            
+            
+
+        })
+
+        services={
+            revenue :totalservices?._sum?.price
+        }
+
+    } catch (e) {
+
+    }
+
+    return services
+}
 
 
 
 const page = async () => {
     const services = await getServices()
+    const servicesSummary = await getServicesSummary()
     const {isAuthenticated, getPermissions} = await getKindeServerSession()
 
     const permissions = await getPermissions()
@@ -33,7 +65,7 @@ const page = async () => {
     return (
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
-                <PageView services={services} permissions={permissions?.permissions}/>
+                <PageView services={services} servicesSummary={servicesSummary} permissions={permissions?.permissions}/>
             </div>
 
         </div>

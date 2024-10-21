@@ -89,7 +89,7 @@ import DeleteItems from '../reusables/DeleteItems'
 
 
 
-const PageView = ({ services, permissions }: { services: any; permissions: any }) => {
+const PageView = ({ services, permissions, servicesSummary }: { services: any; permissions: any; servicesSummary:any }) => {
 
 
     return (
@@ -109,7 +109,12 @@ const PageView = ({ services, permissions }: { services: any; permissions: any }
                                     <DollarSign className="h-4 w-4 text-primary500" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold text-primary600">$45,231.89</div>
+                                    <div className="text-2xl font-bold text-primary600">
+                                    {new Intl.NumberFormat("en-US", {
+                                            style: "currency",
+                                            currency: "KES",
+                                        }).format(parseFloat(servicesSummary["revenue"]))}
+                                    </div>
                                     <p className="text-xs text-muted-foreground">
                                         today
                                     </p>
