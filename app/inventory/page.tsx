@@ -5,6 +5,9 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { $Enums } from '@prisma/client'
 import React, { Suspense } from 'react'
 
+export const dynamic = 'force-dynamic'
+
+
 async function getCatgeories() {
     let category: any = []
     try {

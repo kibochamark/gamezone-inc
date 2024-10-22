@@ -5,6 +5,10 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { Loader } from 'lucide-react'
 import React, { Suspense } from 'react'
 
+
+export const dynamic = 'force-dynamic'
+
+
 async function getCatgeories() {
     let category: any = []
     try {

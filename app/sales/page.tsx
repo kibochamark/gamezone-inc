@@ -5,6 +5,9 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import React from 'react'
 
 
+export const dynamic = 'force-dynamic'
+
+
 async function getSales() {
     let sales: any = []
     try {

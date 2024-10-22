@@ -7,6 +7,8 @@ import { getLowStockSummary, getTotalInv } from '../inventory/page'
 import { getExpenseSummary } from '../expenses/page'
 
 
+export const dynamic = 'force-dynamic'
+
 async function getProducts() {
     let inventory: any
     try {
