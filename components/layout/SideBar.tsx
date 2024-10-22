@@ -76,7 +76,7 @@ const SideBar = ({salescount}:{salescount:number}) => {
 
             console.log(salecount?._count, 'sal')
 
-            return salecount?._count
+            return salecount?._count.inventoryId
         }
     })
 
@@ -112,7 +112,7 @@ const SideBar = ({salescount}:{salescount:number}) => {
                                 Sales
                                 {Loading ? (<Loader className="text-white animate animate-spin rounded-full" />) : (
                                     <Badge className="ml- bg-primary800 text-white flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                                        {salescount}
+                                        {data}
                                     </Badge>
                                 )}
                                 {/* <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
