@@ -15,7 +15,8 @@ async function getProducts() {
         inventory = await prisma.inventory.findMany({
             take: 5,
             orderBy: {
-                frequencySold: "desc"
+                frequencySold: "desc",
+                id:"desc"
             }
         }) ?? []
     } catch (e: any) {
