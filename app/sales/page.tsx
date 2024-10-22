@@ -48,7 +48,7 @@ async function getSalesSummary() {
         const creditsales =await prisma.sales.aggregate({
             where: {
                 type:"CREDIT",
-                or: [
+                OR: [
                     {
                         created_at: {
                             gte: today,
@@ -71,7 +71,7 @@ async function getSalesSummary() {
         const debitsales =await prisma.sales.aggregate({
             where: {
                 type:"DEBIT",
-                or: [
+                OR: [
                     {
                         created_at: {
                             gte: today,
@@ -94,7 +94,7 @@ async function getSalesSummary() {
 
         const revenue = await prisma.sales.aggregate({
             where: {
-                or: [
+                OR: [
                     {
                         created_at: {
                             gte: today,
