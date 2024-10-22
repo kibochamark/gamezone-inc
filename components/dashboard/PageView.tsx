@@ -132,11 +132,11 @@ export default function PageView({ inventory, recentsales, lowstock, totalInv, s
             <CardContent>
               <div className="grid grid-cols-2 gap-2 my-2">
                 <div className="flex flex-col gap-4 items-center">
-                  <p className="font-semibold text-green-400">{totalInv}</p>
+                  <p className="font-semibold text-green-400">{totalInv._count || 0}</p>
                   <p>Quantity at hand</p>
                 </div>
                 <div className="flex flex-col gap-4 items-center">
-                  <p className="text-red-500 font-semibold">{lowstock}</p>
+                  <p className="text-red-500 font-semibold">{lowstock._count || 0}</p>
                   <p>low stock</p>
                 </div>
               </div>
