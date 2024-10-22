@@ -48,7 +48,7 @@ import {
 import { DataTable } from "../reusables/DataGrid"
 import { columns } from "../Inventory/columns"
 
-export default function PageView({ inventory, expenses, recentsales, lowstock, totalInv, salesSummary }: { inventory: any; expenses:any; recentsales: any; lowstock: any; totalInv: any; salesSummary: { revenue: number; profit: number; creditsales: number; debitsales: number; creditcount:number; debitcount:number; } }) {
+export default function PageView({ inventory, expenses, recentsales, lowstock, totalInv, salesSummary }: { inventory: any; expenses: any; recentsales: any; lowstock: any; totalInv: any; salesSummary: { revenue: number; profit: number; creditsales: number; debitsales: number; creditcount: number; debitcount: number; } }) {
   return (
     <div className="flex min-h-screen w-full flex-col p-4 gap-2">
       <h2 className="text-titleLarge font-bold mb-4">Dashboard</h2>
@@ -84,7 +84,7 @@ export default function PageView({ inventory, expenses, recentsales, lowstock, t
                 currency: "KES",
               }).format(parseFloat(salesSummary["profit"].toString()))}</div>
               <p className="text-xs text-muted-foreground">
-                +180.1% from last month
+                today
               </p>
             </CardContent>
           </Card>
@@ -125,7 +125,7 @@ export default function PageView({ inventory, expenses, recentsales, lowstock, t
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-primary600">
-              {new Intl.NumberFormat("en-US", {
+                {new Intl.NumberFormat("en-US", {
                   style: "currency",
                   currency: "KES",
                 }).format(parseFloat(salesSummary["debitsales"].toString()))}
@@ -154,7 +154,7 @@ export default function PageView({ inventory, expenses, recentsales, lowstock, t
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-primary600">
-              {new Intl.NumberFormat("en-US", {
+                {new Intl.NumberFormat("en-US", {
                   style: "currency",
                   currency: "KES",
                 }).format(parseFloat(expenses?.revenue.toString()))}
