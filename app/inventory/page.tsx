@@ -31,7 +31,8 @@ async function getInventory() {
 
     return inventory
 }
-async function getLowStockSummary() {
+
+export async function getLowStockSummary() {
     let inventory: any
     try {
         inventory = await prisma.lowStockSummary.aggregate({
@@ -46,6 +47,24 @@ async function getLowStockSummary() {
 
     return inventory
 }
+
+
+export async function getTotalInv() {
+    let inventory: any
+    try {
+        inventory = await prisma.inventory.aggregate({
+            _count: {
+                id: true,
+            }
+        }) ?? 0
+    } catch (e: any) {
+        console.log(e.message)
+    }
+
+
+    return inventory
+}
+
 
 async function getLowStock() {
     let inventory: any
@@ -83,6 +102,7 @@ async function getRevenueSummary() {
 const page = async () => {
     const {isAuthenticated, getPermissions} = await getKindeServerSession()
     const inventory = await getInventory()
+    
     const category = await getCatgeories()
     const lowStockSummary = await getLowStockSummary()
     const lowStock = await getLowStock()

@@ -38,7 +38,7 @@ async function getSales() {
 
 
 
-async function getSalesSummary() {
+export async function getSalesSummary() {
     let salesSummary: { revenue: number; profit: number; creditsales:number; debitsales:number } | null = null;
 
     try {

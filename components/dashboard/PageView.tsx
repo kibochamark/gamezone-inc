@@ -48,7 +48,7 @@ import {
 import { DataTable } from "../reusables/DataGrid"
 import { columns } from "../Inventory/columns"
 
-export default function PageView({ inventory, recentsales }: { inventory: any; recentsales: any }) {
+export default function PageView({ inventory, recentsales, lowstock, totalInv, salesSummary }: { inventory: any; recentsales: any; lowstock:any; totalInv:any; salesSummary:{revenue:number; profit:number; creditsales:number; debitsales:number} }) {
   return (
     <div className="flex min-h-screen w-full flex-col p-4 gap-2">
       <h2 className="text-titleLarge font-bold mb-4">Dashboard</h2>
@@ -62,7 +62,10 @@ export default function PageView({ inventory, recentsales }: { inventory: any; r
               <DollarSign className="h-4 w-4 text-primary500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary600">$45,231.89</div>
+              <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
+                                            style: "currency",
+                                            currency: "KES",
+                                        }).format(parseFloat(salesSummary["revenue"]))}</div>
               <p className="text-xs text-muted-foreground">
                 today
               </p>
@@ -76,7 +79,10 @@ export default function PageView({ inventory, recentsales }: { inventory: any; r
               <Users className="h-4 w-4 text-primary500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary600">+2350</div>
+              <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
+                                            style: "currency",
+                                            currency: "KES",
+                                        }).format(parseFloat(salesSummary["profit"]))}</div>
               <p className="text-xs text-muted-foreground">
                 +180.1% from last month
               </p>
@@ -88,7 +94,7 @@ export default function PageView({ inventory, recentsales }: { inventory: any; r
               <CreditCard className="h-4 w-4 text-primary500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary600">+12,234</div>
+              <div className="text-2xl font-bold text-primary600"></div>
               <p className="text-xs text-muted-foreground">
                 today
               </p>
@@ -126,11 +132,11 @@ export default function PageView({ inventory, recentsales }: { inventory: any; r
             <CardContent>
               <div className="grid grid-cols-2 gap-2 my-2">
                 <div className="flex flex-col gap-4 items-center">
-                  <p className="font-semibold text-green-400">200</p>
+                  <p className="font-semibold text-green-400">{totalInv}</p>
                   <p>Quantity at hand</p>
                 </div>
                 <div className="flex flex-col gap-4 items-center">
-                  <p className="text-red-500 font-semibold">200</p>
+                  <p className="text-red-500 font-semibold">{lowstock}</p>
                   <p>low stock</p>
                 </div>
               </div>
@@ -152,7 +158,7 @@ export default function PageView({ inventory, recentsales }: { inventory: any; r
                   </CardDescription>
                 </div>
                 <Button asChild size="sm" className="ml-auto gap-1">
-                  <Link href="/sales" className=" text-primary600 hover:text-white transition-all duration-300 bg-white border hover:bg-primary600 border-primary800">
+                  <Link href="/inventory" className=" text-primary600 hover:text-white transition-all duration-300 bg-white border hover:bg-primary600 border-primary800">
                     make a sale
                     <ArrowUpRight className="h-4 w-4" />
                   </Link>

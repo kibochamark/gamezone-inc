@@ -2,6 +2,8 @@ import PageView from '@/components/dashboard/PageView'
 import { prisma } from '@/lib/prismaClient'
 import { Loader } from 'lucide-react'
 import React, { Suspense } from 'react'
+import { getSalesSummary } from '../sales/page'
+import { getLowStockSummary, getTotalInv } from '../inventory/page'
 
 
 async function getProducts() {
@@ -50,11 +52,14 @@ async function getRecentSales() {
 const page = async () => {
     const inventory = await getProducts() ?? []
     const sales = await getRecentSales() ?? []
+    const salesSummary = await getSalesSummary()
+    const lowstock = await getLowStockSummary()
+    const totalInv = await getTotalInv()
     return (
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
                 <Suspense fallback={<Loader className="flex items-center justify-center animate animate-spin" />}>
-                    <PageView inventory={inventory} recentsales={sales} />
+                    <PageView inventory={inventory} lowstock={lowstock}  totalInv={totalInv} salesSummary={salesSummary} recentsales={sales} />
                 </Suspense>
             </div>
 
