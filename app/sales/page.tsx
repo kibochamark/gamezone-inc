@@ -39,7 +39,7 @@ async function getSales() {
 
 
 async function getSalesSummary() {
-    let salesSummary: { revenue: number; profit: number } | null = null;
+    let salesSummary: { revenue: number; profit: number; creditsales:number; debitsales:number } | null = null;
 
     try {
         const today = new Date();
