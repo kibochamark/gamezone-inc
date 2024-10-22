@@ -157,7 +157,7 @@ export default function PageView({ inventory, expenses, recentsales, lowstock, t
               {new Intl.NumberFormat("en-US", {
                   style: "currency",
                   currency: "KES",
-                }).format(parseFloat(expenses.toString()))}
+                }).format(parseFloat(expenses?.revenue.toString()))}
               </div>
               <p className="text-xs text-muted-foreground">
                 today
