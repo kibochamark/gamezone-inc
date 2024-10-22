@@ -135,7 +135,30 @@ export async function getSalesSummary() {
                 },
             },
         });
-        const creditcount = await prisma.sales.count({
+        const creditcount = await prisma.sales.aggregate({
+            where: {
+                OR: [
+                    {
+                        created_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                        }
+                    },
+                    {
+                        updated_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today 
+                        }
+                    }
+                ],
+                type:"CREDIT"
+            },
+            _count:{
+                id:true
+            }
+        });
+
+        const debitcount = await prisma.sales.aggregate({
 
             where: {
                 OR: [
@@ -154,30 +177,12 @@ export async function getSalesSummary() {
                 ],
                 type:"CREDIT"
             },
+            _count:{
+                id:true
+            }
         });
 
-        const debitcount = await prisma.sales.count({
-
-            where: {
-                OR: [
-                    {
-                        created_at: {
-                            gte: today,
-                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
-                        }
-                    },
-                    {
-                        updated_at: {
-                            gte: today,
-                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today 
-                        }
-                    }
-                ],
-                type:"CREDIT"
-            },
-        });
-
-        console.log(creditcount, debitcount, "sjdfgsjfhjks")
+        // console.log(creditcount, debitcount, "sjdfgsjfhjks")
 
         const totalBuyingPrice = buyingprice.reduce((total, item) => {
             return total + (item.inventory?.buyingprice || 0);
@@ -191,8 +196,8 @@ export async function getSalesSummary() {
             profit: profit,
             creditsales: creditsales._sum?.priceSold || 0,
             debitsales: debitsales._sum?.priceSold || 0,
-            creditcount:creditcount || 0,
-            debitcount:debitcount || 0
+            creditcount:creditcount._count?.id || 0,
+            debitcount:debitcount._count?.id || 0
         };
 
     } catch (e) {
