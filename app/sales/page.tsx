@@ -155,7 +155,7 @@ export async function getSalesSummary() {
                 type:"CREDIT"
             },
         });
-        
+
         const debitcount = await prisma.sales.count({
 
             where: {
@@ -176,6 +176,8 @@ export async function getSalesSummary() {
                 type:"CREDIT"
             },
         });
+
+        console.log(creditcount, debitcount, "sjdfgsjfhjks")
 
         const totalBuyingPrice = buyingprice.reduce((total, item) => {
             return total + (item.inventory?.buyingprice || 0);
