@@ -45,12 +45,70 @@ async function getSalesSummary() {
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Set time to 00:00:00
 
+        const creditsales =await prisma.sales.aggregate({
+            where: {
+                type:"CREDIT",
+                or: [
+                    {
+                        created_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                        }
+                    },
+                    {
+                        updated_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today 
+                        }
+                    }
+                ]
+
+            },
+            _sum: {
+                priceSold: true,
+            },
+        });
+        const debitsales =await prisma.sales.aggregate({
+            where: {
+                type:"DEBIT",
+                or: [
+                    {
+                        created_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                        }
+                    },
+                    {
+                        updated_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today 
+                        }
+                    }
+                ]
+
+            },
+            _sum: {
+                priceSold: true,
+            },
+        });
+
         const revenue = await prisma.sales.aggregate({
             where: {
-                created_at: {
-                    gte: today,
-                    lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
-                }
+                or: [
+                    {
+                        created_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                        }
+                    },
+                    {
+                        updated_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today 
+                        }
+                    }
+                ]
+
             },
             _sum: {
                 priceSold: true,
@@ -83,6 +141,8 @@ async function getSalesSummary() {
         salesSummary = {
             revenue: totalRevenue,
             profit: profit,
+            creditsales:creditsales._sum?.priceSold || 0,
+            debitsales:debitsales._sum?.priceSold || 0
         };
 
     } catch (e) {

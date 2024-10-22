@@ -130,6 +130,44 @@ const PageView = ({ sales, permissions, salesSummary }: { sales: any; permission
                                     </p>
                                 </CardContent>
                             </Card>
+                            <Card x-chunk="dashboard-01-chunk-0">
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">
+                                        Sales on Credit
+                                    </CardTitle>
+                                    <DollarSign className="h-4 w-4 text-primary500" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="md:text-2xl text-md font-bold text-primary600">
+                                    {new Intl.NumberFormat("en-US", {
+                                            style: "currency",
+                                            currency: "KES",
+                                        }).format(parseFloat(salesSummary["creditsales"]))}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        today
+                                    </p>
+                                </CardContent>
+                            </Card>
+                            <Card x-chunk="dashboard-01-chunk-0">
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">
+                                        Sales on Debit
+                                    </CardTitle>
+                                    <DollarSign className="h-4 w-4 text-primary500" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="md:text-2xl text-md font-bold text-primary600">
+                                    {new Intl.NumberFormat("en-US", {
+                                            style: "currency",
+                                            currency: "KES",
+                                        }).format(parseFloat(salesSummary["debitsales"]))}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        today
+                                    </p>
+                                </CardContent>
+                            </Card>
 
 
                         </div>
