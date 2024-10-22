@@ -48,7 +48,7 @@ import {
 import { DataTable } from "../reusables/DataGrid"
 import { columns } from "../Inventory/columns"
 
-export default function PageView({ inventory, recentsales, lowstock, totalInv, salesSummary }: { inventory: any; recentsales: any; lowstock:any; totalInv:any; salesSummary:{revenue:number; profit:number; creditsales:number; debitsales:number} }) {
+export default function PageView({ inventory, recentsales, lowstock, totalInv, salesSummary }: { inventory: any; recentsales: any; lowstock:any; totalInv:any; salesSummary:{revenue:number; profit:number; creditsales:number; debitsales:number} | null }) {
   return (
     <div className="flex min-h-screen w-full flex-col p-4 gap-2">
       <h2 className="text-titleLarge font-bold mb-4">Dashboard</h2>
