@@ -65,7 +65,7 @@ export default function PageView({ inventory, recentsales, lowstock, totalInv, s
               <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
                                             style: "currency",
                                             currency: "KES",
-                                        }).format(parseFloat(salesSummary["revenue"]))}</div>
+                                        }).format(parseFloat(salesSummary["revenue"].toString()))}</div>
               <p className="text-xs text-muted-foreground">
                 today
               </p>
@@ -82,7 +82,7 @@ export default function PageView({ inventory, recentsales, lowstock, totalInv, s
               <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
                                             style: "currency",
                                             currency: "KES",
-                                        }).format(parseFloat(salesSummary["profit"]))}</div>
+                                        }).format(parseFloat(salesSummary["profit"].toString()))}</div>
               <p className="text-xs text-muted-foreground">
                 +180.1% from last month
               </p>
