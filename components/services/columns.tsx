@@ -43,6 +43,7 @@ export const columns: ColumnDef<Service>[] = [
                 <DataTableColumnHeader column={column} title="Service name" />
             )
         },
+        enableSorting:true
     },
     {
         accessorKey: "kindeName",
@@ -56,6 +57,7 @@ export const columns: ColumnDef<Service>[] = [
                 <div className="text-justify font-medium">{row.original.kindeName}</div>
             )
         },
+        enableSorting:true
     },
    
     {
@@ -74,6 +76,7 @@ export const columns: ColumnDef<Service>[] = [
 
             return <div className="text-justify font-medium">{formatted}</div>
         },
+        enableSorting:true
 
 
     },
@@ -97,6 +100,7 @@ export const columns: ColumnDef<Service>[] = [
         },
         sortingFn: "datetime",
         filterFn: dateFilterFn, // or another appropriate filter function
+        enableSorting:true
     },
 ];
 

@@ -51,6 +51,7 @@ export const columns: ColumnDef<Product>[] = [
                 <DataTableColumnHeader column={column} title="Product name" />
             )
         },
+        enableSorting:true
     },
     {
         accessorKey: "quantity",
@@ -59,6 +60,7 @@ export const columns: ColumnDef<Product>[] = [
                 <DataTableColumnHeader column={column} title="Quantity" />
             )
         },
+        enableSorting:true
     },
     {
         accessorKey: "status",
@@ -83,6 +85,7 @@ export const columns: ColumnDef<Product>[] = [
                 </div>
             );
         },
+        enableSorting:true
     },
     {
         accessorKey: "buyingprice",
@@ -100,6 +103,7 @@ export const columns: ColumnDef<Product>[] = [
 
             return <div className="text-justify font-medium">{formatted}</div>
         },
+        enableSorting:true
 
 
     },
@@ -119,6 +123,7 @@ export const columns: ColumnDef<Product>[] = [
 
             return <div className="text-justify font-medium">{formatted}</div>
         },
+        enableSorting:true
 
 
     },
@@ -141,6 +146,7 @@ export const columns: ColumnDef<Product>[] = [
         },
         sortingFn: "datetime",
         filterFn: dateFilterFn, // or another appropriate filter function
+        enableSorting:true
     },    
     {
         id:"Sale",
@@ -155,6 +161,7 @@ export const columns: ColumnDef<Product>[] = [
                 <HandleButtonSell row={row}/>
             </div>
         },
+        enableSorting:true
         
          
     },    
@@ -168,6 +175,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
                 <DataTableColumnHeader column={column} title="Product name" />
             )
         },
+        enableSorting:true
     },
     {
         accessorKey: "inventory.quantity",
@@ -176,6 +184,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
                 <DataTableColumnHeader column={column} title="Quantity" />
             )
         },
+        enableSorting:true
     },
     {
         accessorKey: "inventory.status",
@@ -200,6 +209,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
                 </div>
             );
         },
+        enableSorting:true
     },
     {
         accessorKey: "inventory.buyingprice",
@@ -217,6 +227,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
 
             return <div className="text-justify font-medium">{formatted}</div>
         },
+        enableSorting:true
 
 
     },
@@ -237,6 +248,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
             return <div className="text-justify font-medium">{formatted}</div>
         },
 
+        enableSorting:true
 
     },
     {
@@ -258,6 +270,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
         },
         sortingFn: "datetime",
         filterFn: dateFilterFn, // or another appropriate filter function
+        enableSorting:true
     },    
     {
         id:"Sale",
@@ -272,7 +285,7 @@ export const lowstockcolumns: ColumnDef<LowStock>[] = [
                 <HandleButtonSellLowStock row={row}/>
             </div>
         },
-        
+        enableSorting:true
          
     },    
 ];

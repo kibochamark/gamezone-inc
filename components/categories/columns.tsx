@@ -24,6 +24,7 @@ export const columns: ColumnDef<Category>[] = [
                 <DataTableColumnHeader column={column} title="Product name" />
             )
         },
+        enableSorting:true
     },
     {
         accessorKey: "type",
@@ -32,6 +33,7 @@ export const columns: ColumnDef<Category>[] = [
                 <DataTableColumnHeader column={column} title="Type" />
             )
         },
+        enableSorting:true
     },
 
 ];

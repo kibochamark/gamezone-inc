@@ -47,6 +47,7 @@ export const columns: ColumnDef<Product>[] = [
                 <DataTableColumnHeader column={column} title="Product name" />
             )
         },
+        enableSorting:true
     },
     {
         accessorKey: "quantitySold",
@@ -55,6 +56,7 @@ export const columns: ColumnDef<Product>[] = [
                 <DataTableColumnHeader column={column} title="Quantity" />
             )
         },
+        enableSorting:true
     },
     
     {
@@ -74,6 +76,7 @@ export const columns: ColumnDef<Product>[] = [
             return <div className="text-justify font-medium">{formatted}</div>
         },
 
+        enableSorting:true
 
     },
     
@@ -96,6 +99,7 @@ export const columns: ColumnDef<Product>[] = [
         },
         sortingFn: "datetime",
         filterFn: dateFilterFn, // or another appropriate filter function
+        enableSorting:true
     },    
 ];
 

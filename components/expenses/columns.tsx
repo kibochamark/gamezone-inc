@@ -8,12 +8,12 @@ import { DataTableColumnHeader } from "../reusables/ColumnHeader"
 export type Expense = {
     id: string;
     expensename: string;
-    kindeName:string;
+    kindeName: string;
     amount: number;
-    category:{
-        name:string;
+    category: {
+        name: string;
     }
-    description:string;
+    description: string;
     created_at: Date;
 }
 
@@ -45,6 +45,7 @@ export const columns: ColumnDef<Expense>[] = [
                 <DataTableColumnHeader column={column} title="Expense Name" />
             )
         },
+        enableSorting: true
     },
     {
         accessorKey: "kindeName",
@@ -53,6 +54,7 @@ export const columns: ColumnDef<Expense>[] = [
                 <DataTableColumnHeader column={column} title="Expense By" />
             )
         },
+        enableSorting: true
     },
     {
         accessorKey: "description",
@@ -61,6 +63,7 @@ export const columns: ColumnDef<Expense>[] = [
                 <DataTableColumnHeader column={column} title="Expense Description" />
             )
         },
+        enableSorting: true
     },
     {
         accessorKey: "category.name",
@@ -69,8 +72,9 @@ export const columns: ColumnDef<Expense>[] = [
                 <DataTableColumnHeader column={column} title="Category" />
             )
         },
+        enableSorting: true
     },
-    
+
     {
         accessorKey: "amount",
         header: ({ column }) => {
@@ -88,6 +92,7 @@ export const columns: ColumnDef<Expense>[] = [
             return <div className="text-justify font-medium">{formatted}</div>
         },
 
+        enableSorting: true
 
     },
     {
@@ -104,12 +109,14 @@ export const columns: ColumnDef<Expense>[] = [
                 month: "long",
                 day: "numeric",
             });
-    
+
             return <div className="text-justify font-medium">{formattedDate}</div>
         },
         sortingFn: "datetime",
         filterFn: dateFilterFn, // or another appropriate filter function
-    },    
+
+        enableSorting: true
+    },
 ];
 
 
