@@ -138,7 +138,7 @@ export async function getSalesSummary() {
                 },
             },
         });
-        const creditcount = await prisma.sales.aggregate({
+        const crdtcount = await prisma.sales.aggregate({
             where: {
                 OR: [
                     {
@@ -161,7 +161,7 @@ export async function getSalesSummary() {
             }
         });
 
-        const debitcount = await prisma.sales.aggregate({
+        const dbtcount = await prisma.sales.aggregate({
 
             where: {
                 OR: [
@@ -199,8 +199,8 @@ export async function getSalesSummary() {
             profit: profit,
             creditsales: creditsales._sum?.priceSold || 0,
             debitsales: debitsales._sum?.priceSold || 0,
-            creditcount:creditcount._count?.id || 0,
-            debitcount:debitcount._count?.id || 0
+            creditcount:crdtcount._count?.id || 0,
+            debitcount:dbtcount._count?.id || 0
         };
 
     } catch (e) {
