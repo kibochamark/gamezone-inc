@@ -36,23 +36,23 @@ async function getSales() {
 
 
 
-
-
 export async function getSalesSummary() {
-    let salesSummary: { revenue: number; profit: number; creditsales:number; debitsales:number } = {
+    let salesSummary: { revenue: number; profit: number; creditsales: number; debitsales: number, creditcount: number; debitcount: number } = {
         revenue: 0,
         profit: 0,
         creditsales: 0,
-        debitsales: 0
+        debitsales: 0,
+        creditcount: 0,
+        debitcount: 0
     };
 
     try {
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Set time to 00:00:00
 
-        const creditsales =await prisma.sales.aggregate({
+        const creditsales = await prisma.sales.aggregate({
             where: {
-                type:"CREDIT",
+                type: "CREDIT",
                 OR: [
                     {
                         created_at: {
@@ -73,9 +73,9 @@ export async function getSalesSummary() {
                 priceSold: true,
             },
         });
-        const debitsales =await prisma.sales.aggregate({
+        const debitsales = await prisma.sales.aggregate({
             where: {
-                type:"DEBIT",
+                type: "DEBIT",
                 OR: [
                     {
                         created_at: {
@@ -135,6 +135,47 @@ export async function getSalesSummary() {
                 },
             },
         });
+        const creditcount = await prisma.sales.count({
+
+            where: {
+                OR: [
+                    {
+                        created_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                        }
+                    },
+                    {
+                        updated_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today 
+                        }
+                    }
+                ],
+                type:"CREDIT"
+            },
+        });
+        
+        const debitcount = await prisma.sales.count({
+
+            where: {
+                OR: [
+                    {
+                        created_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                        }
+                    },
+                    {
+                        updated_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today 
+                        }
+                    }
+                ],
+                type:"CREDIT"
+            },
+        });
 
         const totalBuyingPrice = buyingprice.reduce((total, item) => {
             return total + (item.inventory?.buyingprice || 0);
@@ -146,8 +187,10 @@ export async function getSalesSummary() {
         salesSummary = {
             revenue: totalRevenue,
             profit: profit,
-            creditsales:creditsales._sum?.priceSold || 0,
-            debitsales:debitsales._sum?.priceSold || 0
+            creditsales: creditsales._sum?.priceSold || 0,
+            debitsales: debitsales._sum?.priceSold || 0,
+            creditcount:creditcount || 0,
+            debitcount:debitcount || 0
         };
 
     } catch (e) {

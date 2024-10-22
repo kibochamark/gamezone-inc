@@ -4,6 +4,7 @@ import { Loader } from 'lucide-react'
 import React, { Suspense } from 'react'
 import { getSalesSummary } from '../sales/page'
 import { getLowStockSummary, getTotalInv } from '../inventory/page'
+import { getExpenseSummary } from '../expenses/page'
 
 
 async function getProducts() {
@@ -55,11 +56,12 @@ const page = async () => {
     const salesSummary = await getSalesSummary()
     const lowstock = await getLowStockSummary()
     const totalInv = await getTotalInv()
+    const expensesSummary = await getExpenseSummary()
     return (
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
                 <Suspense fallback={<Loader className="flex items-center justify-center animate animate-spin" />}>
-                    <PageView inventory={inventory} lowstock={lowstock}  totalInv={totalInv} salesSummary={salesSummary} recentsales={sales} />
+                    <PageView inventory={inventory} expenses={expensesSummary} lowstock={lowstock}  totalInv={totalInv} salesSummary={salesSummary} recentsales={sales} />
                 </Suspense>
             </div>
 

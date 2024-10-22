@@ -48,7 +48,7 @@ import {
 import { DataTable } from "../reusables/DataGrid"
 import { columns } from "../Inventory/columns"
 
-export default function PageView({ inventory, recentsales, lowstock, totalInv, salesSummary }: { inventory: any; recentsales: any; lowstock:any; totalInv:any; salesSummary:{revenue:number; profit:number; creditsales:number; debitsales:number} }) {
+export default function PageView({ inventory, expenses, recentsales, lowstock, totalInv, salesSummary }: { inventory: any; expenses:any; recentsales: any; lowstock: any; totalInv: any; salesSummary: { revenue: number; profit: number; creditsales: number; debitsales: number; creditcount:number; debitcount:number; } }) {
   return (
     <div className="flex min-h-screen w-full flex-col p-4 gap-2">
       <h2 className="text-titleLarge font-bold mb-4">Dashboard</h2>
@@ -57,15 +57,15 @@ export default function PageView({ inventory, recentsales, lowstock, totalInv, s
           <Card x-chunk="dashboard-01-chunk-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Revenue
+                Total Sale Revenue
               </CardTitle>
               <DollarSign className="h-4 w-4 text-primary500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
-                                            style: "currency",
-                                            currency: "KES",
-                                        }).format(parseFloat(salesSummary["revenue"].toString()))}</div>
+                style: "currency",
+                currency: "KES",
+              }).format(parseFloat(salesSummary["revenue"].toString()))}</div>
               <p className="text-xs text-muted-foreground">
                 today
               </p>
@@ -80,9 +80,9 @@ export default function PageView({ inventory, recentsales, lowstock, totalInv, s
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
-                                            style: "currency",
-                                            currency: "KES",
-                                        }).format(parseFloat(salesSummary["profit"].toString()))}</div>
+                style: "currency",
+                currency: "KES",
+              }).format(parseFloat(salesSummary["profit"].toString()))}</div>
               <p className="text-xs text-muted-foreground">
                 +180.1% from last month
               </p>
@@ -94,7 +94,13 @@ export default function PageView({ inventory, recentsales, lowstock, totalInv, s
               <CreditCard className="h-4 w-4 text-primary500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary600"></div>
+              <div className="text-2xl font-bold text-primary600">
+                {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "KES",
+                }).format(parseFloat(salesSummary["creditsales"].toString()))}
+
+              </div>
               <p className="text-xs text-muted-foreground">
                 today
               </p>
@@ -102,11 +108,40 @@ export default function PageView({ inventory, recentsales, lowstock, totalInv, s
           </Card>
           <Card x-chunk="dashboard-01-chunk-2">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
+              <CardTitle className="text-sm font-medium">No of sales On credit</CardTitle>
+              <CreditCard className="h-4 w-4 text-primary500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary600">{salesSummary["creditcount"]}</div>
+              <p className="text-xs text-muted-foreground">
+                today
+              </p>
+            </CardContent>
+          </Card>
+          <Card x-chunk="dashboard-01-chunk-2">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Sales on Debit</CardTitle>
               <DollarSign className="h-4 w-4 text-primary500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary600">+12,234</div>
+              <div className="text-2xl font-bold text-primary600">
+              {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "KES",
+                }).format(parseFloat(salesSummary["debitsales"].toString()))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                today
+              </p>
+            </CardContent>
+          </Card>
+          <Card x-chunk="dashboard-01-chunk-2">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">No of sales on debit</CardTitle>
+              <CreditCard className="h-4 w-4 text-primary500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary600">{salesSummary["debitcount"]}</div>
               <p className="text-xs text-muted-foreground">
                 today
               </p>
@@ -118,7 +153,12 @@ export default function PageView({ inventory, recentsales, lowstock, totalInv, s
               <DollarSign className="h-4 w-4 text-primary500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary600">+12,234</div>
+              <div className="text-2xl font-bold text-primary600">
+              {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "KES",
+                }).format(parseFloat(expenses.toString()))}
+              </div>
               <p className="text-xs text-muted-foreground">
                 today
               </p>
@@ -294,13 +334,13 @@ export default function PageView({ inventory, recentsales, lowstock, totalInv, s
             </CardHeader>
             <CardContent className="grid gap-8 w-full">
               {recentsales.length > 0 ? recentsales.map((sale: {
-                id:any;
+                id: any;
                 inventory: {
                   name: string;
                 },
                 priceSold: number;
                 quantitySold: number;
-              }, idx:number) => {
+              }, idx: number) => {
                 return (
                   <div className="flex items-center gap-4" key={idx}>
                     <Avatar className="hidden h-9 w-9 sm:flex">

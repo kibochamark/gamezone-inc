@@ -49,7 +49,7 @@ async function getExpenses() {
 }
 
 
-async function getExpenseSummary() {
+export async function getExpenseSummary() {
     let expenses
     try {
         const today = new Date();
