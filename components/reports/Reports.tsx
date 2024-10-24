@@ -1,176 +1,160 @@
 'use client'
 
-import { useState } from 'react'
-import { Download, FileDown, AlertCircle, DollarSign, ShoppingCart, Package, Briefcase } from 'lucide-react'
+import { useState, useRef, useEffect, Key } from 'react'
+import { FileDown, FileSpreadsheet, Calendar } from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { format } from "date-fns"
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
+import * as XLSX from 'xlsx'
+import { DatePickerWithRange } from '../ui/date-picker-with-range'
 import toast from 'react-hot-toast'
 
-// Mock data for charts
-const salesData = [
-  { name: 'Jan', sales: 4000 },
-  { name: 'Feb', sales: 3000 },
-  { name: 'Mar', sales: 5000 },
-  { name: 'Apr', sales: 4500 },
-  { name: 'May', sales: 6000 },
-  { name: 'Jun', sales: 5500 },
-]
 
-const expenseData = [
-  { name: 'Jan', expenses: 3000 },
-  { name: 'Feb', expenses: 2800 },
-  { name: 'Mar', expenses: 3200 },
-  { name: 'Apr', expenses: 3100 },
-  { name: 'May', expenses: 3500 },
-  { name: 'Jun', expenses: 3300 },
-]
+type ReportType = 'inventory' | 'sales' | 'expenses';
 
-const serviceData = [
-  { name: 'Jan', revenue: 2000 },
-  { name: 'Feb', revenue: 2200 },
-  { name: 'Mar', revenue: 2400 },
-  { name: 'Apr', revenue: 2600 },
-  { name: 'May', revenue: 2800 },
-  { name: 'Jun', revenue: 3000 },
-]
+
+// Mock data for reports
+const mockReportData = {
+  'inventory': [
+    { id: 1, name: 'Product A', quantity: 100, price: 19.99 },
+    { id: 2, name: 'Product B', quantity: 50, price: 29.99 },
+    { id: 3, name: 'Product C', quantity: 75, price: 14.99 },
+  ],
+  'sales': [
+    { id: 1, date: '2023-06-01', product: 'Product A', quantity: 5, total: 99.95 },
+    { id: 2, date: '2023-06-02', product: 'Product B', quantity: 2, total: 59.98 },
+    { id: 3, date: '2023-06-03', product: 'Product C', quantity: 10, total: 149.90 },
+  ],
+  'expenses': [
+    { id: 1, date: '2023-06-01', description: 'Rent', amount: 1000 },
+    { id: 2, date: '2023-06-02', description: 'Utilities', amount: 200 },
+    { id: 3, date: '2023-06-03', description: 'Supplies', amount: 150 },
+  ],
+}
+
+const reportTitles = {
+  'inventory': 'Inventory Report',
+  'sales': 'Sales Report',
+  'expenses': 'Expense Report',
+}
 
 export default function ShopReports() {
-  const [dateRange, setDateRange] = useState('last-30-days')
+  const [download, setDownload] = useState(false)
+  const [reportType, setReportType] = useState('inventory')
+  const [dateRange, setDateRange] = useState({ from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), to: new Date() })
+  const [reportData, setReportData] = useState<any[]>(mockReportData[reportType as ReportType])
+  const tableRef = useRef(null)
 
-  const reports = [
-    { 
-      title: 'Inventory Report', 
-      description: 'Full list of current inventory',
-      icon: Package,
-      filename: 'inventory-report',
-      hasChart: false
-    },
-    { 
-      title: 'Low Stock Products', 
-      description: 'Products that need restocking',
-      icon: AlertCircle,
-      filename: 'low-stock-report',
-      hasChart: false
-    },
-    { 
-      title: 'Sales Transactions', 
-      description: 'Detailed report of all sales',
-      icon: ShoppingCart,
-      filename: 'sales-transactions',
-      hasChart: true,
-      chartData: salesData,
-      dataKey: 'sales'
-    },
-    { 
-      title: 'Expense Transactions', 
-      description: 'List of all expenses',
-      icon: DollarSign,
-      filename: 'expense-transactions',
-      hasChart: true,
-      chartData: expenseData,
-      dataKey: 'expenses'
-    },
-    { 
-      title: 'Service Transactions', 
-      description: 'Report of all service-related revenue',
-      icon: Briefcase,
-      filename: 'service-transactions',
-      hasChart: true,
-      chartData: serviceData,
-      dataKey: 'revenue'
+  useEffect(() => {
+    // In a real application, this would fetch data based on the selected report type and date range
+    setReportData(mockReportData[reportType as ReportType])
+  }, [reportType, dateRange])
+
+  const handleDownloadPDF = () => {
+    // setDownload(true)
+    if (tableRef.current) {
+      html2canvas(tableRef.current).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png')
+        const pdf = new jsPDF()
+        const imgProps = pdf.getImageProperties(imgData)
+        const pdfWidth = pdf.internal.pageSize.getWidth()
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
+        pdf.save(`${reportType}-report.pdf`)
+        
+      })
+      // setDownload(false)
     }
-  ]
 
-  const handleDownload = (reportType: string, filename: string) => {
-    // In a real application, this would trigger an API call to generate and download the PDF report
-    toast.success("Download Started")
+    toast.success(`Your ${reportType} report PDF is being generated and will download shortly.`)
+  }
 
-    // Simulating PDF download
-    setTimeout(() => {
-      const link = document.createElement('a')
-      link.href = `/api/reports/${filename}.pdf` // This would be your actual API endpoint
-      link.download = `${filename}.pdf`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    }, 2000)
+  const handleDownloadExcel = () => {
+    const wb = XLSX.utils.book_new()
+    const ws = XLSX.utils.json_to_sheet(reportData)
+    XLSX.utils.book_append_sheet(wb, ws, reportType)
+    XLSX.writeFile(wb, `${reportType}-report.xlsx`)
+
+    toast.success(`Your ${reportType} report Excel file is being generated and will download shortly.`)
+  }
+
+  const renderTableHeaders = () => {
+    if (reportData.length === 0) return null
+    return Object.keys(reportData[0]).map((key) => (
+      <TableHead key={key} className="font-bold">{key.charAt(0).toUpperCase() + key.slice(1)}</TableHead>
+    ))
+  }
+
+  const renderTableRows = () => {
+    return reportData.map((row: any, index: number) => (
+      <TableRow key={index}>
+        {Object.values(row).map((value:any, cellIndex) => (
+          <TableCell key={cellIndex}>{value}</TableCell>
+        ))}
+      </TableRow>
+    ))
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Shop Reports</h1>
-      <div className="mb-6">
-        <Select value={dateRange} onValueChange={setDateRange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select date range" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="last-7-days">Last 7 days</SelectItem>
-            <SelectItem value="last-30-days">Last 30 days</SelectItem>
-            <SelectItem value="last-90-days">Last 90 days</SelectItem>
-            <SelectItem value="year-to-date">Year to date</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {reports.map((report) => (
-          <Card key={report.filename}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <report.icon className="h-5 w-5" />
-                {report.title}
-              </CardTitle>
-              <CardDescription>{report.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {report.hasChart && (
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full mb-4">View Chart</Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>{report.title} Chart</DialogTitle>
-                      <DialogDescription>
-                        Chart showing {report.description.toLowerCase()}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <ChartContainer
-                      config={{
-                        [report.dataKey as string]: {
-                          label: report.title,
-                          color: "hsl(var(--chart-1))",
-                        },
-                      }}
-                      className="h-[300px]"
-                    >
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={report.chartData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis />
-                          <ChartTooltip content={<ChartTooltipContent />} />
-                          <Legend />
-                          <Bar dataKey={report.dataKey as string} fill="var(--color-chart-1)" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </ChartContainer>
-                  </DialogContent>
-                </Dialog>
-              )}
-            </CardContent>
-            <CardFooter>
-              <Button onClick={() => handleDownload(report.title, report.filename)} className="w-full">
-                <FileDown className="mr-2 h-4 w-4" /> Download PDF ({dateRange.replace('-', ' ')})
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+    <div ref={tableRef} className="container mx-auto p-4">
+      <Card className="border-2 border-gray-200">
+        <CardHeader className="flex flex-row items-center justify-between border-b-2 border-gray-200 pb-4">
+          <div className="flex items-center space-x-2">
+            <img src="/placeholder.svg" alt="Shop Logo" className="h-8 w-8" />
+            <CardTitle>MyShop</CardTitle>
+          </div>
+          <div className="flex space-x-2">
+            <Button onClick={handleDownloadPDF} size="sm">
+              <FileDown className="mr-2 h-4 w-4" /> PDF
+            </Button>
+            <Button onClick={handleDownloadExcel} size="sm">
+              <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6 pb-8">
+          <h2 className="text-2xl font-bold mb-4">{reportTitles[reportType as ReportType]}</h2>
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <Select value={reportType} onValueChange={setReportType}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select report type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="inventory">Inventory Report</SelectItem>
+                <SelectItem value="sales">Sales Report</SelectItem>
+                <SelectItem value="expenses">Expense Report</SelectItem>
+              </SelectContent>
+            </Select>
+            <DatePickerWithRange
+            //   dateRange={dateRange}
+            //   setDateRange={setDateRange}
+            />
+          </div>
+          <div  className="border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {renderTableHeaders()}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {renderTableRows()}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+        <div className="border-t-2 border-gray-200 p-4 flex justify-center items-center">
+          <div className="flex items-center space-x-2">
+            <img src="/placeholder.svg" alt="Shop Logo" className="h-6 w-6" />
+            <span>© 2023 MyShop. All rights reserved.</span>
+          </div>
+        </div>
+      </Card>
     </div>
   )
 }
+
