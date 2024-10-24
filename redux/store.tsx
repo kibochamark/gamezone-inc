@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { DatatableReducer } from './DatatbaleSlice'
+import { ReportReducer } from './ReportSlice'
 // ...
 
 export const store = configureStore({
   reducer: {
-    datatable:DatatableReducer
+    datatable:DatatableReducer,
+    report:ReportReducer
   }
 })
 

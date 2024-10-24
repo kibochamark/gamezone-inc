@@ -1,16 +1,17 @@
+"use server"
 import { prisma } from "@/lib/prismaClient";
 import { Reports } from "./Reports";
 
-export async function getReportData(reportType:Reports, fromdate:Date = new Date(), todate:Date=new Date()) {
+export async function getReportData(reportType: Reports, fromdate: Date = new Date(), todate: Date = new Date()) {
 
-    console.log(fromdate, todate, 'date range')
-    let result;
+    // console.log(fromdate, todate, 'date range', reportType)
+    let result: any = [];
     try {
-        switch(reportType){
+        switch (reportType) {
             case "lowstock":
                 const inventory = await prisma.inventory.findMany({
                     where: {
-                
+
                         OR: [
                             {
                                 created_at: {
@@ -25,18 +26,38 @@ export async function getReportData(reportType:Reports, fromdate:Date = new Date
                                 }
                             }
                         ]
-        
+
                     },
+                    select: {
+                        buyingprice: true,
+                        category: {
+                            select: {
+                                name: true
+                            }
+                        },
+                        created_at: true,
+                        name: true,
+                        price: true,
+                        quantity: true,
+                        threshold: true
+                    }
                 })
 
-                result = inventory.filter((inv)=> inv.quantity < inv.threshold)
+                // console.log(inventory)
+
+                result = inventory.filter((inv) => inv.quantity < inv.threshold)
+
+
 
                 break
             default:
-                result = "not a valid report"
+                result = []
                 break
 
         }
+
+        // console.log(result);
+
 
         return result
     } catch (e) {
