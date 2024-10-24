@@ -85,7 +85,7 @@ export default function ShopReports() {
   const renderTableHeaders = () => {
     if (reportData.length === 0) return null
     return Object.keys(reportData[0]).map((key) => (
-      <TableHead key={key} className="font-bold">{key.charAt(0).toUpperCase() + key.slice(1)}</TableHead>
+      <TableHead key={key} className="font-bold text-primary800 text-md">{key.charAt(0).toUpperCase() + key.slice(1)}</TableHead>
     ))
   }
 
@@ -100,7 +100,7 @@ export default function ShopReports() {
   }
 
   return (
-    <div ref={tableRef} className="container mx-auto p-4">
+    <div  className="container mx-auto p-4">
       <Card className="border-2 border-gray-200">
         <CardHeader className="flex flex-row items-center justify-between border-b-2 border-gray-200 pb-4">
           <div className="flex items-center space-x-2">
@@ -134,7 +134,7 @@ export default function ShopReports() {
             //   setDateRange={setDateRange}
             />
           </div>
-          <div  className="border rounded-lg overflow-hidden">
+          <div ref={tableRef} className="border-2 border-primary500 rounded-lg overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
