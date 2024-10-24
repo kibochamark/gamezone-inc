@@ -22,26 +22,6 @@ type ReportType = 'inventory' | 'sales' | 'expenses';
 
 export type Reports = 'inventory' | 'lowstock'
 
-
-// Mock data for reports
-const mockReportData = {
-    'inventory': [
-        { id: 1, name: 'Product A', quantity: 100, price: 19.99 },
-        { id: 2, name: 'Product B', quantity: 50, price: 29.99 },
-        { id: 3, name: 'Product C', quantity: 75, price: 14.99 },
-    ],
-    'sales': [
-        { id: 1, date: '2023-06-01', product: 'Product A', quantity: 5, total: 99.95 },
-        { id: 2, date: '2023-06-02', product: 'Product B', quantity: 2, total: 59.98 },
-        { id: 3, date: '2023-06-03', product: 'Product C', quantity: 10, total: 149.90 },
-    ],
-    'expenses': [
-        { id: 1, date: '2023-06-01', description: 'Rent', amount: 1000 },
-        { id: 2, date: '2023-06-02', description: 'Utilities', amount: 200 },
-        { id: 3, date: '2023-06-03', description: 'Supplies', amount: 150 },
-    ],
-}
-
 const reportTitles = {
     'inventory': 'Inventory Report',
     'sales': 'Sales Report',
@@ -77,7 +57,7 @@ export default function ShopReports() {
             // console.log(reportData)
 
         })
-    }, [reportType, dateRange])
+    }, [reportType, date])
 
 
     //   get report mutation
