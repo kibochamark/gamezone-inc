@@ -124,10 +124,10 @@ const reportmutation= useMutation({
             <CardTitle>Dantech Solutions</CardTitle>
           </div>
           <div className="flex space-x-2">
-            <Button onClick={handleDownloadPDF} size="sm">
+            <Button onClick={handleDownloadPDF} size="sm" className="bg-white border-primary700 text-primary900">
               <FileDown className="mr-2 h-4 w-4" /> PDF
             </Button>
-            <Button onClick={handleDownloadExcel} size="sm">
+            <Button onClick={handleDownloadExcel} size="sm" className="bg-primary700 text-white">
               <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel
             </Button>
           </div>
