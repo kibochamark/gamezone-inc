@@ -87,8 +87,8 @@ export const columns: ColumnDef<Product>[] = [
         },
         enableSorting:true
     },
-    {
-        accessorKey: "buyingprice",
+   /* {
+       accessorKey: "buyingprice",
         header: ({ column }) => {
             return (
                 <DataTableColumnHeader className="text-justify" column={column} title="Buying Price" />
@@ -106,7 +106,7 @@ export const columns: ColumnDef<Product>[] = [
         enableSorting:true
 
 
-    },
+    },*/
     {
         accessorKey: "price",
         header: ({ column }) => {
