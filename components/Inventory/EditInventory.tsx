@@ -63,7 +63,7 @@ const EditInventory = ({ categories }: { categories: any }) => {
                 return value > parseFloat(buyingprice);
             }),
 
-            quantity: Yup.number().required().min(1),
+            quantity: Yup.number().required().min(0),
             threshold: Yup.number().required().test('is-less-than-quantity', 'Threshold must be less than the quantity by at least one', function (value) {
                 const { quantity } = this.parent;
                 return value <= quantity;
