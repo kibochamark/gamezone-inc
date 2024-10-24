@@ -13,11 +13,10 @@ async function getProducts() {
     let inventory: any
     try {
         inventory = await prisma.inventory.findMany({
-            take: 5,
             orderBy: {
-                created_at:"desc",
                 frequencySold: "desc",
-            }
+            },
+            take: 5,
         }) ?? []
     } catch (e: any) {
         console.log(e.message)
