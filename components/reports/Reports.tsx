@@ -108,7 +108,7 @@ const reportmutation= useMutation({
   const renderTableRows = () => {
     return reportData?.map((row: any, index: number) => (
       <TableRow key={index}>
-        {Object.values(row).map((value:any, cellIndex) => (
+        {Object.values(row)?.map((value:any, cellIndex) => (
           <TableCell key={cellIndex}>{value}</TableCell>
         ))}
       </TableRow>
