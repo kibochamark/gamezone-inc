@@ -12,9 +12,13 @@ import jsPDF from 'jspdf'
 import * as XLSX from 'xlsx'
 import { DatePickerWithRange } from '../ui/date-picker-with-range'
 import toast from 'react-hot-toast'
+import { useMutation } from '@tanstack/react-query'
+import { getReportData } from './ReportActions'
 
 
 type ReportType = 'inventory' | 'sales' | 'expenses';
+
+export type Reports = 'inventory' | 'lowstock'
 
 
 // Mock data for reports
@@ -44,15 +48,27 @@ const reportTitles = {
 
 export default function ShopReports() {
   const [download, setDownload] = useState(false)
-  const [reportType, setReportType] = useState('inventory')
+  const [reportType, setReportType] = useState<Reports>('inventory')
   const [dateRange, setDateRange] = useState({ from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), to: new Date() })
-  const [reportData, setReportData] = useState<any[]>(mockReportData[reportType as ReportType])
+  const [reportData, setReportData] = useState<any>()
   const tableRef = useRef(null)
 
   useEffect(() => {
-    // In a real application, this would fetch data based on the selected report type and date range
-    setReportData(mockReportData[reportType as ReportType])
+    reportmutation.mutateAsync({report:reportType}).then((value)=>{
+        console.log(value)
+        setReportData(value as any)
+
+    }) 
   }, [reportType, dateRange])
+
+
+//   get report mutation
+const reportmutation= useMutation({
+    mutationFn:async(values:{report:Reports, from?:Date; to?:Date})=>{
+        const res= await getReportData(values.report as Reports, values.from as Date, values.to as Date)
+        return res
+    }
+})
 
   const handleDownloadPDF = () => {
     // setDownload(true)
@@ -83,14 +99,14 @@ export default function ShopReports() {
   }
 
   const renderTableHeaders = () => {
-    if (reportData.length === 0) return null
+    if (reportData?.length === 0) return null
     return Object.keys(reportData[0]).map((key) => (
       <TableHead key={key} className="font-bold text-primary800 text-md">{key.charAt(0).toUpperCase() + key.slice(1)}</TableHead>
     ))
   }
 
   const renderTableRows = () => {
-    return reportData.map((row: any, index: number) => (
+    return reportData?.map((row: any, index: number) => (
       <TableRow key={index}>
         {Object.values(row).map((value:any, cellIndex) => (
           <TableCell key={cellIndex}>{value}</TableCell>
@@ -105,7 +121,7 @@ export default function ShopReports() {
         <CardHeader className="flex flex-row items-center justify-between border-b-2 border-gray-200 pb-4">
           <div className="flex items-center space-x-2">
             <img src="/placeholder.svg" alt="Shop Logo" className="h-8 w-8" />
-            <CardTitle>MyShop</CardTitle>
+            <CardTitle>Dantech Solutions</CardTitle>
           </div>
           <div className="flex space-x-2">
             <Button onClick={handleDownloadPDF} size="sm">
@@ -119,7 +135,7 @@ export default function ShopReports() {
         <CardContent className="pt-6 pb-8">
           <h2 className="text-2xl font-bold mb-4">{reportTitles[reportType as ReportType]}</h2>
           <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <Select value={reportType} onValueChange={setReportType}>
+            <Select value={reportType} onValueChange={(value)=>setReportType(value as Reports)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select report type" />
               </SelectTrigger>
@@ -127,14 +143,17 @@ export default function ShopReports() {
                 <SelectItem value="inventory">Inventory Report</SelectItem>
                 <SelectItem value="sales">Sales Report</SelectItem>
                 <SelectItem value="expenses">Expense Report</SelectItem>
+                <SelectItem value="lowstock">Low stock products</SelectItem>
               </SelectContent>
             </Select>
             <DatePickerWithRange
+            
             //   dateRange={dateRange}
             //   setDateRange={setDateRange}
             />
           </div>
           <div ref={tableRef} className="border-2 border-primary500 rounded-lg overflow-hidden">
+            
             <Table>
               <TableHeader>
                 <TableRow>
@@ -150,7 +169,7 @@ export default function ShopReports() {
         <div className="border-t-2 border-gray-200 p-4 flex justify-center items-center">
           <div className="flex items-center space-x-2">
             <img src="/placeholder.svg" alt="Shop Logo" className="h-6 w-6" />
-            <span>© 2023 MyShop. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} Gamezone. All rights reserved.</span>
           </div>
         </div>
       </Card>
