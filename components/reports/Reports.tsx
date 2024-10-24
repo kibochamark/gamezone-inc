@@ -100,7 +100,7 @@ const reportmutation= useMutation({
 
   const renderTableHeaders = () => {
     if (reportData?.length === 0) return null
-    return Object.keys(reportData[0]).map((key) => (
+    return Object.keys(reportData[0])?.map((key) => (
       <TableHead key={key} className="font-bold text-primary800 text-md">{key.charAt(0).toUpperCase() + key.slice(1)}</TableHead>
     ))
   }
