@@ -50,7 +50,7 @@ const AddInventory = ({ categories }: { categories: any }) => {
             quantity: Yup.number().required().min(1),
             threshold: Yup.number().required().test('is-less-than-quantity', 'Threshold must be less than the quantity by at least one', function (value) {
                 const { quantity } = this.parent;
-                return value < quantity;
+                return value <= quantity;
             }).min(1),
             categoryId: Yup.string().required(),
         }),

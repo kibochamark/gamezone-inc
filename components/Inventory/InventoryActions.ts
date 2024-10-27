@@ -257,39 +257,69 @@ export const updateSale = async (sale: {
         try {
             await prisma.$transaction(async (tx) => {
                 if (sale.quantity > 0) {
-                    if(sale.saletype =="DEBIT"){
-                        const newinventory = await tx.sales.update({
+                    if(sale.status === "RETURNED"){
+                        //update the product in the inventory
+                        const getsale  = await tx.sales.findUnique({
                             where:{
                                 id:sale.id
                             },
-                            data: {
-                                quantitySold: sale.quantity,
-                                priceSold: sale.price,
-                                status:sale.status as ProductStatus,
-                                type:sale.saletype
+                            select:{
+                                inventoryId:true
+                            }
+                        }) 
+
+                        await tx.inventory.update({
+                            where:{
+                                id:getsale?.inventoryId
                             },
-    
-                            select: {
-                                id: true
+                            data:{
+                                quantity:{
+                                    increment:sale.quantity
+                                }
+                            }
+                        })
+
+                        await tx.sales.delete({
+                            where:{
+                                id:sale.id
                             }
                         })
                     }else{
-                        const newinventory = await tx.sales.update({
-                            where:{
-                                id:sale.id
-                            },
-                            data: {
-                                quantitySold: sale.quantity,
-                                priceSold: sale.price,
-                                vendor:sale.vendor,
-                                type:sale.saletype as SaleType,
-                                status:sale.status as ProductStatus
-                            },
-                            select: {
-                                id: true
-                            }
-                        })
+                        if(sale.saletype =="DEBIT"){
+                            const newinventory = await tx.sales.update({
+                                where:{
+                                    id:sale.id
+                                },
+                                data: {
+                                    quantitySold: sale.quantity,
+                                    priceSold: sale.price,
+                                    status:sale.status as ProductStatus,
+                                    type:sale.saletype
+                                },
+        
+                                select: {
+                                    id: true
+                                }
+                            })
+                        }else{
+                            const newinventory = await tx.sales.update({
+                                where:{
+                                    id:sale.id
+                                },
+                                data: {
+                                    quantitySold: sale.quantity,
+                                    priceSold: sale.price,
+                                    vendor:sale.vendor,
+                                    type:sale.saletype as SaleType,
+                                    status:sale.status as ProductStatus
+                                },
+                                select: {
+                                    id: true
+                                }
+                            })
+                        }
                     }
+                
                 }
             }
             )
