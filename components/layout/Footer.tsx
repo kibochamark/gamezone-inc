@@ -1,4 +1,5 @@
 import { Link, Package2 } from "lucide-react";
+import Image from "next/image";
 
 import React from 'react'
 
@@ -9,8 +10,7 @@ const Footer = () => {
                 <div className="sm:flex sm:items-center sm:justify-between">
                     <div className="flex justify-center sm:justify-start">
                         <Link href="/" className="flex items-center gap-2 font-semibold">
-                            <Package2 className="h-6 w-6" />
-                            <span className="text-titleLarge text-primary900">Dantech Inc</span>
+                            {/* <Image src="/logo.jpg" alt="logo" width={100} height={100} className="" /> */}
                         </Link>
                     </div>
 

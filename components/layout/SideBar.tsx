@@ -41,6 +41,7 @@ import { usePathname } from 'next/navigation'
 import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components'
 import { prisma } from '@/lib/prismaClient'
 import { useQuery } from '@tanstack/react-query'
+import Image from 'next/image'
 
 
 const SideBar = ({salescount}:{salescount:number}) => {
@@ -85,10 +86,11 @@ const SideBar = ({salescount}:{salescount:number}) => {
         <>
             <div className="hidden h-screen bg-background shadow-md border-r-2 md:block ">
                 <div className="flex h-full max-h-screen flex-col gap-2">
-                    <div className="flex h-14 items-center  px-4 lg:h-[60px] lg:px-6">
-                        <Link href="/" className="flex items-center gap-2 font-semibold">
-                            <Package2 className="h-6 w-6" />
-                            <span className="text-titleLarge text-primary900">Dantech Inc</span>
+                    <div className="flex h-14 my-10 items-center  px-4 lg:h-[60px] lg:px-6">
+                        <Link href="/" className="flex  items-center gap-2  font-semibold">
+                        <Image className='rounded-full' src={"/logo.jpg"} width={200} height={200} alt='dantech logo'/>
+                            {/* <Package2 className="h-6 w-6" /> */}
+                            {/* <span className="text-titleLarge text-primary900">Dantech Inc</span> */}
                         </Link>
                         <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
                             <Bell className="h-4 w-4" />
