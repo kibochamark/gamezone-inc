@@ -5,6 +5,7 @@ import React, { Suspense } from 'react'
 import { getSalesSummary } from '../sales/page'
 import { getLowStockSummary, getTotalInv } from '../inventory/page'
 import { getExpenseSummary } from '../expenses/page'
+import { seedData } from '@/components/Inventory/InventoryActions'
 
 
 export const dynamic = 'force-dynamic'
@@ -15,6 +16,7 @@ async function getProducts() {
         inventory = await prisma.inventory.findMany({
             orderBy: {
                 frequencySold: "desc",
+
             },
             take: 5,
         }) ?? []
@@ -36,12 +38,12 @@ async function getRecentSales() {
             select: {
                 inventory: {
                     select: {
-                        name:true
+                        name: true
                     }
                 },
-                priceSold:true,
-                quantitySold:true,
-                
+                priceSold: true,
+                quantitySold: true,
+
             }
         }) ?? []
     } catch (e: any) {
@@ -59,11 +61,12 @@ const page = async () => {
     const lowstock = await getLowStockSummary()
     const totalInv = await getTotalInv()
     const expensesSummary = await getExpenseSummary()
+    // const data = await seedData()
     return (
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
                 <Suspense fallback={<Loader className="flex items-center justify-center animate animate-spin" />}>
-                    <PageView inventory={inventory} expenses={expensesSummary} lowstock={lowstock}  totalInv={totalInv} salesSummary={salesSummary} recentsales={sales} />
+                    <PageView inventory={inventory} expenses={expensesSummary} lowstock={lowstock} totalInv={totalInv} salesSummary={salesSummary} recentsales={sales} />
                 </Suspense>
             </div>
 

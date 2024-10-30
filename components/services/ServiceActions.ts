@@ -1,6 +1,7 @@
 "use server"
 
 import { prisma } from "@/lib/prismaClient"
+import { genRandonString } from "@/lib/generateAccountRef";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
 
 
@@ -62,6 +63,34 @@ export const createService = async (service: { name: string; price: number }) =>
                     },
                 });
             }
+              // create transaction
+            const createRevenueTransaction = await prisma.revenueAccount.create({
+                data: {
+                    accountRef: `RC${genRandonString()}`,
+                    creditTotal: newService.price,
+                    debitTotal: 0
+                }
+            })
+            const serviceAccount = await prisma.serviceAccount.create({
+                data: {
+                    accountRef: `EC${genRandonString()}`,
+                    debitTotal: 0,
+                    creditTotal:service.price,
+                    serviceId:newService.id
+                },
+            });
+            // Create a new transaction record
+            const newTransaction = await prisma.transactionAccount.create({
+                data: {
+                    accountRef: `TC${genRandonString()}`,
+                    debitAmount: 0,
+                    creditAmount: service.price,
+                    description: "service",
+                    creditAccountId: newService.id, // credit the Inventory Account
+                    debitAccountId: '',     // debiting the Cash Account or source
+                },
+            });
+
 
         } catch (e: any) {
             console.error(e.message);

@@ -1,8 +1,10 @@
 "use server"
 
+import { genRandonString } from "@/lib/generateAccountRef";
 import { prisma } from "@/lib/prismaClient"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
 import { ProductStatus, SaleType } from "@prisma/client";
+import { randomUUID } from "crypto";
 import { AwardIcon } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
@@ -28,7 +30,8 @@ export const createInventory = async (inventory: Inventory) => {
                         threshold: inventory.threshold
                     },
                     select: {
-                        id: true
+                        id: true,
+                        buyingprice: true
                     }
                 })
 
@@ -40,11 +43,36 @@ export const createInventory = async (inventory: Inventory) => {
                         }
                     })
                 }
+
+                // create transaction
+                const createMainAccountTransaction = await tx.mainAccount.create({
+                    data: {
+                        accountRef: `MC${genRandonString()}`,
+                        debitTotal: newinventory.buyingprice,
+                        creditTotal: 0
+                    }
+                })
+                const InventoryAccount = await tx.inventoryAccount.create({
+                    data: {
+                        productId: newinventory.id,
+                        accountRef: `IC${genRandonString()}`,
+                        creditTotal: newinventory.buyingprice
+                    },
+                });
+                // Create a new transaction record
+                const newTransaction = await tx.transactionAccount.create({
+                    data: {
+                        accountRef: `TC${genRandonString()}`,
+                        debitAmount: 0,
+                        creditAmount: newinventory.buyingprice,
+                        description: "new stock",
+                        creditAccountId: createMainAccountTransaction.id, // credit the Inventory Account
+                        debitAccountId: InventoryAccount.id,     // debiting the Cash Account or source
+                    },
+                });
+
+
             })
-
-
-
-
 
         } catch (e: any) {
             console.log(e.message)
@@ -153,37 +181,37 @@ export const createSale = async (sale: {
         try {
             await prisma.$transaction(async (tx) => {
                 if (sale.quantity > 0) {
-                    if(sale.saletype =="DEBIT"){
+                    if (sale.saletype == "DEBIT") {
                         const newinventory = await tx.sales.create({
                             data: {
                                 inventoryId: sale.inventoryId,
                                 quantitySold: sale.quantity,
                                 kindeId: user?.id,
                                 priceSold: sale.price,
-                                type:"DEBIT"
+                                type: "DEBIT"
                             },
-    
+
                             select: {
                                 id: true
                             }
                         })
-                    }else{
+                    } else {
                         const newinventory = await tx.sales.create({
                             data: {
                                 inventoryId: sale.inventoryId,
                                 quantitySold: sale.quantity,
                                 kindeId: user?.id,
                                 priceSold: sale.price,
-                                type:"CREDIT",
-                                vendor:sale.vendor
+                                type: "CREDIT",
+                                vendor: sale.vendor
                             },
-    
+
                             select: {
                                 id: true
                             }
                         })
                     }
-                    
+
 
 
 
@@ -222,7 +250,39 @@ export const createSale = async (sale: {
 
 
 
+          
+
+
+
                 }
+                            // create transaction
+            const createRevenueTransaction = await tx.revenueAccount.create({
+                data: {
+                    accountRef: `RC${genRandonString()}`,
+                    creditTotal: sale.price,
+                    debitTotal: 0
+                }
+            })
+            const saleAccount = await tx.salesAccount.create({
+                data: {
+                    accountRef: `EC${genRandonString()}`,
+                    creditTotal: sale.price,
+                    debitTotal:0,
+                    productId:sale.inventoryId
+                },
+            });
+            // Create a new transaction record
+            const newTransaction = await tx.transactionAccount.create({
+                data: {
+                    accountRef: `TC${genRandonString()}`,
+                    debitAmount: 0,
+                    creditAmount: sale.price,
+                    description: "sale",
+                    creditAccountId: saleAccount.id, // credit the Inventory Account
+                    debitAccountId: createRevenueTransaction.id,     // debiting the Cash Account or source
+                },
+            });
+
             }
             )
         } catch (e: any) {
@@ -237,12 +297,12 @@ export const createSale = async (sale: {
 
 
 export const updateSale = async (sale: {
-    id:string;
-    price: number, 
+    id: string;
+    price: number,
     quantity: number;
     threshold: number;
     saletype: string;
-    status?:string;
+    status?: string;
     vendor?: string;
 }) => {
     const { isAuthenticated, getUser } = await getKindeServerSession()
@@ -257,61 +317,61 @@ export const updateSale = async (sale: {
         try {
             await prisma.$transaction(async (tx) => {
                 if (sale.quantity > 0) {
-                    if(sale.status === "RETURNED"){
+                    if (sale.status === "RETURNED") {
                         //update the product in the inventory
-                        const getsale  = await tx.sales.findUnique({
-                            where:{
-                                id:sale.id
+                        const getsale = await tx.sales.findUnique({
+                            where: {
+                                id: sale.id
                             },
-                            select:{
-                                inventoryId:true
+                            select: {
+                                inventoryId: true
                             }
-                        }) 
+                        })
 
                         await tx.inventory.update({
-                            where:{
-                                id:getsale?.inventoryId
+                            where: {
+                                id: getsale?.inventoryId
                             },
-                            data:{
-                                quantity:{
-                                    increment:sale.quantity
+                            data: {
+                                quantity: {
+                                    increment: sale.quantity
                                 }
                             }
                         })
 
                         await tx.sales.delete({
-                            where:{
-                                id:sale.id
+                            where: {
+                                id: sale.id
                             }
                         })
-                    }else{
-                        if(sale.saletype =="DEBIT"){
+                    } else {
+                        if (sale.saletype == "DEBIT") {
                             const newinventory = await tx.sales.update({
-                                where:{
-                                    id:sale.id
+                                where: {
+                                    id: sale.id
                                 },
                                 data: {
                                     quantitySold: sale.quantity,
                                     priceSold: sale.price,
-                                    status:sale.status as ProductStatus,
-                                    type:sale.saletype
+                                    status: sale.status as ProductStatus,
+                                    type: sale.saletype
                                 },
-        
+
                                 select: {
                                     id: true
                                 }
                             })
-                        }else{
+                        } else {
                             const newinventory = await tx.sales.update({
-                                where:{
-                                    id:sale.id
+                                where: {
+                                    id: sale.id
                                 },
                                 data: {
                                     quantitySold: sale.quantity,
                                     priceSold: sale.price,
-                                    vendor:sale.vendor,
-                                    type:sale.saletype as SaleType,
-                                    status:sale.status as ProductStatus
+                                    vendor: sale.vendor,
+                                    type: sale.saletype as SaleType,
+                                    status: sale.status as ProductStatus
                                 },
                                 select: {
                                     id: true
@@ -319,7 +379,7 @@ export const updateSale = async (sale: {
                             })
                         }
                     }
-                
+
                 }
             }
             )
@@ -402,3 +462,102 @@ export const createBulkInventory = async (inventory: {
         return new Error("Not authenticated");
     }
 };
+
+
+
+export async function seedData() {
+    try {
+        const inventory = await prisma.sales.findMany({
+            // _sum:{
+            //     creditTotal:true,
+            //     debitTotal:true
+
+            // }
+        })
+        // const inventoryAcc = await prisma.inventoryAccount.create({
+        //     // _sum:{
+        //     //     creditTotal:true,
+        //     //     debitTotal:true
+
+        //     // }
+        //     data:{
+        //         productId:"671fcb9f44c071f728787978"
+        //     }
+        // })
+        
+        // await prisma.transactionAccount.deleteMany({
+        //     where:{
+        //         debitAccountId:{
+        //             not:''
+        //         }
+        //     }
+        // })
+
+        
+        // const inventoryAcc = await prisma.inventoryAccount.findMany()
+        console.log(inventory)
+
+
+
+        for (let i = 0; i < inventory.length; i++) {
+
+
+
+            await prisma.$transaction(async (tx) => {
+
+                // // // create transaction
+                // const createMainAccountTransaction = await tx.mainAccount.create({
+                //     data: {
+                //         accountRef: `MC${genRandonString()}`,
+                //         debitTotal: inventory[i].creditTotal,
+                //         creditTotal: 0,
+                //         created_at:new Date(inventory[i]?.created_at),
+                //         updated_at:new Date(inventory[i].updated_at)
+                //     }
+                // })
+
+                // // console.log(createMainAccountTransaction, "trab")
+                const saleAccount = await tx.salesAccount.create({
+                    data: {
+                        productId: inventory[i].inventoryId,
+                        accountRef: `SC${genRandonString()}`,
+                        debitTotal: 0,
+                        creditTotal:inventory[i].priceSold,
+                        created_at:new Date(inventory[i].created_at),
+                        updated_at:new Date(inventory[i].updated_at)
+                    },
+                });
+                // // console.log(createMainAccountTransaction, "trab")
+                const revAccount = await tx.revenueAccount.create({
+                    data: {
+                        accountRef: `RC${genRandonString()}`,
+                        debitTotal: 0,
+                        creditTotal:inventory[i].priceSold,
+                        created_at:new Date(inventory[i].created_at),
+                        updated_at:new Date(inventory[i].updated_at)
+                    },
+                });
+                // Create a new transaction record
+                const newTransaction = await tx.transactionAccount.create({
+                    data: {
+                        accountRef: `TC${genRandonString()}`,
+                        debitAmount: inventory[i].priceSold,
+                        creditAmount: 0,
+                        description: "sale acc setup",
+                        creditAccountId: revAccount.id,
+                        debitAccountId: '',
+                        created_at:new Date(inventory[i]?.created_at),
+                        updated_at:new Date(inventory[i].updated_at)
+                        // credit the Inventory Account
+                        // debitAccountId: InventoryAccount.id,     // debiting the Cash Account or source
+                    },
+                });
+            });
+
+        }
+
+    } catch (e: any) {
+        console.log(e.message)
+    }
+
+}
