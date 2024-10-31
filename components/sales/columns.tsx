@@ -65,6 +65,21 @@ export const columns: ColumnDef<Product>[] = [
         enableSorting:true
     },
     {
+        accessorKey: "status",
+        header: ({ column }) => {
+            return (
+                <DataTableColumnHeader column={column} title="Sale Status" />
+            )
+        },
+        cell: ({ row }) => {
+            
+
+            return <div className={`text-justify font-medium p-3 p-1 rounded-full ${row.original.status === "SOLD" ? "text-white bg-green-500" :row.original.status === "RETURNED" ? "text-black bg-gray-500" : "text-white bg-orange-500"}`}>{row.getValue("status")}</div>
+        },
+
+        enableSorting:true
+    },
+    {
         accessorKey: "quantitySold",
         header: ({ column }) => {
             return (
