@@ -471,7 +471,7 @@ export async function seedData() {
         const inventory = await prisma.services.findMany({
             where:{
                 created_at: {
-                    gt:new Date("2024-10-25")
+                    gt:new Date("2024-10-30")
                 }
             }
             // _sum:{
