@@ -5,7 +5,6 @@ import React, { Suspense } from 'react'
 import { getSalesSummary } from '../sales/page'
 import { getLowStockSummary, getTotalInv } from '../inventory/page'
 import { getExpenseSummary } from '../expenses/page'
-import { seedData } from '@/components/Inventory/InventoryActions'
 
 
 export const dynamic = 'force-dynamic'
@@ -61,7 +60,6 @@ const page = async () => {
     const lowstock = await getLowStockSummary()
     const totalInv = await getTotalInv()
     const expensesSummary = await getExpenseSummary()
-    const data = await seedData()
     return (
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
