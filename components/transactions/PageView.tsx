@@ -72,7 +72,7 @@ export default function TransactionsReport() {
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob)
       link.setAttribute('href', url)
-      link.setAttribute('download', `${account}_report_${format(date.from, 'yyyyMMdd')}_${format(date?.to, 'yyyyMMdd')}.csv`)
+      link.setAttribute('download', `${account}_report_${format(date.from as Date, 'yyyyMMdd')}_${format(date.to as Date, 'yyyyMMdd')}.csv`)
       link.style.visibility = 'hidden'
       document.body.appendChild(link)
       link.click()
