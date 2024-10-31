@@ -74,7 +74,7 @@ export const columns: ColumnDef<Product>[] = [
         cell: ({ row }) => {
             
 
-            return <div className={`text-center font-small text-sm px-2 lowercase py-1 rounded-full ${row.original.status === "SOLD" ? "text-white bg-green-500" :row.original.status === "RETURNED" ? "text-black bg-gray-500" : "text-white bg-orange-500"}`}>{row.getValue("status")}</div>
+            return <div className={`text-center font-small text-sm p-1 lowercase rounded-full ${row.original.status === "SOLD" ? "text-white bg-green-500" :row.original.status === "RETURNED" ? "text-black bg-gray-500" : "text-white bg-orange-500"}`}>{row.getValue("status")}</div>
         },
 
         enableSorting:true
