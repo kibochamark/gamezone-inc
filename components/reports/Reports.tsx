@@ -194,7 +194,7 @@ export default function ShopReports() {
                 </CardContent>
                 <div className="border-t-2 border-gray-200 p-4 flex justify-center items-center">
                     <div className="flex items-center space-x-2">
-                        <img src="/placeholder.svg" alt="Shop Logo" className="h-6 w-6" />
+                        <img src="/logo.jpg" alt="Shop Logo" className="h-6 w-6" />
                         <span>© {new Date().getFullYear()} Gamezone. All rights reserved.</span>
                     </div>
                 </div>
