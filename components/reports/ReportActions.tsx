@@ -50,6 +50,42 @@ export async function getReportData(reportType: Reports, fromdate: Date = new Da
 
 
                 break
+            case 'creditsales':
+                const customers = await prisma.customerAccount.groupBy({
+                    by:['accountName'],
+                    where: {
+
+                        OR: [
+                            {
+                                created_at: {
+                                    gte: fromdate,
+                                    lt: todate
+                                }
+                            },
+                            {
+                                updated_at: {
+                                    gte: fromdate,
+                                    lt: todate  
+                                }
+                            }
+                        ]
+
+                    },
+                    _sum:{
+                        debitTotal:true,
+                        creditTotal:true
+                    }
+                })
+
+                result = customers.filter((c)=>{
+                    return {
+                        accountname:c.accountName,
+                        balance :(c._sum.creditTotal as number) - (c._sum.debitTotal as number)
+                    }
+                })
+
+
+                return result
             default:
                 result = []
                 break

@@ -18,15 +18,16 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 
 
-type ReportType = 'inventory' | 'sales' | 'expenses';
+type ReportType = 'inventory' | 'sales' | 'expenses' |'creditsales';
 
-export type Reports = 'inventory' | 'lowstock'
+export type Reports = 'inventory' | 'lowstock' | 'creditsales'
 
 const reportTitles = {
     'inventory': 'Inventory Report',
     'sales': 'Sales Report',
     'expenses': 'Expense Report',
-    'lowstock': 'Low stock Report'
+    'lowstock': 'Low stock Report',
+    'creditsales':'Credit sales report'
 }
 
 export default function ShopReports() {
@@ -144,6 +145,7 @@ export default function ShopReports() {
                                 <SelectItem value="sales">Sales Report</SelectItem>
                                 <SelectItem value="expenses">Expense Report</SelectItem>
                                 <SelectItem value="lowstock">Low stock products</SelectItem>
+                                <SelectItem value="creditsales">Sales on credit with vendor associated</SelectItem>
                             </SelectContent>
                         </Select>
                         <DatePickerWithRange
