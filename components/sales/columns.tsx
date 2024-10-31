@@ -50,6 +50,21 @@ export const columns: ColumnDef<Product>[] = [
         enableSorting:true
     },
     {
+        accessorKey: "type",
+        header: ({ column }) => {
+            return (
+                <DataTableColumnHeader column={column} title="Sale Type" />
+            )
+        },
+        cell: ({ row }) => {
+            
+
+            return <div className={`text-justify font-medium ${row.original.type === "DEBIT" ? "text-green-500" :"text-red-500"}`}>{row.getValue("type")}</div>
+        },
+
+        enableSorting:true
+    },
+    {
         accessorKey: "quantitySold",
         header: ({ column }) => {
             return (
