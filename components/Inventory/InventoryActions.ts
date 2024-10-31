@@ -467,7 +467,13 @@ export const createBulkInventory = async (inventory: {
 
 export async function seedData() {
     try {
+
         const inventory = await prisma.services.findMany({
+            where:{
+                created_at: {
+                    gt:new Date("2024-10-25")
+                }
+            }
             // _sum:{
             //     creditTotal:true,
             //     debitTotal:true

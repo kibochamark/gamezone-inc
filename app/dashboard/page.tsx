@@ -61,7 +61,7 @@ const page = async () => {
     const lowstock = await getLowStockSummary()
     const totalInv = await getTotalInv()
     const expensesSummary = await getExpenseSummary()
-    // const data = await seedData()
+    const data = await seedData()
     return (
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
