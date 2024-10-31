@@ -102,7 +102,7 @@ export default function TransactionsReport() {
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className="w-full mb-10">
       <CardHeader>
         <CardTitle>Account Reports</CardTitle>
       </CardHeader>

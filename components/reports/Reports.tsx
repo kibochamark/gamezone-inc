@@ -135,7 +135,7 @@ export default function ShopReports() {
             <Card className="border-2 border-gray-200">
                 <CardHeader className="flex flex-row items-center justify-between border-b-2 border-gray-200 pb-4">
                     <div className="flex items-center space-x-2">
-                        <img src="/placeholder.svg" alt="Shop Logo" className="h-8 w-8" />
+                        <img src="/logo.jpg" alt="Shop Logo" className="h-8 w-8" />
                         <CardTitle>Dantech Solutions</CardTitle>
                     </div>
                     <div className="flex space-x-2">
