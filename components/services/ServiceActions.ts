@@ -73,7 +73,7 @@ export const createService = async (service: { name: string; price: number }) =>
             })
             const serviceAccount = await prisma.serviceAccount.create({
                 data: {
-                    accountRef: `EC${genRandonString()}`,
+                    accountRef: `SC${genRandonString()}`,
                     debitTotal: 0,
                     creditTotal:service.price,
                     serviceId:newService.id

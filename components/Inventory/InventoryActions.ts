@@ -265,7 +265,7 @@ export const createSale = async (sale: {
             })
             const saleAccount = await tx.salesAccount.create({
                 data: {
-                    accountRef: `EC${genRandonString()}`,
+                    accountRef: `SC${genRandonString()}`,
                     creditTotal: sale.price,
                     debitTotal:0,
                     productId:sale.inventoryId
@@ -467,7 +467,7 @@ export const createBulkInventory = async (inventory: {
 
 export async function seedData() {
     try {
-        const inventory = await prisma.sales.findMany({
+        const inventory = await prisma.services.findMany({
             // _sum:{
             //     creditTotal:true,
             //     debitTotal:true
@@ -517,12 +517,12 @@ export async function seedData() {
                 // })
 
                 // // console.log(createMainAccountTransaction, "trab")
-                const saleAccount = await tx.salesAccount.create({
+                const saleAccount = await tx.serviceAccount.create({
                     data: {
-                        productId: inventory[i].inventoryId,
+                        serviceId: inventory[i].id,
                         accountRef: `SC${genRandonString()}`,
                         debitTotal: 0,
-                        creditTotal:inventory[i].priceSold,
+                        creditTotal:inventory[i].price,
                         created_at:new Date(inventory[i].created_at),
                         updated_at:new Date(inventory[i].updated_at)
                     },
@@ -532,7 +532,7 @@ export async function seedData() {
                     data: {
                         accountRef: `RC${genRandonString()}`,
                         debitTotal: 0,
-                        creditTotal:inventory[i].priceSold,
+                        creditTotal:inventory[i].price,
                         created_at:new Date(inventory[i].created_at),
                         updated_at:new Date(inventory[i].updated_at)
                     },
@@ -541,9 +541,9 @@ export async function seedData() {
                 const newTransaction = await tx.transactionAccount.create({
                     data: {
                         accountRef: `TC${genRandonString()}`,
-                        debitAmount: inventory[i].priceSold,
+                        debitAmount: inventory[i].price,
                         creditAmount: 0,
-                        description: "sale acc setup",
+                        description: "services acc setup",
                         creditAccountId: revAccount.id,
                         debitAccountId: '',
                         created_at:new Date(inventory[i]?.created_at),
