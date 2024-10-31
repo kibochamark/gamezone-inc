@@ -44,7 +44,7 @@ import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { prisma } from '@/lib/prismaClient'
 
-const Navbar = ({ children, salescount }: { children: ReactNode; salescount:number }) => {
+const Navbar = ({ children, salescount }: { children: ReactNode; salescount: number }) => {
   const path = usePathname()
   const {
     isLoading,
@@ -63,16 +63,16 @@ const Navbar = ({ children, salescount }: { children: ReactNode; salescount:numb
     error
   } = useKindeAuth();
 
-  const {data, isLoading:Loading, error:queryError} = useQuery({
-    queryKey:["getsalescount"],
-    queryFn:async()=>{
+  const { data, isLoading: Loading, error: queryError } = useQuery({
+    queryKey: ["getsalescount"],
+    queryFn: async () => {
       let today = new Date()
-      today.setHours(0,0,0)
+      today.setHours(0, 0, 0)
       const salecount = await prisma.sales.count({
-        where:{
-          created_at:{
-            gte:today,
-            lt:new Date(today.getTime() + 86400000 )
+        where: {
+          created_at: {
+            gte: today,
+            lt: new Date(today.getTime() + 86400000)
           }
         }
       })
@@ -118,12 +118,12 @@ const Navbar = ({ children, salescount }: { children: ReactNode; salescount:numb
                   >
                     <ShoppingCart className="h-4 w-4" />
                     Sales
-                    {Loading ? (<Loader className="text-white animate animate-spin rounded-full"/>) : (
+                    {Loading ? (<Loader className="text-white animate animate-spin rounded-full" />) : (
                       <Badge className="ml- bg-primary800 text-white flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                    {salescount}
-                    </Badge>
+                        {salescount}
+                      </Badge>
                     )}
-                    
+
                   </Link>
                   <Link
                     href="/inventory"
@@ -160,6 +160,13 @@ const Navbar = ({ children, salescount }: { children: ReactNode; salescount:numb
                   >
                     <LineChart className="h-4 w-4" />
                     Reports
+                  </Link>
+                  <Link
+                    href="/transactionreports"
+                    className={`flex items-center gap-3 ${path.includes("transactionreports") && "dark:bg-primary100 text-primary bg-primary50 "} rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
+                  >
+                    <LineChart className="h-4 w-4" />
+                    Account Reports
                   </Link>
                 </nav>
                 <div className="mt-auto">
