@@ -534,8 +534,8 @@ export async function seedData() {
                         accountRef: `CA${genRandonString()}`,
                         accountName:inventory[i].vendor as string,
                         customerContact:'',
-                        debitTotal: 0,
-                        creditTotal:inventory[i].priceSold,
+                        debitTotal: inventory[i].priceSold,
+                        creditTotal:0,
                         created_at:new Date(inventory[i].created_at),
                         updated_at:new Date(inventory[i].updated_at)
                     },
