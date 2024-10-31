@@ -465,99 +465,114 @@ export const createBulkInventory = async (inventory: {
 
 
 
-// export async function seedData() {
-//     try {
-//         // const inventory = await prisma.sales.findMany({
-//         //     // _sum:{
-//         //     //     creditTotal:true,
-//         //     //     debitTotal:true
+export async function seedData() {
+    try {
+        const inventory = await prisma.sales.findMany({
+            where:{
+                type:"CREDIT",
+                OR:[
+                    {
+                        status:"SOLD",
+                        
+                    },
+                    {
+                        status:"RETURNED"
+                    }
+                ]
+            }
+            // _sum:{
+            //     creditTotal:true,
+            //     debitTotal:true
 
-//         //     // }
-//         // })
-//         // const inventoryAcc = await prisma.inventoryAccount.create({
-//         //     // _sum:{
-//         //     //     creditTotal:true,
-//         //     //     debitTotal:true
+            // }
+        })
+        // const inventoryAcc = await prisma.inventoryAccount.create({
+        //     // _sum:{
+        //     //     creditTotal:true,
+        //     //     debitTotal:true
 
-//         //     // }
-//         //     data:{
-//         //         productId:"671fcb9f44c071f728787978"
-//         //     }
-//         // })
+        //     // }
+        //     data:{
+        //         productId:"671fcb9f44c071f728787978"
+        //     }
+        // })
         
-//         // await prisma.transactionAccount.deleteMany({
-//         //     where:{
-//         //         debitAccountId:{
-//         //             not:''
-//         //         }
-//         //     }
-//         // })
-
-        
-//         // const inventoryAcc = await prisma.inventoryAccount.findMany()
-//         // console.log(inventory)
-
-
-
-//         // for (let i = 0; i < inventory.length; i++) {
-
-
-
-//             await prisma.$transaction(async (tx) => {
-
-//                 // // // create transaction
-//                 // const createMainAccountTransaction = await tx.mainAccount.create({
-//                 //     data: {
-//                 //         accountRef: `MC${genRandonString()}`,
-//                 //         debitTotal: inventory[i].creditTotal,
-//                 //         creditTotal: 0,
-//                 //         created_at:new Date(inventory[i]?.created_at),
-//                 //         updated_at:new Date(inventory[i].updated_at)
-//                 //     }
-//                 // })
-
-//                 // // console.log(createMainAccountTransaction, "trab")
-//                 const saleAccount = await tx.serviceAccount.create({
-//                     data: {
-//                         serviceId: '672326e60f9a98b64488245e',
-//                         accountRef: `SC${genRandonString()}`,
-//                         debitTotal: 0,
-//                         creditTotal:20,
-//                         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
-//                         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
-//                     },
-//                 });
-//                 // // console.log(createMainAccountTransaction, "trab")
-//                 const revAccount = await tx.revenueAccount.create({
-//                     data: {
-//                         accountRef: `RC${genRandonString()}`,
-//                         debitTotal: 0,
-//                         creditTotal:20,
-//                         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
-//                         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
-//                     },
-//                 });
-//                 // Create a new transaction record
-//                 const newTransaction = await tx.transactionAccount.create({
-//                     data: {
-//                         accountRef: `TC${genRandonString()}`,
-//                         debitAmount: 20,
-//                         creditAmount: 0,
-//                         description: "sale acc setup",
-//                         creditAccountId: revAccount.id,
-//                         debitAccountId: '',
-//                         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
-//                         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
-//                         // credit the Inventory Account
-//                         // debitAccountId: InventoryAccount.id,     // debiting the Cash Account or source
-//                     },
-//                 });
-//             });
+        // await prisma.transactionAccount.deleteMany({
+        //     where:{
+        //         debitAccountId:{
+        //             not:''
+        //         }
+        //     }
+        // })
 
         
+        // const inventoryAcc = await prisma.inventoryAccount.findMany()
+        // console.log(inventory)
 
-//     } catch (e: any) {
-//         console.log(e.message)
-//     }
 
-// }
+
+        for (let i = 0; i < inventory.length; i++) {
+
+
+
+            await prisma.$transaction(async (tx) => {
+
+                // // // create transaction
+                // const createMainAccountTransaction = await tx.mainAccount.create({
+                //     data: {
+                //         accountRef: `MC${genRandonString()}`,
+                //         debitTotal: inventory[i].creditTotal,
+                //         creditTotal: 0,
+                //         created_at:new Date(inventory[i]?.created_at),
+                //         updated_at:new Date(inventory[i].updated_at)
+                //     }
+                // })
+
+                // // console.log(createMainAccountTransaction, "trab")
+                const saleAccount = await tx.customerAccount.create({
+                    data: {
+                        accountRef: `CA${genRandonString()}`,
+                        accountName:inventory[i].vendor as string,
+                        customerContact:'',
+                        debitTotal: 0,
+                        creditTotal:inventory[i].priceSold,
+                        created_at:new Date(inventory[i].created_at),
+                        updated_at:new Date(inventory[i].updated_at)
+                    },
+                });
+                // // // console.log(createMainAccountTransaction, "trab")
+                // const revAccount = await tx.revenueAccount.create({
+                //     data: {
+                //         accountRef: `RC${genRandonString()}`,
+                //         debitTotal: 0,
+                //         creditTotal:20,
+                //         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
+                //         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
+                //     },
+                // });
+                // // Create a new transaction record
+                // const newTransaction = await tx.transactionAccount.create({
+                //     data: {
+                //         accountRef: `TC${genRandonString()}`,
+                //         debitAmount: 20,
+                //         creditAmount: 0,
+                //         description: "sale acc setup",
+                //         creditAccountId: revAccount.id,
+                //         debitAccountId: '',
+                //         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
+                //         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
+                //         // credit the Inventory Account
+                //         // debitAccountId: InventoryAccount.id,     // debiting the Cash Account or source
+                //     },
+                // });
+            });
+
+        }
+
+        
+
+    } catch (e: any) {
+        console.log(e.message)
+    }
+
+}
