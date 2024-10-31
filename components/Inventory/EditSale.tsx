@@ -56,14 +56,16 @@ const EditSale = () => {
             threshold: 0,
             saletype: '',
             vendor: '',
-            status:''
+            status:'',
+            contact:''
 
         },
         validationSchema: Yup.object().shape({
             price: Yup.number().required(),
             saletype: Yup.string().oneOf(["DEBIT", "CREDIT"]).required(),
             vendor: Yup.string().optional(),
-            status:Yup.string().oneOf(["CREDITED", "RETURNED", "SOLD"]).required()
+            status:Yup.string().oneOf(["CREDITED", "RETURNED", "SOLD"]).required(),
+            contact:Yup.string().optional()
         }),
         onSubmit: async (values, formikHelpers) => {
             // console.log(values)
@@ -99,7 +101,8 @@ const EditSale = () => {
                 threshold: editdata?.inventory?.threshold,
                 saletype: editdata?.type,
                 vendor:editdata?.vendor,
-                status:editdata?.status
+                status:editdata?.status,
+                contact:editdata?.contact
             })
         }
     }, [isedit, page, editdata])
@@ -176,8 +179,8 @@ const EditSale = () => {
                                     <select id="categoryId" name='saletype' defaultValue={formik.values.saletype} onChange={formik.handleChange} onBlur={formik.handleBlur} disabled={formik.isSubmitting} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                         <option value="">select a sale type</option>
 
-                                        <option value={"DEBIT"}>Debit</option>
-                                        <option value={"CREDIT"}>Credit</option>
+                                        <option value={"DEBIT"} disabled={true}>Debit</option>
+                                        <option value={"CREDIT"}  disabled={true}>Credit</option>
 
 
                                     </select>
@@ -190,7 +193,7 @@ const EditSale = () => {
                                     <select id="" name='status' defaultValue={formik.values.status} onChange={formik.handleChange} onBlur={formik.handleBlur} disabled={formik.isSubmitting} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                         <option value="">select a sale status</option>
 
-                                        <option value={"CREDITED"}>Credited</option>
+                                        <option value={"CREDITED"} disabled={true}>Credited</option>
                                         <option value={"SOLD"}>Sold</option>
                                         <option value={"RETURNED"}>Returned</option>
 
@@ -200,6 +203,7 @@ const EditSale = () => {
 
 
                                 {formik.values.saletype === "CREDIT" && (
+                                    <>
                                     <div className="grid gap-2">
                                         <Label htmlFor="vendor">Vendor Name</Label>
                                         {formik.touched.vendor && formik.errors.vendor && (
@@ -213,12 +217,35 @@ const EditSale = () => {
                                             defaultValue={formik.values.vendor}
                                             className='space-x-2'
                                             onBlur={formik.handleBlur}
+                                            readOnly
                                             disabled={formik.isSubmitting}
 
                                             placeholder=""
                                             required
                                         />
                                     </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="contact">Vendor phone number</Label>
+                                        {formik.touched.contact && formik.errors.contact && (
+                                            <p className='text-sm text-red-600 tracking-tight leading-tight'>{formik.errors.contact}</p>
+                                        )}
+                                        <Input
+                                            id="contact"
+                                            name='contact'
+                                            type="text"
+                                            onChange={formik.handleChange}
+                                            defaultValue={formik.values.contact}
+                                            className='space-x-2'
+                                            onBlur={formik.handleBlur}
+                                            readOnly
+                                            disabled={formik.isSubmitting}
+
+                                            placeholder=""
+                                            required
+                                        />
+                                    </div>
+
+                                    </>
 
                                 )}
 

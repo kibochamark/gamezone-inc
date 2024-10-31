@@ -9,7 +9,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 
-import { ArrowUpRight, Loader } from 'lucide-react'
+import { ArrowUpRight, Contact, Loader } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -42,15 +42,17 @@ const MakeSale = () => {
             price: 0,
             quantity: 1,
             threshold: 0,
-            saletype:'',
-            vendor:''
+            saletype: '',
+            vendor: '',
+            contact: ''
 
         },
         validationSchema: Yup.object().shape({
             price: Yup.number().required(),
             quantity: Yup.number().required().min(1),
             saletype: Yup.string().oneOf(["DEBIT", "CREDIT"]).required(),
-            vendor:Yup.string().optional()
+            vendor: Yup.string().optional(),
+            contact: Yup.string().optional()
         }),
         onSubmit: async (values, formikHelpers) => {
             // console.log(values)
@@ -143,26 +145,47 @@ const MakeSale = () => {
 
 
             {formik.values.saletype === "CREDIT" && (
-                <div className="grid gap-2">
-                    <Label htmlFor="vendor">Vendor Name</Label>
-                    {formik.touched.vendor && formik.errors.vendor && (
-                        <p className='text-sm text-red-600 tracking-tight leading-tight'>{formik.errors.vendor}</p>
-                    )}
-                    <Input
-                        id="vendor"
-                        name='vendor'
-                        type="text"
-                        onChange={formik.handleChange}
-                        defaultValue={formik.values.vendor}
-                        className='space-x-2'
-                        onBlur={formik.handleBlur}
-                        disabled={formik.isSubmitting}
+                <>
+                    <div className="grid gap-2">
+                        <Label htmlFor="vendor">Vendor Name</Label>
+                        {formik.touched.vendor && formik.errors.vendor && (
+                            <p className='text-sm text-red-600 tracking-tight leading-tight'>{formik.errors.vendor}</p>
+                        )}
+                        <Input
+                            id="vendor"
+                            name='vendor'
+                            type="text"
+                            onChange={formik.handleChange}
+                            defaultValue={formik.values.vendor}
+                            className='space-x-2'
+                            onBlur={formik.handleBlur}
+                            disabled={formik.isSubmitting}
 
-                        placeholder=""
-                        required
-                    />
-                </div>
+                            placeholder=""
+                            required
+                        />
+                    </div>
 
+                    <div className="grid gap-2">
+                        <Label htmlFor="contact">Vendor Phone number</Label>
+                        {formik.touched.contact && formik.errors.contact && (
+                            <p className='text-sm text-red-600 tracking-tight leading-tight'>{formik.errors.contact}</p>
+                        )}
+                        <Input
+                            id="contact"
+                            name='contact'
+                            type="text"
+                            onChange={formik.handleChange}
+                            defaultValue={formik.values.contact}
+                            className='space-x-2'
+                            onBlur={formik.handleBlur}
+                            disabled={formik.isSubmitting}
+
+                            placeholder=""
+                            required
+                        />
+                    </div>
+                </>
             )}
 
 

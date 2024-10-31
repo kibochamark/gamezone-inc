@@ -168,6 +168,7 @@ export const createSale = async (sale: {
 
     saletype: string;
     vendor?: string;
+    contact?: string;
 }) => {
     const { isAuthenticated, getUser } = await getKindeServerSession()
     const auth = await isAuthenticated()
@@ -250,38 +251,53 @@ export const createSale = async (sale: {
 
 
 
-          
+
 
 
 
                 }
-                            // create transaction
-            const createRevenueTransaction = await tx.revenueAccount.create({
-                data: {
-                    accountRef: `RC${genRandonString()}`,
-                    creditTotal: sale.price,
-                    debitTotal: 0
+                // create transaction
+                const createRevenueTransaction = await tx.revenueAccount.create({
+                    data: {
+                        accountRef: `RC${genRandonString()}`,
+                        creditTotal: sale.price,
+                        debitTotal: 0
+                    }
+                })
+                const saleAccount = await tx.salesAccount.create({
+                    data: {
+                        accountRef: `SC${genRandonString()}`,
+                        creditTotal: sale.price,
+                        debitTotal: 0,
+                        productId: sale.inventoryId
+                    },
+                });
+                // Create a new transaction record
+                const newTransaction = await tx.transactionAccount.create({
+                    data: {
+                        accountRef: `TC${genRandonString()}`,
+                        debitAmount: 0,
+                        creditAmount: sale.price,
+                        description: "sale",
+                        creditAccountId: saleAccount.id, // credit the Inventory Account
+                        debitAccountId: createRevenueTransaction.id,     // debiting the Cash Account or source
+                    },
+                });
+
+                // create a customer if not exists 
+                if (sale.saletype !== "Debit") {
+
+                    await tx.customerAccount.create({
+                        data: {
+                            accountRef: `CA${genRandonString()}`,
+                            accountName: sale.vendor,
+                            customerContact: sale?.contact as string,
+                            creditTotal: sale.price
+                        }
+                    })
+
+
                 }
-            })
-            const saleAccount = await tx.salesAccount.create({
-                data: {
-                    accountRef: `SC${genRandonString()}`,
-                    creditTotal: sale.price,
-                    debitTotal:0,
-                    productId:sale.inventoryId
-                },
-            });
-            // Create a new transaction record
-            const newTransaction = await tx.transactionAccount.create({
-                data: {
-                    accountRef: `TC${genRandonString()}`,
-                    debitAmount: 0,
-                    creditAmount: sale.price,
-                    description: "sale",
-                    creditAccountId: saleAccount.id, // credit the Inventory Account
-                    debitAccountId: createRevenueTransaction.id,     // debiting the Cash Account or source
-                },
-            });
 
             }
             )
@@ -304,6 +320,7 @@ export const updateSale = async (sale: {
     saletype: string;
     status?: string;
     vendor?: string;
+    contact?: string
 }) => {
     const { isAuthenticated, getUser } = await getKindeServerSession()
     const auth = await isAuthenticated()
@@ -317,6 +334,18 @@ export const updateSale = async (sale: {
         try {
             await prisma.$transaction(async (tx) => {
                 if (sale.quantity > 0) {
+                    if (sale.saletype === "SOLD") {
+                        await tx.customerAccount.create({
+                            data: {
+                                accountRef: `CA${genRandonString()}`,
+                                accountName: sale.vendor,
+                                customerContact: sale?.contact as string,
+                                debitTotal: sale.price,
+                                creditTotal: 0
+
+                            }
+                        })
+                    }
                     if (sale.status === "RETURNED") {
                         //update the product in the inventory
                         const getsale = await tx.sales.findUnique({
@@ -336,6 +365,16 @@ export const updateSale = async (sale: {
                                 quantity: {
                                     increment: sale.quantity
                                 }
+                            }
+                        })
+
+                        await tx.customerAccount.create({
+                            data: {
+                                accountRef: `CA${genRandonString()}`,
+                                accountName: sale.vendor,
+                                customerContact: sale.contact as string,
+                                debitTotal: sale.price,
+                                creditTotal: 0
                             }
                         })
 
@@ -468,12 +507,12 @@ export const createBulkInventory = async (inventory: {
 export async function seedData() {
     try {
         const inventory = await prisma.sales.findMany({
-            where:{
-                type:"CREDIT",
-                OR:[
+            where: {
+                type: "CREDIT",
+                OR: [
                     {
-                        status:"CREDITED",
-                        
+                        status: "CREDITED",
+
                     }
                 ]
             }
@@ -493,7 +532,7 @@ export async function seedData() {
         //         productId:"671fcb9f44c071f728787978"
         //     }
         // })
-        
+
         // await prisma.transactionAccount.deleteMany({
         //     where:{
         //         debitAccountId:{
@@ -502,7 +541,7 @@ export async function seedData() {
         //     }
         // })
 
-        
+
         // const inventoryAcc = await prisma.inventoryAccount.findMany()
         // console.log(inventory)
 
@@ -529,12 +568,12 @@ export async function seedData() {
                 const saleAccount = await tx.customerAccount.create({
                     data: {
                         accountRef: `CA${genRandonString()}`,
-                        accountName:inventory[i].vendor as string,
-                        customerContact:'',
+                        accountName: inventory[i].vendor as string,
+                        customerContact: '',
                         debitTotal: 0,
-                        creditTotal:inventory[i].priceSold,
-                        created_at:new Date(inventory[i].created_at),
-                        updated_at:new Date(inventory[i].updated_at)
+                        creditTotal: inventory[i].priceSold,
+                        created_at: new Date(inventory[i].created_at),
+                        updated_at: new Date(inventory[i].updated_at)
                     },
                 });
                 // // // console.log(createMainAccountTransaction, "trab")
@@ -566,7 +605,7 @@ export async function seedData() {
 
         }
 
-        
+
 
     } catch (e: any) {
         console.log(e.message)
