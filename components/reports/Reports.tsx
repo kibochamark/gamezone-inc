@@ -42,19 +42,25 @@ export default function ShopReports() {
 
     useEffect(() => {
         reportmutation.mutateAsync({ report: reportType, from:date?.from, to:date?.to }).then((value) => {
-            // console.log(value)
-            let formatteddata = value.map((inv:any, index:number)=>{
-                return {
-                    id:index+1,
-                    ...inv,
-                    category:inv?.category?.name || "",
-                    created_at:new Date(inv?.created_at).toLocaleDateString(),
-                    report_date:new Date().toLocaleDateString()
-                }
-            })
+
+            if(reportType === "lowstock"){
+                let formatteddata = value.map((inv:any, index:number)=>{
+                    return {
+                        id:index+1,
+                        ...inv,
+                        category:inv?.category?.name || "",
+                        created_at:new Date(inv?.created_at).toLocaleDateString(),
+                        report_date:new Date().toLocaleDateString()
+                    }
+                })
+                setReportData(formatteddata)
+            }else if( reportType === "creditsales"){
+                console.log(value)
+            }
+            
 
             // console.log(formatteddata)
-            setReportData(formatteddata)
+            
             // console.log(reportData)
 
         })
