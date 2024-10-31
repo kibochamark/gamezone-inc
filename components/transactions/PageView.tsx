@@ -84,21 +84,21 @@ export default function TransactionsReport() {
     const ws = XLSX.utils.json_to_sheet(previewData)
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, "Report")
-    XLSX.writeFile(wb, `${account}_report_${format(date.from, 'yyyyMMdd')}_${format(date.to, 'yyyyMMdd')}.xlsx`)
+    XLSX.writeFile(wb, `${account}_report_${format(date.from as Date, 'yyyyMMdd')}_${format(date.to as Date, 'yyyyMMdd')}.xlsx`)
   }
 
   const downloadPDF = () => {
     const doc = new jsPDF()
     doc.text(`${account} Account Report`, 14, 15)
-    doc.text(`From: ${format(date.from, 'yyyy-MM-dd')} To: ${format(date.to, 'yyyy-MM-dd')}`, 14, 25)
+    doc.text(`From: ${format(date.from as Date, 'yyyy-MM-dd')} To: ${format(date.to as Date, 'yyyy-MM-dd')}`, 14, 25)
     
-    doc.autoTable({
-      head: [['Date', 'Debit', 'Credit', 'Balance']],
-      body: previewData.map(row => [row.date, row.debit, row.credit, row.balance]),
-      startY: 30,
-    })
+    // doc.autoTable({
+    //   head: [['Date', 'Debit', 'Credit', 'Balance']],
+    //   body: previewData.map(row => [row.date, row.debit, row.credit, row.balance]),
+    //   startY: 30,
+    // })
 
-    doc.save(`${account}_report_${format(date.from, 'yyyyMMdd')}_${format(date.to, 'yyyyMMdd')}.pdf`)
+    doc.save(`${account}_report_${format(date.from as Date, 'yyyyMMdd')}_${format(date.to as Date, 'yyyyMMdd')}.pdf`)
   }
 
   return (
@@ -156,7 +156,7 @@ export default function TransactionsReport() {
                   mode="range"
                   defaultMonth={date?.from}
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={(range) => setDate(range ?? { from: undefined, to: undefined })}
                   numberOfMonths={2}
                 />
               </PopoverContent>
