@@ -472,11 +472,8 @@ export async function seedData() {
                 type:"CREDIT",
                 OR:[
                     {
-                        status:"SOLD",
+                        status:"CREDITED",
                         
-                    },
-                    {
-                        status:"RETURNED"
                     }
                 ]
             }
@@ -534,8 +531,8 @@ export async function seedData() {
                         accountRef: `CA${genRandonString()}`,
                         accountName:inventory[i].vendor as string,
                         customerContact:'',
-                        debitTotal: inventory[i].priceSold,
-                        creditTotal:0,
+                        debitTotal: 0,
+                        creditTotal:inventory[i].priceSold,
                         created_at:new Date(inventory[i].created_at),
                         updated_at:new Date(inventory[i].updated_at)
                     },
