@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
     // action columns
-    const actioncolumns: ColumnDef<any>[] = [
+    const actioncolumns: ColumnDef<TData, any>[] = [
 
         {
             id: "actions",
@@ -90,7 +90,7 @@ export function DataTable<TData, TValue>({
 
     const table = useReactTable({
         data,
-        columns: [...columns, ...actioncolumns],
+        columns: [...columns, ...actioncolumns] as ColumnDef<TData, any>[],
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
