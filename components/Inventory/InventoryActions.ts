@@ -250,38 +250,38 @@ export const createSale = async (sale: {
 
 
 
-
+          
 
 
 
                 }
-                // create transaction
-                const createRevenueTransaction = await tx.revenueAccount.create({
-                    data: {
-                        accountRef: `RC${genRandonString()}`,
-                        creditTotal: sale.price,
-                        debitTotal: 0
-                    }
-                })
-                const saleAccount = await tx.salesAccount.create({
-                    data: {
-                        accountRef: `SC${genRandonString()}`,
-                        creditTotal: sale.price,
-                        debitTotal: 0,
-                        productId: sale.inventoryId
-                    },
-                });
-                // Create a new transaction record
-                const newTransaction = await tx.transactionAccount.create({
-                    data: {
-                        accountRef: `TC${genRandonString()}`,
-                        debitAmount: 0,
-                        creditAmount: sale.price,
-                        description: "sale",
-                        creditAccountId: saleAccount.id, // credit the Inventory Account
-                        debitAccountId: createRevenueTransaction.id,     // debiting the Cash Account or source
-                    },
-                });
+                            // create transaction
+            const createRevenueTransaction = await tx.revenueAccount.create({
+                data: {
+                    accountRef: `RC${genRandonString()}`,
+                    creditTotal: sale.price,
+                    debitTotal: 0
+                }
+            })
+            const saleAccount = await tx.salesAccount.create({
+                data: {
+                    accountRef: `SC${genRandonString()}`,
+                    creditTotal: sale.price,
+                    debitTotal:0,
+                    productId:sale.inventoryId
+                },
+            });
+            // Create a new transaction record
+            const newTransaction = await tx.transactionAccount.create({
+                data: {
+                    accountRef: `TC${genRandonString()}`,
+                    debitAmount: 0,
+                    creditAmount: sale.price,
+                    description: "sale",
+                    creditAccountId: saleAccount.id, // credit the Inventory Account
+                    debitAccountId: createRevenueTransaction.id,     // debiting the Cash Account or source
+                },
+            });
 
             }
             )
@@ -467,19 +467,13 @@ export const createBulkInventory = async (inventory: {
 
 export async function seedData() {
     try {
+        // const inventory = await prisma.sales.findMany({
+        //     // _sum:{
+        //     //     creditTotal:true,
+        //     //     debitTotal:true
 
-        const inventory = await prisma.services.findMany({
-            where:{
-                created_at: {
-                    gt:new Date("2024-10-30")
-                }
-            }
-            // _sum:{
-            //     creditTotal:true,
-            //     debitTotal:true
-
-            // }
-        })
+        //     // }
+        // })
         // const inventoryAcc = await prisma.inventoryAccount.create({
         //     // _sum:{
         //     //     creditTotal:true,
@@ -490,7 +484,7 @@ export async function seedData() {
         //         productId:"671fcb9f44c071f728787978"
         //     }
         // })
-
+        
         // await prisma.transactionAccount.deleteMany({
         //     where:{
         //         debitAccountId:{
@@ -499,75 +493,68 @@ export async function seedData() {
         //     }
         // })
 
-
+        
         // const inventoryAcc = await prisma.inventoryAccount.findMany()
-        console.log(inventory)
+        // console.log(inventory)
 
 
 
+        // for (let i = 0; i < inventory.length; i++) {
 
 
-        // Set batch size
-        const batchSize = 10; // Adjust based on your environment
-        for (let i = 0; i < inventory.length; i += batchSize) {
-            const batch = inventory.slice(i, i + batchSize);
 
-            // Use Promise.all to handle the batch concurrently
-            await Promise.all(batch.map(async (item) => {
-                await prisma.$transaction(async (tx) => {
+            await prisma.$transaction(async (tx) => {
 
-                    // // // create transaction
-                    // const createMainAccountTransaction = await tx.mainAccount.create({
-                    //     data: {
-                    //         accountRef: `MC${genRandonString()}`,
-                    //         debitTotal: inventory[i].creditTotal,
-                    //         creditTotal: 0,
-                    //         created_at:new Date(inventory[i]?.created_at),
-                    //         updated_at:new Date(inventory[i].updated_at)
-                    //     }
-                    // })
+                // // // create transaction
+                // const createMainAccountTransaction = await tx.mainAccount.create({
+                //     data: {
+                //         accountRef: `MC${genRandonString()}`,
+                //         debitTotal: inventory[i].creditTotal,
+                //         creditTotal: 0,
+                //         created_at:new Date(inventory[i]?.created_at),
+                //         updated_at:new Date(inventory[i].updated_at)
+                //     }
+                // })
 
-                    // // console.log(createMainAccountTransaction, "trab")
-                    const saleAccount = await tx.serviceAccount.create({
-                        data: {
-                            serviceId: inventory[i].id,
-                            accountRef: `SC${genRandonString()}`,
-                            debitTotal: 0,
-                            creditTotal: inventory[i].price,
-                            created_at: new Date(inventory[i].created_at),
-                            updated_at: new Date(inventory[i].updated_at)
-                        },
-                    });
-                    // // console.log(createMainAccountTransaction, "trab")
-                    const revAccount = await tx.revenueAccount.create({
-                        data: {
-                            accountRef: `RC${genRandonString()}`,
-                            debitTotal: 0,
-                            creditTotal: inventory[i].price,
-                            created_at: new Date(inventory[i].created_at),
-                            updated_at: new Date(inventory[i].updated_at)
-                        },
-                    });
-                    // Create a new transaction record
-                    const newTransaction = await tx.transactionAccount.create({
-                        data: {
-                            accountRef: `TC${genRandonString()}`,
-                            debitAmount: inventory[i].price,
-                            creditAmount: 0,
-                            description: "services acc setup",
-                            creditAccountId: revAccount.id,
-                            debitAccountId: '',
-                            created_at: new Date(inventory[i]?.created_at),
-                            updated_at: new Date(inventory[i].updated_at)
-                            // credit the Inventory Account
-                            // debitAccountId: InventoryAccount.id,     // debiting the Cash Account or source
-                        },
-                    });
+                // // console.log(createMainAccountTransaction, "trab")
+                const saleAccount = await tx.serviceAccount.create({
+                    data: {
+                        serviceId: '672326e60f9a98b64488245e',
+                        accountRef: `SC${genRandonString()}`,
+                        debitTotal: 0,
+                        creditTotal:20,
+                        created_at:new Date('2024-10-31T06:42:46.101+00:00'),
+                        updated_at:new Date('2024-10-31T06:42:46.101+00:00')
+                    },
                 });
+                // // console.log(createMainAccountTransaction, "trab")
+                const revAccount = await tx.revenueAccount.create({
+                    data: {
+                        accountRef: `RC${genRandonString()}`,
+                        debitTotal: 0,
+                        creditTotal:20,
+                        created_at:new Date('2024-10-31T06:42:46.101+00:00'),
+                        updated_at:new Date('2024-10-31T06:42:46.101+00:00')
+                    },
+                });
+                // Create a new transaction record
+                const newTransaction = await tx.transactionAccount.create({
+                    data: {
+                        accountRef: `TC${genRandonString()}`,
+                        debitAmount: 20,
+                        creditAmount: 0,
+                        description: "sale acc setup",
+                        creditAccountId: revAccount.id,
+                        debitAccountId: '',
+                        created_at:new Date('2024-10-31T06:42:46.101+00:00'),
+                        updated_at:new Date('2024-10-31T06:42:46.101+00:00')
+                        // credit the Inventory Account
+                        // debitAccountId: InventoryAccount.id,     // debiting the Cash Account or source
+                    },
+                });
+            });
 
-            }
-            ))
-        }
+        
 
     } catch (e: any) {
         console.log(e.message)
