@@ -11,7 +11,9 @@ async function getServices() {
     let services: any = []
     try {
         services = await prisma.services.findMany({
-
+            orderBy:{
+                created_at:"desc"
+            }
         })
 
     } catch (e) {

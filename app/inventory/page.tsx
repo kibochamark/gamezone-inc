@@ -26,7 +26,12 @@ async function getCatgeories() {
 async function getInventory() {
     let inventory: any
     try {
-        inventory = await prisma.inventory.findMany() ?? []
+        inventory = await prisma.inventory.findMany({
+            orderBy:{
+                created_at:"desc"
+            }
+        }
+        ) ?? []
     } catch (e: any) {
         console.log(e.message)
     }

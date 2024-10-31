@@ -42,6 +42,9 @@ async function getExpenses() {
                 },
                 description:true,
                 created_at:true
+            },
+            orderBy:{
+                created_at:"desc"
             }
         })
     } catch (e: any) {

@@ -27,6 +27,9 @@ async function getSales() {
                 type: true,
                 vendor: true,
                 created_at: true
+            },
+            orderBy:{
+                created_at:"desc"
             }
         })
 
