@@ -33,9 +33,7 @@ model Inventory {
 
   CreditedSummary CreditedSummary[]
 
-  InventoryAccount InventoryAccount[]
 
-  SalesAccount SalesAccount[]
 
   AssetAccount      AssetAccount[]
   NewRevenueAccount NewRevenueAccount[]
@@ -83,7 +81,6 @@ model Expenses {
   created_at  DateTime @default(now())
   updated_at  DateTime @default(now())
 
-  ExpenseAccount ExpenseAccount[]
 }
 
 model Services {
@@ -96,7 +93,6 @@ model Services {
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
-  ServiceAccount ServiceAccount[]
 
   NewRevenueAccount NewRevenueAccount[]
 }
@@ -183,98 +179,6 @@ model MainAccount {
   updated_at  DateTime @default(now())
 }
 
-// accounts
-model CustomerAccount {
-  id              String @id @default(auto()) @map("_id") @db.ObjectId
-  accountRef      String @unique
-  accountName     String @default("Customer account")
-  customerContact String
-  debitTotal      Float  @default(0)
-  creditTotal     Float  @default(0)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-}
-
-model RevenueAccount {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  accountRef  String @unique
-  name        String @default("Revenue account")
-  debitTotal  Float  @default(0)
-  creditTotal Float  @default(0)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-}
-
-model ServiceAccount {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  accountRef  String @unique
-  name        String @default("Service account")
-  debitTotal  Float  @default(0)
-  creditTotal Float  @default(0)
-
-  serviceId String   @db.ObjectId
-  service   Services @relation(fields: [serviceId], references: [id])
-
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-}
-
-model ExpenseAccount {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  accountRef  String @unique
-  name        String @default("Revenue")
-  debitTotal  Float  @default(0)
-  creditTotal Float  @default(0)
-
-  expenseId String   @db.ObjectId
-  expense   Expenses @relation(fields: [expenseId], references: [id])
-
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-}
-
-model SalesAccount {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  accountRef  String    @unique
-  productId   String    @db.ObjectId
-  product     Inventory @relation(fields: [productId], references: [id])
-  debitTotal  Float     @default(0)
-  creditTotal Float     @default(0)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-
-  // transactions Transaction[]
-}
-
-model InventoryAccount {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  accountRef  String    @unique
-  productId   String    @db.ObjectId
-  product     Inventory @relation(fields: [productId], references: [id])
-  debitTotal  Float     @default(0)
-  creditTotal Float     @default(0)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-
-  // transactions Transaction[]
-}
-
-model TransactionAccount {
-  id              String @id @default(auto()) @map("_id") @db.ObjectId
-  accountRef      String @unique
-  debitAmount     Float  @default(0)
-  creditAmount    Float  @default(0)
-  description     String
-  debitAccountId  String
-  creditAccountId String
-
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-}
 
 // Revamped accounts
 model AssetAccount {
