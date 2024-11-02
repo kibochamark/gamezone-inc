@@ -12,8 +12,9 @@ export async function getAccountData(account:string, dataRange:{
     try {
         switch(account){
             case 'salesaccount':
-                result = await prisma.salesAccount.aggregate({
+                result = await prisma.newRevenueAccount.aggregate({
                     where: {
+                        accounttype:"SALESACCOUNT",
                         OR: [
                             {
                                 created_at: {
@@ -36,7 +37,7 @@ export async function getAccountData(account:string, dataRange:{
                     },
                 });
             case 'expenseaccount':
-                result = await prisma.expenseAccount.aggregate({
+                result = await prisma.newExpenseAccount.aggregate({
                     where: {
                         OR: [
                             {
@@ -61,7 +62,7 @@ export async function getAccountData(account:string, dataRange:{
                 });
 
             case 'revenueaccount':
-                result = await prisma.revenueAccount.aggregate({
+                result = await prisma.newRevenueAccount.aggregate({
                     where: {
                         OR: [
                             {
@@ -86,8 +87,9 @@ export async function getAccountData(account:string, dataRange:{
                 });
 
             case 'inventoryaccount':
-                result = await prisma.inventoryAccount.aggregate({
+                result = await prisma.assetAccount.aggregate({
                     where: {
+                        accounttype:"INVENTORYACCOUNT",
                         OR: [
                             {
                                 created_at: {
@@ -111,8 +113,9 @@ export async function getAccountData(account:string, dataRange:{
                 });
 
             case 'serviceaccount':
-                result = await prisma.serviceAccount.aggregate({
+                result = await prisma.newRevenueAccount.aggregate({
                     where: {
+                        accounttype:"SERVICEACCOUNT",
                         OR: [
                             {
                                 created_at: {
@@ -136,8 +139,9 @@ export async function getAccountData(account:string, dataRange:{
                 });
 
             case 'customeraccount':
-                result = await prisma.customerAccount.aggregate({
+                result = await prisma.assetAccount.aggregate({
                     where: {
+                        accounttype:"ACCOUNTRECEIVABLE",
                         OR: [
                             {
                                 created_at: {
