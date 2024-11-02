@@ -51,10 +51,10 @@ export async function getReportData(reportType: Reports, fromdate: Date = new Da
 
                 break
             case 'creditsales':
-                result= await prisma.customerAccount.groupBy({
-                    by:['accountName'],
+                result= await prisma.assetAccount.groupBy({
+                    by:['customername'],
                     where: {
-
+                        accounttype:"ACCOUNTRECEIVABLE",
                         OR: [
                             {
                                 created_at: {
