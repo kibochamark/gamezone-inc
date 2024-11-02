@@ -88,13 +88,17 @@ async function getCashAtHand() {
             where: {
                 accounttype: "CASHACCOUNT",
                 OR: [
-                    created_at: {
-                        gte: yesterday,
-                        lt: new Date(yesterday.getTime() + 86400000) // Add 1 day to get end of today
+                    {
+                        created_at: {
+                            gte: yesterday,
+                            lt: new Date(yesterday.getTime() + 86400000) // Add 1 day to get end of today
+                        },
                     },
-                    updated_at : {
-                        gte: yesterday,
-                        lt: new Date(yesterday.getTime() + 86400000)
+                    {
+                        updated_at: {
+                            gte: yesterday,
+                            lt: new Date(yesterday.getTime() + 86400000)
+                        }
                     }
                 ]
             },
@@ -110,13 +114,17 @@ async function getCashAtHand() {
             where: {
                 accounttype: "CASHACCOUNT",
                 OR: [
-                    created_at: {
-                        gte: today,
-                        lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                    {
+                        created_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                        },
                     },
-                    updated_at : {
-                        gte: today,
-                        lt: new Date(today.getTime() + 86400000)
+                    {
+                        updated_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000)
+                        }
                     }
                 ]
             },
@@ -130,13 +138,16 @@ async function getCashAtHand() {
         const expenses = await prisma.newExpenseAccount.aggregate({
             where: {
                 OR: [
-                    created_at: {
-                        gte: today,
-                        lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
-                    },
-                    updated_at : {
-                        gte: today,
-                        lt: new Date(today.getTime() + 86400000)
+                    {
+                        created_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                        },
+                    }, {
+                        updated_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000)
+                        }
                     }
                 ]
             },
