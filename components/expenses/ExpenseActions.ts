@@ -9,7 +9,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
 
 
 
-export const createExpense = async (expense: { name: string; amount: number; description: string; categoryId: string }) => {
+export const createExpense = async (expense: { name: string; amount: number; description: string; categoryId: string; paymentType:"CASH" | "Mpesa" }) => {
     const { isAuthenticated, getUser } = await getKindeServerSession();
     const auth = await isAuthenticated();
     const user = await getUser();
@@ -24,11 +24,18 @@ export const createExpense = async (expense: { name: string; amount: number; des
                     description: expense.description,
                     categoryId: expense.categoryId,
                     kindeId: user?.id as string,
+                    paymenttype:expense.paymentType,
                     kindeName: user?.given_name as string,
                 },
                 select: {
                     id: true,
                     amount: true,
+                    category:{
+                        select:{
+                            name:true
+                        }
+                        
+                    }
                 },
             });
 
@@ -68,33 +75,24 @@ export const createExpense = async (expense: { name: string; amount: number; des
                 });
             }
 
-
-            // create transaction
-            const createRevenueTransaction = await prisma.revenueAccount.create({
-                data: {
-                    accountRef: `RC${genRandonString()}`,
-                    creditTotal: 0,
-                    debitTotal: expense.amount
+            // accounts
+            await prisma.assetAccount.create({
+                data:{
+                    accountRef:`AC${genRandonString()}`,
+                    accounttype:"CASHACCOUNT",
+                    creditTotal:expense.amount,
+                    paymenttype:expense.paymentType
                 }
             })
-            const expenseAccount = await prisma.expenseAccount.create({
-                data: {
-                    accountRef: `EC${genRandonString()}`,
-                    debitTotal: expense.amount,
-                    expenseId:newExpense.id
-                },
-            });
-            // Create a new transaction record
-            const newTransaction = await prisma.transactionAccount.create({
-                data: {
-                    accountRef: `TC${genRandonString()}`,
-                    debitAmount: 0,
-                    creditAmount: expense.amount,
-                    description: "expense",
-                    creditAccountId: expenseAccount.id, // credit the Inventory Account
-                    debitAccountId: createRevenueTransaction.id,     // debiting the Cash Account or source
-                },
-            });
+
+            await prisma.newExpenseAccount.create({
+                data:{
+                    accountRef:`EA${genRandonString()}`,
+                    expensetype:newExpense.category.name,
+                    debitTotal:expense.amount,
+                    paymenttype:expense.paymentType
+                }
+            })
 
         } catch (e: any) {
             console.error(e.message);
@@ -105,7 +103,7 @@ export const createExpense = async (expense: { name: string; amount: number; des
     }
 };
 
-export const updateExpense = async (expense: { id: string; name: string; amount: number; description: string, categoryId: string }) => {
+export const updateExpense = async (expense: { id: string; name: string; amount: number; description: string, categoryId: string; paymentType:"CASH" |"Mpesa" }) => {
     const { isAuthenticated, getUser } = await getKindeServerSession();
     const auth = await isAuthenticated();
     const user = await getUser();
@@ -116,6 +114,11 @@ export const updateExpense = async (expense: { id: string; name: string; amount:
             const existingExpense = await prisma.expenses.findUnique({
                 where: { id: expense.id },
                 select: {
+                    category:{
+                        select:{
+                            name:true
+                        }
+                    },
                     amount: true,
                     created_at: true, // Assuming there's a 'created_at' field for the expense creation date
                 },
@@ -168,6 +171,44 @@ export const updateExpense = async (expense: { id: string; name: string; amount:
                     },
                 });
             }
+
+            if(((existingExpense.amount) - expense.amount) < 0){
+                await prisma.assetAccount.create({
+                    data:{
+                        accountRef:`AC${genRandonString()}`,
+                        accounttype:"CASHACCOUNT",
+                        debitTotal:((existingExpense.amount) - expense.amount) ,
+                        paymenttype:expense.paymentType
+                    }
+                })
+    
+                await prisma.newExpenseAccount.create({
+                    data:{
+                        accountRef:`EA${genRandonString()}`,
+                        expensetype:existingExpense.category.name,
+                        creditTotal:Math.abs(((existingExpense.amount) - expense.amount)) ,
+                        paymenttype:expense.paymentType
+                    }
+                })
+            }else{
+                await prisma.assetAccount.create({
+                    data:{
+                        accountRef:`AC${genRandonString()}`,
+                        accounttype:"CASHACCOUNT",
+                        creditTotal:((existingExpense.amount) - expense.amount) ,
+                        paymenttype:expense.paymentType
+                    }
+                })
+    
+                await prisma.newExpenseAccount.create({
+                    data:{
+                        accountRef:`EA${genRandonString()}`,
+                        expensetype:existingExpense.category.name,
+                        debitTotal:((existingExpense.amount) - expense.amount) ,
+                        paymenttype:expense.paymentType
+                    }
+                })
+            }
         } catch (e: any) {
             console.error(e.message);
             return new Error(e.message);
@@ -192,7 +233,13 @@ export const deleteExpense = async (id: string) => {
                     id,
                 },
                 select: {
+                    category:{
+                        select:{
+                            name:true
+                        }
+                    },
                     amount: true,
+                    paymenttype:true,
                     created_at: true, // Assuming there's a 'created_at' field for the expense creation date
                 },
             });
@@ -232,6 +279,25 @@ export const deleteExpense = async (id: string) => {
                     },
                 });
             }
+
+            // accounts
+            await prisma.assetAccount.create({
+                data:{
+                    accountRef:`AC${genRandonString()}`,
+                    accounttype:"CASHACCOUNT",
+                    debitTotal:expenseToDelete.amount,
+                    paymenttype:expenseToDelete.paymenttype
+                }
+            })
+
+            await prisma.newExpenseAccount.create({
+                data:{
+                    accountRef:`EA${genRandonString()}`,
+                    expensetype:expenseToDelete.category.name,
+                    creditTotal:expenseToDelete.amount,
+                    paymenttype:expenseToDelete.paymenttype
+                }
+            })
         } catch (e: any) {
             console.error(e.message);
             return new Error(e.message);

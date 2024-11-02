@@ -6,6 +6,7 @@ import { getSalesSummary } from '../sales/page'
 import { getLowStockSummary, getTotalInv } from '../inventory/page'
 import { getExpenseSummary } from '../expenses/page'
 import { seedData } from '@/components/Inventory/InventoryActions'
+import { genRandonString } from '@/lib/generateAccountRef'
 
 
 export const dynamic = 'force-dynamic'
@@ -54,6 +55,26 @@ async function getRecentSales() {
     return sales
 }
 
+async function getsummary() {
+    return await prisma.assetAccount.create({
+        data: {
+            accountRef: `CA${genRandonString()}`,
+            accounttype: "CASHACCOUNT",
+            paymenttype: "CASH",
+            debitTotal: 214462,
+            creditTotal: 0
+        }
+    })
+    // return await prisma.equityAccount.create({
+    //     data:{
+    //         accountRef:`EA${genRandonString()}`,
+    //         accounttype:"CAPTIALACCOUNT",
+    //         paymenttype:"CASH",
+    //         debitTotal:214462,
+    //         creditTotal:0
+    //     }
+    // })
+}
 const page = async () => {
     const inventory = await getProducts() ?? []
     const sales = await getRecentSales() ?? []
@@ -61,7 +82,10 @@ const page = async () => {
     const lowstock = await getLowStockSummary()
     const totalInv = await getTotalInv()
     const expensesSummary = await getExpenseSummary()
+    // const data = await getsummary()
     // const data = await seedData()
+    // console.log(data, "aggregated data")
+
     return (
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>

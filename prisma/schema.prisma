@@ -36,6 +36,11 @@ model Inventory {
   InventoryAccount InventoryAccount[]
 
   SalesAccount SalesAccount[]
+
+  AssetAccount      AssetAccount[]
+  NewRevenueAccount NewRevenueAccount[]
+
+  WriteOffAccount WriteOffAccount[]
 }
 
 enum ProductStatus {
@@ -70,6 +75,7 @@ model Expenses {
   kindeId     String
   kindeName   String
   expensename String
+  paymenttype  PaymentType @default(CASH)
   category    Category @relation(fields: [categoryId], references: [id])
   categoryId  String   @db.ObjectId
   amount      Float
@@ -86,10 +92,13 @@ model Services {
   kindeName  String   @db.String
   name       String   @db.String
   price      Float
+  paymenttype PaymentType @default(CASH)
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
   ServiceAccount ServiceAccount[]
+
+  NewRevenueAccount NewRevenueAccount[]
 }
 
 model SalesSummary {
@@ -265,4 +274,101 @@ model TransactionAccount {
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
+}
+
+// Revamped accounts
+model AssetAccount {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  accountRef      String           @unique
+  accounttype     AssetAccountType
+  customername    String?
+  customercontact String?
+  paymenttype     PaymentType
+  productId       String?          @db.ObjectId
+  product         Inventory?       @relation(fields: [productId], references: [id])
+  debitTotal      Float            @default(0)
+  creditTotal     Float            @default(0)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+enum AssetAccountType {
+  CASHACCOUNT
+  ACCOUNTRECEIVABLE
+  INVENTORYACCOUNT
+}
+
+enum PaymentType {
+  CASH
+  Mpesa
+}
+
+model EquityAccount {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  accountRef  String            @unique
+  accounttype EquityAccountType
+  paymenttype PaymentType
+  debitTotal  Float             @default(0)
+  creditTotal Float             @default(0)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+enum EquityAccountType {
+  CAPITALACCOUNT
+  RETAINEDEARNINGS
+}
+
+model NewRevenueAccount {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  accountRef  String            @unique
+  accounttype RevenueAccountType
+  paymenttype PaymentType
+  productId   String?           @db.ObjectId
+  product     Inventory?        @relation(fields: [productId], references: [id])
+  serviceId   String?           @db.ObjectId
+  service     Services?         @relation(fields: [serviceId], references: [id])
+  debitTotal  Float             @default(0)
+  creditTotal Float             @default(0)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+enum RevenueAccountType {
+  SALESACCOUNT
+  SERVICEACCOUNT
+}
+
+model NewExpenseAccount {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  accountRef  String      @unique
+  expensetype String
+  paymenttype PaymentType
+  debitTotal  Float       @default(0)
+  creditTotal Float       @default(0)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+model WriteOffAccount {
+  id          String              @id @default(auto()) @map("_id") @db.ObjectId
+  accountRef  String              @unique
+  accounttype WriteOffAccountType
+  paymenttype PaymentType
+  productId   String?             @db.ObjectId
+  product     Inventory?          @relation(fields: [productId], references: [id])
+  debitTotal  Float               @default(0)
+  creditTotal Float               @default(0)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+enum WriteOffAccountType {
+  DISPOSABLEACCOUNT
+  BADDEBT
 }

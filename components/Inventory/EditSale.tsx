@@ -57,7 +57,8 @@ const EditSale = () => {
             saletype: '',
             vendor: '',
             status:'',
-            contact:''
+            contact:'',
+            previousstatus:''
 
         },
         validationSchema: Yup.object().shape({
@@ -102,7 +103,8 @@ const EditSale = () => {
                 saletype: editdata?.type,
                 vendor:editdata?.vendor,
                 status:editdata?.status,
-                contact:editdata?.contact
+                contact:editdata?.contact,
+                previousstatus:editdata?.status
             })
         }
     }, [isedit, page, editdata])

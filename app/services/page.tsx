@@ -60,7 +60,7 @@ const page = async () => {
     const {isAuthenticated, getPermissions} = await getKindeServerSession()
 
     const permissions = await getPermissions()
-    console.log(services)
+    // console.log(services)
 
 
     return (

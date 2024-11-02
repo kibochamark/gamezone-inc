@@ -27,7 +27,16 @@ import { handleEdit } from '@/redux/DatatbaleSlice'
 import { updateService } from './ServiceActions'
 
 
-
+const payments =[
+    {
+        id:"CASH",
+        name:"cash"
+    },
+    {
+        id:"Mpesa",
+        name:"mpesa"
+    }
+]
 
 const Editservice = () => {
 
@@ -51,6 +60,7 @@ const Editservice = () => {
             id: "",
             name: "",
             price: 0,
+            paymentType:"" as "CASH" | "Mpesa"
 
         },
         validationSchema: Yup.object().shape({
@@ -84,6 +94,7 @@ const Editservice = () => {
                 id: editdata.id,
                 name: editdata.name as string,
                 price: editdata.price as number,
+                paymentType:editdata?.paymenttype
 
             })
         }
@@ -147,6 +158,25 @@ const Editservice = () => {
                                         required
                                     />
                                 </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="categoryId mb-2">Payment Type</Label>
+                                    {formik.touched.paymentType && formik.errors.paymentType && (
+                                        <p className='text-sm text-red-600 tracking-tight leading-tight'>{formik.errors.paymentType}</p>
+                                    )}
+                                    <select id="categoryId" name='paymentType' defaultValue={formik.values.paymentType} onChange={formik.handleChange} onBlur={formik.handleBlur} disabled={formik.isSubmitting} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                        <option value="">select category</option>
+                                        {
+                                            payments?.map((cat: any, idx: number) => (
+                                                <option key={idx} value={cat.id}>{cat.name}</option>
+                                            ))}
+
+                                    </select>
+
+
+
+                                </div>
+
 
 
 

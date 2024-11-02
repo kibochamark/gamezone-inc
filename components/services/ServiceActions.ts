@@ -7,7 +7,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
 
 
 
-export const createService = async (service: { name: string; price: number }) => {
+export const createService = async (service: { name: string; price: number, paymentType: "CASH" | "Mpesa" }) => {
     const { isAuthenticated, getUser } = await getKindeServerSession();
     const auth = await isAuthenticated();
     const user = await getUser();
@@ -21,6 +21,7 @@ export const createService = async (service: { name: string; price: number }) =>
                     price: service.price,
                     kindeId: user?.id as string,
                     kindeName: user?.given_name as string,
+                    paymenttype:service.paymentType
                 },
                 select: {
                     id: true,
@@ -63,33 +64,27 @@ export const createService = async (service: { name: string; price: number }) =>
                     },
                 });
             }
-              // create transaction
-            const createRevenueTransaction = await prisma.revenueAccount.create({
+
+
+            // accounts
+            await prisma.assetAccount.create({
                 data: {
-                    accountRef: `RC${genRandonString()}`,
-                    creditTotal: newService.price,
-                    debitTotal: 0
+                    accountRef: `AC${genRandonString()}`,
+                    paymenttype: service.paymentType,
+                    accounttype: "CASHACCOUNT",
+                    debitTotal: service.price
                 }
             })
-            const serviceAccount = await prisma.serviceAccount.create({
+
+            await prisma.newRevenueAccount.create({
                 data: {
-                    accountRef: `SC${genRandonString()}`,
-                    debitTotal: 0,
-                    creditTotal:service.price,
-                    serviceId:newService.id
-                },
-            });
-            // Create a new transaction record
-            const newTransaction = await prisma.transactionAccount.create({
-                data: {
-                    accountRef: `TC${genRandonString()}`,
-                    debitAmount: 0,
-                    creditAmount: service.price,
-                    description: "service",
-                    creditAccountId: newService.id, // credit the Inventory Account
-                    debitAccountId: '',     // debiting the Cash Account or source
-                },
-            });
+                    accountRef: `RA${genRandonString()}`,
+                    paymenttype: service.paymentType,
+                    serviceId: newService.id,
+                    accounttype: "SERVICEACCOUNT",
+                    debitTotal: service.price
+                }
+            })
 
 
         } catch (e: any) {
@@ -102,7 +97,7 @@ export const createService = async (service: { name: string; price: number }) =>
 };
 
 
-export const updateService = async (service: { id: string; name: string; price: number }) => {
+export const updateService = async (service: { id: string; name: string; price: number, paymentType: "CASH" | "Mpesa" }) => {
     const { isAuthenticated, getUser } = await getKindeServerSession();
     const auth = await isAuthenticated();
     const user = await getUser();
@@ -113,6 +108,7 @@ export const updateService = async (service: { id: string; name: string; price: 
             const existingService = await prisma.services.findUnique({
                 where: { id: service.id },
                 select: {
+                    id: true,
                     price: true,
                     created_at: true, // Assuming there's a 'created_at' field for the service creation date
                 },
@@ -163,6 +159,48 @@ export const updateService = async (service: { id: string; name: string; price: 
                     },
                 });
             }
+            // accounts
+
+            if (((existingService.price) - service.price) < 0) {
+                await prisma.assetAccount.create({
+                    data: {
+                        accountRef: `AC${genRandonString()}`,
+                        paymenttype: service.paymentType,
+                        accounttype: "CASHACCOUNT",
+                        creditTotal: Math.abs((existingService.price) - service.price)
+                    }
+                })
+                await prisma.newRevenueAccount.create({
+                    data: {
+                        accountRef: `RA${genRandonString()}`,
+                        paymenttype: service.paymentType,
+                        accounttype: "SERVICEACCOUNT",
+                        creditTotal: Math.abs((existingService.price) - service.price)
+
+                    }
+                })
+
+            } else {
+
+                await prisma.assetAccount.create({
+                    data: {
+                        accountRef: `AC${genRandonString()}`,
+                        paymenttype: service.paymentType,
+                        accounttype: "CASHACCOUNT",
+                        debitTotal: (existingService.price) - service.price
+                    }
+                })
+                await prisma.newRevenueAccount.create({
+                    data: {
+                        accountRef: `RA${genRandonString()}`,
+                        paymenttype: service.paymentType,
+                        accounttype: "SERVICEACCOUNT",
+                        debitTotal: (existingService.price) - service.price
+                    }
+                })
+            }
+
+
         } catch (e: any) {
             console.error(e.message);
             return new Error(e.message);
@@ -179,6 +217,11 @@ export const deleteService = async (id: string) => {
 
     if (auth && user) {
         try {
+            const service = await prisma.services.findUnique({
+                where: {
+                    id: id
+                }
+            })
             // Fetch the service before deleting
             const serviceToDelete = await prisma.services.findUnique({
                 where: {
@@ -225,6 +268,25 @@ export const deleteService = async (id: string) => {
                     },
                 });
             }
+
+            // accounts
+            await prisma.newRevenueAccount.create({
+                data: {
+                    accountRef: `RA${genRandonString()}`,
+                    paymenttype: service?.paymenttype ?? "CASH",
+                    accounttype: "SERVICEACCOUNT",
+                    creditTotal: service?.price
+                }
+            })
+            await prisma.assetAccount.create({
+                data: {
+                    accountRef: `AC${genRandonString()}`,
+                    paymenttype: service?.paymenttype ?? "CASH",
+                    accounttype: "CASHACCOUNT",
+                    creditTotal: service?.price
+                }
+            })
+
         } catch (e: any) {
             console.error(e.message);
             return new Error(e.message);

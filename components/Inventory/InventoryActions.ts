@@ -20,59 +20,90 @@ export const createInventory = async (inventory: Inventory) => {
 
         try {
             await prisma.$transaction(async (tx) => {
-                const newinventory = await tx.inventory.create({
-                    data: {
-                        name: inventory.name,
-                        categoryId: inventory.categoryId,
-                        quantity: inventory.quantity,
-                        price: inventory.price,
-                        buyingprice: inventory.buyingprice,
-                        threshold: inventory.threshold
+
+                const capital = await tx.equityAccount.aggregate({
+                    where: {
+                        accounttype: "CAPITALACCOUNT"
                     },
-                    select: {
-                        id: true,
-                        buyingprice: true
+                    _sum: {
+                        debitTotal: true,
+                        creditTotal: true
                     }
                 })
 
-                if (inventory.quantity < inventory.threshold) {
-                    await tx.lowStockSummary.create({
+                if (((capital._sum.debitTotal as number) - (capital._sum.creditTotal as number)) !== 0) {
+                    await tx.equityAccount.create({
                         data: {
-                            inventoryId: newinventory.id,
-                            quantity: inventory.quantity
+                            accountRef: `EA${genRandonString()}`,
+                            accounttype: "CAPITALACCOUNT",
+                            creditTotal: inventory.price,
+                            debitTotal: 0,
+                            paymenttype: "CASH"
                         }
                     })
+
+                    await tx.assetAccount.create({
+                        data: {
+                            accountRef: `AC${genRandonString()}`,
+                            accounttype: "CASHACCOUNT",
+                            debitTotal: inventory.price,
+                            paymenttype: "CASH"
+                        }
+                    })
+
+                    await tx.assetAccount.create({
+                        data: {
+                            accountRef: `AC${genRandonString()}`,
+                            accounttype: "CASHACCOUNT",
+                            creditTotal: inventory.price,
+                            paymenttype: "CASH"
+                        }
+                    })
+
+
+                    await tx.assetAccount.create({
+                        data: {
+                            accountRef: `AC${genRandonString()}`,
+                            accounttype: "INVENTORYACCOUNT",
+                            debitTotal: inventory.price,
+                            paymenttype: "CASH"
+                        }
+                    })
+
+
+                    const newinventory = await tx.inventory.create({
+                        data: {
+                            name: inventory.name,
+                            categoryId: inventory.categoryId,
+                            quantity: inventory.quantity,
+                            price: inventory.price,
+                            buyingprice: inventory.buyingprice,
+                            threshold: inventory.threshold
+                        },
+                        select: {
+                            id: true,
+                            buyingprice: true
+                        }
+                    })
+
+                    if (inventory.quantity < inventory.threshold) {
+                        await tx.lowStockSummary.create({
+                            data: {
+                                inventoryId: newinventory.id,
+                                quantity: inventory.quantity
+                            }
+                        })
+                    }
+                } else {
+                    return new Error("Capital account is empty")
                 }
 
-                // create transaction
-                const createMainAccountTransaction = await tx.mainAccount.create({
-                    data: {
-                        accountRef: `MC${genRandonString()}`,
-                        debitTotal: newinventory.buyingprice,
-                        creditTotal: 0
-                    }
-                })
-                const InventoryAccount = await tx.inventoryAccount.create({
-                    data: {
-                        productId: newinventory.id,
-                        accountRef: `IC${genRandonString()}`,
-                        creditTotal: newinventory.buyingprice
-                    },
-                });
-                // Create a new transaction record
-                const newTransaction = await tx.transactionAccount.create({
-                    data: {
-                        accountRef: `TC${genRandonString()}`,
-                        debitAmount: 0,
-                        creditAmount: newinventory.buyingprice,
-                        description: "new stock",
-                        creditAccountId: createMainAccountTransaction.id, // credit the Inventory Account
-                        debitAccountId: InventoryAccount.id,     // debiting the Cash Account or source
-                    },
-                });
-
-
-            })
+            },
+                {
+                    maxWait: 5000, // 5 seconds max wait to connect to prisma
+                    timeout: 20000, // 20 seconds
+                }
+            )
 
         } catch (e: any) {
             console.log(e.message)
@@ -115,7 +146,31 @@ export const updateInventory = async (inventory: { id: string; name: string; pri
                         id: true
                     }
                 })
-            })
+
+                const asset = await tx.assetAccount.findFirst({
+                    where: {
+                        accounttype: "INVENTORYACCOUNT",
+                        productId: inventory.id,
+                        creditTotal: {
+                            in: [0]
+                        }
+                    }
+                })
+
+                await tx.assetAccount.update({
+                    where: {
+                        accountRef: asset?.accountRef
+                    },
+                    data: {
+                        debitTotal: inventory.buyingprice
+                    }
+                })
+            },
+                {
+                    maxWait: 5000, // 5 seconds max wait to connect to prisma
+                    timeout: 20000, // 20 seconds
+                }
+            )
 
 
 
@@ -139,6 +194,11 @@ export const deleteInventory = async (id: string) => {
 
         try {
             await prisma.$transaction(async (tx) => {
+                const inventory = await tx.inventory.findUnique({
+                    where: {
+                        id
+                    }
+                })
                 const newinventory = await prisma.inventory.delete({
                     where: {
                         id
@@ -151,7 +211,32 @@ export const deleteInventory = async (id: string) => {
                         inventoryId: id
                     }
                 })
-            })
+
+                // move asset to write off
+                await tx.assetAccount.create({
+                    data: {
+                        accountRef: `AC${genRandonString()}`,
+                        creditTotal: inventory?.buyingprice,
+                        paymenttype: "CASH",
+                        debitTotal: 0,
+                        accounttype: "INVENTORYACCOUNT"
+                    }
+                })
+
+                await tx.writeOffAccount.create({
+                    data: {
+                        accountRef: `WA${genRandonString()}`,
+                        accounttype: "DISPOSABLEACCOUNT",
+                        debitTotal: inventory?.buyingprice,
+                        paymenttype: "CASH"
+                    }
+                })
+            },
+                {
+                    maxWait: 5000, // 5 seconds max wait to connect to prisma
+                    timeout: 20000, // 20 seconds
+                }
+            )
         } catch (e: any) {
             console.log(e.message)
             return new Error(e.message)
@@ -256,50 +341,105 @@ export const createSale = async (sale: {
 
 
                 }
-                // create transaction
-                const createRevenueTransaction = await tx.revenueAccount.create({
-                    data: {
-                        accountRef: `RC${genRandonString()}`,
-                        creditTotal: sale.price,
-                        debitTotal: 0
-                    }
-                })
-                const saleAccount = await tx.salesAccount.create({
-                    data: {
-                        accountRef: `SC${genRandonString()}`,
-                        creditTotal: sale.price,
-                        debitTotal: 0,
-                        productId: sale.inventoryId
-                    },
-                });
-                // Create a new transaction record
-                const newTransaction = await tx.transactionAccount.create({
-                    data: {
-                        accountRef: `TC${genRandonString()}`,
-                        debitAmount: 0,
-                        creditAmount: sale.price,
-                        description: "sale",
-                        creditAccountId: saleAccount.id, // credit the Inventory Account
-                        debitAccountId: createRevenueTransaction.id,     // debiting the Cash Account or source
-                    },
-                });
 
-                // create a customer if not exists 
-                if (sale.saletype !== "Debit") {
+                if (sale.saletype === "CREDIT") {
 
-                    await tx.customerAccount.create({
+                    await tx.newRevenueAccount.create({
                         data: {
-                            accountRef: `CA${genRandonString()}`,
-                            accountName: sale.vendor,
-                            customerContact: sale?.contact as string,
-                            creditTotal: sale.price
+                            accountRef: `RA${genRandonString()}`,
+                            paymenttype: "CASH",
+                            productId: sale.inventoryId,
+                            creditTotal: sale.price,
+                            accounttype: "SALESACCOUNT"
+                        }
+                    })
+                    await tx.assetAccount.create({
+                        data: {
+                            accountRef: `AR${genRandonString()}`,
+                            debitTotal: sale.price,
+                            productId: sale.inventoryId,
+                            paymenttype: "CASH",
+                            customername: sale.vendor,
+                            customercontact: sale.contact,
+                            accounttype: "ACCOUNTRECEIVABLE"
                         }
                     })
 
+                    const inv = await tx.inventory.findUnique({
+                        where: {
+                            id: sale.inventoryId
+                        }
+                    })
+                    await tx.assetAccount.create({
+                        data: {
+                            accountRef: `AR${genRandonString()}`,
+                            creditTotal: (inv?.buyingprice as number) * sale.quantity,
+                            paymenttype: "CASH",
+                            productId: sale.inventoryId,
+                            accounttype: "INVENTORYACCOUNT"
+                        }
+                    })
+                    await tx.newExpenseAccount.create({
+                        data: {
+                            accountRef: `EA${genRandonString()}`,
+                            expensetype: "cost of goods on credit",
+                            debitTotal: (inv?.buyingprice as number) * sale.quantity,
+                            paymenttype: "CASH"
 
+                        }
+                    })
+                } else {
+                    await tx.newRevenueAccount.create({
+                        data: {
+                            accountRef: `RA${genRandonString()}`,
+                            paymenttype: "CASH",
+                            debitTotal: sale.price,
+                            productId: sale.inventoryId,
+                            accounttype: "SALESACCOUNT"
+                        }
+                    })
+                    await tx.assetAccount.create({
+                        data: {
+                            accountRef: `AR${genRandonString()}`,
+                            debitTotal: sale.price,
+                            paymenttype: "CASH",
+                            accounttype: "CASHACCOUNT"
+                        }
+                    })
+
+                    const inv = await tx.inventory.findUnique({
+                        where: {
+                            id: sale.inventoryId
+                        }
+                    })
+                    await tx.assetAccount.create({
+                        data: {
+                            accountRef: `AR${genRandonString()}`,
+                            creditTotal: (inv?.buyingprice as number) * sale.quantity,
+                            paymenttype: "CASH",
+                            productId: sale.inventoryId,
+                            accounttype: "INVENTORYACCOUNT"
+                        }
+                    })
+                    await tx.newExpenseAccount.create({
+                        data: {
+                            accountRef: `EA${genRandonString()}`,
+                            expensetype: "cost of goods on sold",
+                            debitTotal: (inv?.buyingprice as number) * sale.quantity,
+                            paymenttype: "CASH"
+
+                        }
+                    })
                 }
 
-            }
+
+
+            },
+                {
+                    maxWait: 5000, // 5 seconds max wait to connect to prisma
+                    timeout: 20000, // 20 seconds
+                }
+
             )
         } catch (e: any) {
             console.log(e.message)
@@ -320,7 +460,9 @@ export const updateSale = async (sale: {
     saletype: string;
     status?: string;
     vendor?: string;
-    contact?: string
+    contact?: string;
+    previousstatus: string;
+    inventoryId: string;
 }) => {
     const { isAuthenticated, getUser } = await getKindeServerSession()
     const auth = await isAuthenticated()
@@ -334,15 +476,88 @@ export const updateSale = async (sale: {
         try {
             await prisma.$transaction(async (tx) => {
                 if (sale.quantity > 0) {
-                    if (sale.saletype === "SOLD") {
-                        await tx.customerAccount.create({
-                            data: {
-                                accountRef: `CA${genRandonString()}`,
-                                accountName: sale.vendor,
-                                customerContact: sale?.contact as string,
-                                debitTotal: sale.price,
-                                creditTotal: 0
+                    const inv = await tx.inventory.findUnique({
+                        where: {
+                            id: sale.inventoryId
+                        }
+                    })
 
+                    // handle returning a sale to credited
+                    if (sale.previousstatus === "SOLD" && sale.status === "CREDITED") {
+                        // settle the customer account with a balance
+                        await tx.equityAccount.create({
+                            data: {
+                                accountRef: `AC${genRandonString()}`,
+                                creditTotal: (sale.price) - ((inv?.buyingprice as number) * sale.quantity),
+                                accounttype: "RETAINEDEARNINGS",
+                                paymenttype: "CASH"
+                            }
+                        })
+                        await tx.newRevenueAccount.create({
+                            data: {
+                                accountRef: `AC${genRandonString()}`,
+                                creditTotal: sale.price,
+                                accounttype: "SALESACCOUNT",
+                                paymenttype: "CASH"
+                            }
+                        })
+                        await tx.assetAccount.create({
+                            data: {
+                                accountRef: `AC${genRandonString()}`,
+                                creditTotal: sale.price,
+                                accounttype: "CASHACCOUNT",
+                                paymenttype: "CASH"
+                            }
+                        })
+                        await tx.assetAccount.create({
+                            data: {
+                                accountRef: `AC${genRandonString()}`,
+                                customername: sale.vendor,
+                                productId: sale.inventoryId,
+                                customercontact: sale?.contact as string,
+                                debitTotal: sale.price,
+                                accounttype: "ACCOUNTRECEIVABLE",
+                                paymenttype: "CASH"
+                            }
+                        })
+                    }
+
+                    if (sale.saletype === "SOLD") {
+                        await tx.assetAccount.create({
+                            data: {
+                                accountRef: `AC${genRandonString()}`,
+                                customername: sale.vendor,
+                                productId: sale.inventoryId,
+                                customercontact: sale?.contact as string,
+                                creditTotal: sale.price,
+                                accounttype: "ACCOUNTRECEIVABLE",
+                                paymenttype: "CASH"
+                            }
+                        })
+                        await tx.newRevenueAccount.create({
+                            data: {
+                                accountRef: `AC${genRandonString()}`,
+                                debitTotal: sale.price,
+                                accounttype: "SALESACCOUNT",
+                                paymenttype: "CASH"
+                            }
+                        })
+                        await tx.assetAccount.create({
+                            data: {
+                                accountRef: `AC${genRandonString()}`,
+                                debitTotal: sale.price,
+                                accounttype: "CASHACCOUNT",
+                                paymenttype: "CASH"
+                            }
+                        })
+
+                        // settle profit
+                        await tx.equityAccount.create({
+                            data: {
+                                accountRef: `AC${genRandonString()}`,
+                                debitTotal: (sale.price) - ((inv?.buyingprice as number) * sale.quantity),
+                                accounttype: "RETAINEDEARNINGS",
+                                paymenttype: "CASH"
                             }
                         })
                     }
@@ -368,13 +583,43 @@ export const updateSale = async (sale: {
                             }
                         })
 
-                        await tx.customerAccount.create({
+                        await tx.assetAccount.create({
                             data: {
-                                accountRef: `CA${genRandonString()}`,
-                                accountName: sale.vendor,
-                                customerContact: sale.contact as string,
+                                accountRef: `AC${genRandonString()}`,
+                                customername: sale.vendor,
+                                productId: sale.inventoryId,
+                                customercontact: sale?.contact as string,
+                                creditTotal: sale.price,
+                                accounttype: "ACCOUNTRECEIVABLE",
+                                paymenttype: "CASH"
+                            }
+                        })
+
+                        await tx.newRevenueAccount.create({
+                            data: {
+                                accountRef: `AC${genRandonString()}`,
                                 debitTotal: sale.price,
-                                creditTotal: 0
+                                accounttype: "SALESACCOUNT",
+                                paymenttype: "CASH"
+                            }
+                        })
+
+                        await tx.newExpenseAccount.create({
+                            data: {
+                                accountRef: `EA${genRandonString()}`,
+                                creditTotal: (inv?.buyingprice as number) * sale.quantity,
+                                expensetype: "cost of goods returned",
+                                paymenttype: "CASH"
+                            }
+                        })
+
+                        await tx.assetAccount.create({
+                            data: {
+                                accountRef: `AC${genRandonString()}`,
+                                productId: sale.inventoryId,
+                                debitTotal: (inv?.buyingprice as number) * sale.quantity,
+                                accounttype: "INVENTORYACCOUNT",
+                                paymenttype: "CASH"
                             }
                         })
 
@@ -384,43 +629,47 @@ export const updateSale = async (sale: {
                             }
                         })
                     } else {
-                        if (sale.saletype == "DEBIT") {
-                            const newinventory = await tx.sales.update({
-                                where: {
-                                    id: sale.id
-                                },
-                                data: {
-                                    quantitySold: sale.quantity,
-                                    priceSold: sale.price,
-                                    status: sale.status as ProductStatus,
-                                    type: sale.saletype
-                                },
 
-                                select: {
-                                    id: true
-                                }
-                            })
-                        } else {
-                            const newinventory = await tx.sales.update({
-                                where: {
-                                    id: sale.id
-                                },
-                                data: {
-                                    quantitySold: sale.quantity,
-                                    priceSold: sale.price,
-                                    vendor: sale.vendor,
-                                    type: sale.saletype as SaleType,
-                                    status: sale.status as ProductStatus
-                                },
-                                select: {
-                                    id: true
-                                }
-                            })
-                        }
+                        const newinventory = await tx.sales.update({
+                            where: {
+                                id: sale.id
+                            },
+                            data: {
+                                quantitySold: sale.quantity,
+                                priceSold: sale.price,
+                                status: sale.status as ProductStatus,
+                                type: sale.saletype as SaleType
+                            },
+
+                            select: {
+                                id: true
+                            }
+                        })
+
+                        await tx.sales.update({
+                            where: {
+                                id: sale.id
+                            },
+                            data: {
+                                quantitySold: sale.quantity,
+                                priceSold: sale.price,
+                                vendor: sale.vendor,
+                                type: sale.saletype as SaleType,
+                                status: sale.status as ProductStatus
+                            },
+                            select: {
+                                id: true
+                            }
+                        })
+
                     }
 
                 }
-            }
+            },
+                {
+                    maxWait: 5000, // 5 seconds max wait to connect to prisma
+                    timeout: 20000, // 20 seconds
+                }
             )
         } catch (e: any) {
             console.log(e.message)
@@ -448,47 +697,100 @@ export const createBulkInventory = async (inventory: {
 
     if (auth) {
         try {
-            // Set batch size
-            const batchSize = 10; // Adjust based on your environment
-            for (let i = 0; i < inventory.length; i += batchSize) {
-                const batch = inventory.slice(i, i + batchSize);
+            const capital = await prisma.equityAccount.aggregate({
+                where: {
+                    accounttype: "CAPITALACCOUNT"
+                },
+                _sum: {
+                    debitTotal: true,
+                    creditTotal: true
+                }
+            })
+            if (((capital._sum.debitTotal as number) - (capital._sum.creditTotal as number)) !== 0) {
+                // Set batch size
+                const batchSize = 10; // Adjust based on your environment
+                for (let i = 0; i < inventory.length; i += batchSize) {
+                    const batch = inventory.slice(i, i + batchSize);
 
-                // Use Promise.all to handle the batch concurrently
-                await Promise.all(batch.map(async (item) => {
-                    await prisma.$transaction(async (tx) => {
-                        const category = await tx.category.findUnique({
-                            where: {
-                                name: item.Category
-                            },
-                            select: {
-                                id: true
-                            }
-                        });
-
-                        const newInventory = await tx.inventory.create({
-                            data: {
-                                name: item.Name,
-                                categoryId: category?.id,
-                                quantity: item.Quantity,
-                                price: item.BuyingPrice,
-                                buyingprice: item.SellingPrice,
-                                threshold: item.Threshold
-                            },
-                            select: {
-                                id: true
-                            }
-                        });
-
-                        if (item.Quantity < item.Threshold) {
-                            await tx.lowStockSummary.create({
+                    // Use Promise.all to handle the batch concurrently
+                    await Promise.all(batch.map(async (item) => {
+                        await prisma.$transaction(async (tx) => {
+                            await tx.equityAccount.create({
                                 data: {
-                                    inventoryId: newInventory.id,
-                                    quantity: item.Quantity,
+                                    accountRef: `EA${genRandonString()}`,
+                                    accounttype: "CAPITALACCOUNT",
+                                    creditTotal: item.BuyingPrice,
+                                    debitTotal: 0,
+                                    paymenttype: "CASH"
+                                }
+                            })
+
+                            await tx.assetAccount.create({
+                                data: {
+                                    accountRef: `AC${genRandonString()}`,
+                                    accounttype: "CASHACCOUNT",
+                                    debitTotal: item.BuyingPrice,
+                                    paymenttype: "CASH"
+                                }
+                            })
+
+                            await tx.assetAccount.create({
+                                data: {
+                                    accountRef: `AC${genRandonString()}`,
+                                    accounttype: "CASHACCOUNT",
+                                    creditTotal: item.BuyingPrice,
+                                    paymenttype: "CASH"
+                                }
+                            })
+
+
+                            await tx.assetAccount.create({
+                                data: {
+                                    accountRef: `AC${genRandonString()}`,
+                                    accounttype: "INVENTORYACCOUNT",
+                                    debitTotal: item.BuyingPrice,
+                                    paymenttype: "CASH"
+                                }
+                            })
+
+                            const category = await tx.category.findUnique({
+                                where: {
+                                    name: item.Category
+                                },
+                                select: {
+                                    id: true
                                 }
                             });
-                        }
-                    });
-                }));
+
+                            const newInventory = await tx.inventory.create({
+                                data: {
+                                    name: item.Name,
+                                    categoryId: category?.id,
+                                    quantity: item.Quantity,
+                                    price: item.BuyingPrice,
+                                    buyingprice: item.SellingPrice,
+                                    threshold: item.Threshold
+                                },
+                                select: {
+                                    id: true
+                                }
+                            });
+
+                            if (item.Quantity < item.Threshold) {
+                                await tx.lowStockSummary.create({
+                                    data: {
+                                        inventoryId: newInventory.id,
+                                        quantity: item.Quantity,
+                                    }
+                                });
+                            }
+
+                        });
+                    }));
+                }
+
+            } else {
+                return new Error("Capital account is not enough or empty")
             }
 
             // Revalidate after all batches are done
@@ -506,16 +808,22 @@ export const createBulkInventory = async (inventory: {
 
 export async function seedData() {
     try {
-        const inventory = await prisma.sales.findMany({
-            where: {
-                type: "CREDIT",
-                OR: [
-                    {
-                        status: "CREDITED",
-
-                    }
-                ]
-            }
+        const inventory = await prisma.services.findMany({
+            // select:{
+            //     id:true,
+            //     amount:true,
+            //     category:{
+            //         select:{
+            //             name:true
+            //         }
+            //     },
+            //     created_at:true,
+            //     updated_at:true
+            // }
+            // where:{
+            //     type:"CREDIT",
+            //     status:"RETURNED"
+            // }
             // _sum:{
             //     creditTotal:true,
             //     debitTotal:true
@@ -547,63 +855,195 @@ export async function seedData() {
 
 
 
-        for (let i = 0; i < inventory.length; i++) {
+        // for (let i = 0; i < inventory.length; i++) {
 
 
 
-            await prisma.$transaction(async (tx) => {
+        //     await prisma.$transaction(async (tx) => {
 
-                // // // create transaction
-                // const createMainAccountTransaction = await tx.mainAccount.create({
-                //     data: {
-                //         accountRef: `MC${genRandonString()}`,
-                //         debitTotal: inventory[i].creditTotal,
-                //         creditTotal: 0,
-                //         created_at:new Date(inventory[i]?.created_at),
-                //         updated_at:new Date(inventory[i].updated_at)
-                //     }
-                // })
+        //         // // // create transaction
+        //         // const createMainAccountTransaction = await tx.mainAccount.create({
+        //         //     data: {
+        //         //         accountRef: `MC${genRandonString()}`,
+        //         //         debitTotal: inventory[i].creditTotal,
+        //         //         creditTotal: 0,
+        //         //         created_at:new Date(inventory[i]?.created_at),
+        //         //         updated_at:new Date(inventory[i].updated_at)
+        //         //     }
+        //         // })
 
-                // // console.log(createMainAccountTransaction, "trab")
-                const saleAccount = await tx.customerAccount.create({
-                    data: {
-                        accountRef: `CA${genRandonString()}`,
-                        accountName: inventory[i].vendor as string,
-                        customerContact: '',
-                        debitTotal: 0,
-                        creditTotal: inventory[i].priceSold,
-                        created_at: new Date(inventory[i].created_at),
-                        updated_at: new Date(inventory[i].updated_at)
-                    },
-                });
-                // // // console.log(createMainAccountTransaction, "trab")
-                // const revAccount = await tx.revenueAccount.create({
-                //     data: {
-                //         accountRef: `RC${genRandonString()}`,
-                //         debitTotal: 0,
-                //         creditTotal:20,
-                //         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
-                //         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
-                //     },
-                // });
-                // // Create a new transaction record
-                // const newTransaction = await tx.transactionAccount.create({
-                //     data: {
-                //         accountRef: `TC${genRandonString()}`,
-                //         debitAmount: 20,
-                //         creditAmount: 0,
-                //         description: "sale acc setup",
-                //         creditAccountId: revAccount.id,
-                //         debitAccountId: '',
-                //         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
-                //         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
-                //         // credit the Inventory Account
-                //         // debitAccountId: InventoryAccount.id,     // debiting the Cash Account or source
-                //     },
-                // });
-            });
+        //         // // console.log(createMainAccountTransaction, "trab")
+        //         const saleAccount = await tx.customerAccount.create({
+        //             data: {
+        //                 accountRef: `CA${genRandonString()}`,
+        //                 accountName: inventory[i].vendor as string,
+        //                 customerContact: '',
+        //                 debitTotal: 0,
+        //                 creditTotal: inventory[i].priceSold,
+        //                 created_at: new Date(inventory[i].created_at),
+        //                 updated_at: new Date(inventory[i].updated_at)
+        //             },
+        //         });
+        //         // // // console.log(createMainAccountTransaction, "trab")
+        //         // const revAccount = await tx.revenueAccount.create({
+        //         //     data: {
+        //         //         accountRef: `RC${genRandonString()}`,
+        //         //         debitTotal: 0,
+        //         //         creditTotal:20,
+        //         //         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
+        //         //         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
+        //         //     },
+        //         // });
+        //         // // Create a new transaction record
+        //         // const newTransaction = await tx.transactionAccount.create({
+        //         //     data: {
+        //         //         accountRef: `TC${genRandonString()}`,
+        //         //         debitAmount: 20,
+        //         //         creditAmount: 0,
+        //         //         description: "sale acc setup",
+        //         //         creditAccountId: revAccount.id,
+        //         //         debitAccountId: '',
+        //         //         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
+        //         //         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
+        //         //         // credit the Inventory Account
+        //         //         // debitAccountId: InventoryAccount.id,     // debiting the Cash Account or source
+        //         //     },
+        //         // });
+        //     });
 
+        // }
+
+        // Set batch size
+        const batchSize = 10; // Adjust based on your environment
+        for (let i = 0; i < inventory.length; i += batchSize) {
+            const batch = inventory.slice(i, i + batchSize);
+
+            // Use Promise.all to handle the batch concurrently
+            await Promise.all(batch.map(async (item) => {
+                await prisma.$transaction(async (tx) => {
+
+                    // credit cash acc
+                    await tx.assetAccount.create({
+                        data: {
+                            accountRef: `AC${genRandonString()}`,
+                            accounttype: "CASHACCOUNT",
+                            paymenttype: "CASH",
+                            creditTotal: 0,
+                            debitTotal: item.price,
+                            created_at: item.created_at,
+                            updated_at: item.updated_at
+                        }
+                    })
+
+
+                    await tx.newRevenueAccount.create({
+                        data: {
+                            accountRef: `RA${genRandonString()}`,
+                            accounttype: "SERVICEACCOUNT",
+                            paymenttype: "CASH",
+                            debitTotal: item.price,
+                            creditTotal: 0,
+                            created_at: item.created_at,
+                            updated_at: item.updated_at
+                        }
+                    })
+
+                    // const product = await tx.inventory.findUnique({
+                    //     where: {
+                    //         id: item.inventoryId
+                    //     }
+                    // })
+
+                    // await tx.newExpenseAccount.create({
+                    //     data: {
+                    //         accountRef: `EA${genRandonString()}`,
+                    //         expensetype: item.category.name,
+                    //         paymenttype: "CASH",
+                    //         debitTotal: item.amount,
+                    //         creditTotal: 0,
+                    //         created_at: item.created_at,
+                    //         updated_at: item.created_at
+
+                    //     }
+                    // })
+
+                    // await tx.assetAccount.create({
+                    //     data: {
+                    //         accountRef: `AC${genRandonString()}`,
+                    //         accounttype: "INVENTORYACCOUNT",
+                    //         paymenttype: "CASH",
+                    //         creditTotal: (product?.buyingprice as number) * item.quantitySold,
+                    //         debitTotal: 0,
+                    //         productId: item.inventoryId,
+                    //         created_at: item.created_at,
+                    //         updated_at: item.updated_at
+                    //     }
+                    // })
+
+                    // await tx.assetAccount.create({
+                    //     data: {
+                    //         accountRef: `AC${genRandonString()}`,
+                    //         accounttype: "ACCOUNTRECEIVABLE",
+                    //         paymenttype: "CASH",
+                    //         creditTotal: item.priceSold,
+                    //         debitTotal: 0,
+                    //         productId: item.inventoryId,
+                    //         created_at: item.created_at,
+                    //         updated_at: item.updated_at
+                    //     }
+                    // })
+
+
+                    // await tx.newRevenueAccount.create({
+                    //     data: {
+                    //         accountRef: `RA${genRandonString()}`,
+                    //         accounttype: "SALESACCOUNT",
+                    //         paymenttype: "CASH",
+                    //         creditTotal: 0,
+                    //         debitTotal: item.priceSold,
+                    //         created_at: item.created_at,
+                    //         updated_at: item.updated_at
+                    //     }
+                    // })
+
+
+
+
+                    // debit inventory acc
+                    // await tx.assetAccount.create({
+                    //     data: {
+                    //         accountRef: `AC${genRandonString()}`,
+                    //         accounttype: "INVENTORYACCOUNT",
+                    //         paymenttype: "CASH",
+                    //         debitTotal: (item.priceSold) - ((product?.buyingprice as number) * item.quantitySold),
+                    //         creditTotal: 0,
+                    //         created_at: item.created_at,
+                    //         updated_at: item.updated_at
+                    //     }
+                    // })
+
+                    // await tx.newExpenseAccount.create({
+                    //     data: {
+                    //         accountRef: `EA${genRandonString()}`,
+                    //         expensetype: "cost of goods returned",
+                    //         paymenttype: "CASH",
+                    //         creditTotal: (item.priceSold) - ((product?.buyingprice as number) * item.quantitySold),
+                    //         debitTotal: 0,
+                    //         created_at: item.created_at,
+                    //         updated_at: item.updated_at
+                    //     }
+                    // })
+                },
+                    {
+                        maxWait: 5000, // 5 seconds max wait to connect to prisma
+                        timeout: 20000, // 20 seconds
+                    }
+
+                );
+            }
+            ));
         }
+
 
 
 
