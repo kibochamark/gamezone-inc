@@ -51,6 +51,7 @@ const EditSale = () => {
     const formik = useFormik({
         initialValues: {
             id:'',
+            inventoryId:"",
             price: 0,
             quantity: 1,
             threshold: 0,
@@ -91,6 +92,8 @@ const EditSale = () => {
 
     })
 
+    console.log(editdata, 'edit')
+
 
     // dynamically set update values from state
     useEffect(() => {
@@ -104,7 +107,8 @@ const EditSale = () => {
                 vendor:editdata?.vendor,
                 status:editdata?.status,
                 contact:editdata?.contact,
-                previousstatus:editdata?.status
+                previousstatus:editdata?.status,
+                inventoryId:editdata?.inventory?.id
             })
         }
     }, [isedit, page, editdata])
