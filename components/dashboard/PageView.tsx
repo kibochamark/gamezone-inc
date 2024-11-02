@@ -71,7 +71,7 @@ export default function PageView({ inventory,cashathand, expenses, recentsales, 
               </p>
             </CardContent>
           </Card>
-          <Card x-chunk="dashboard-01-chunk-0">
+          {/* <Card x-chunk="dashboard-01-chunk-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Cash At hand
@@ -87,7 +87,7 @@ export default function PageView({ inventory,cashathand, expenses, recentsales, 
                 today
               </p>
             </CardContent>
-          </Card>
+          </Card> */}
           <Card x-chunk="dashboard-01-chunk-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">

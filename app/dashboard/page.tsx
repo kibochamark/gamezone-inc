@@ -107,8 +107,32 @@ async function getCashAtHand() {
                 creditTotal: true
             }
         })
+        const expensesyesterday = await prisma.newExpenseAccount.aggregate({
+            where: {
+                OR: [
+                    {
+                        created_at: {
+                            gte: yesterday,
+                            lt: new Date(yesterday.getTime() + 86400000) // Add 1 day to get end of today
+                        },
+                    }, {
+                        updated_at: {
+                            gte: yesterday,
+                            lt: new Date(yesterday.getTime() + 86400000)
+                        }
+                    }
+                ]
+            },
+            _sum: {
+                debitTotal: true,
+                creditTotal: true
+            }
+        })
 
-        let startingbalance = (startingbalancefetch._sum.debitTotal as number) - (startingbalancefetch._sum.creditTotal as number)
+        let expensesforyesterday = (expensesyesterday._sum.debitTotal as number) - (expensesyesterday._sum.creditTotal as number)
+
+
+        let startingbalance = ((startingbalancefetch._sum.debitTotal as number) - (startingbalancefetch._sum.creditTotal as number))-expensesforyesterday
 
         const cashasoftoday = await prisma.assetAccount.aggregate({
             where: {
