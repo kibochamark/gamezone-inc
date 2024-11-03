@@ -48,7 +48,7 @@ import {
 import { DataTable } from "../reusables/DataGrid"
 import { columns } from "../Inventory/columns"
 
-export default function PageView({ inventory, expenses, recentsales, lowstock, totalInv, salesSummary }: { inventory: any; expenses: any; recentsales: any; lowstock: any; totalInv: any; salesSummary: { revenue: number; profit: number; creditsales: number; debitsales: number; creditcount: number; debitcount: number; } }) {
+export default function PageView({ inventory,cashathand, expenses, recentsales, lowstock, totalInv, salesSummary }: { inventory: any; cashathand:any; expenses: any; recentsales: any; lowstock: any; totalInv: any; salesSummary: { revenue: number; profit: number; creditsales: number; debitsales: number; creditcount: number; debitcount: number; } }) {
   return (
     <div className="flex min-h-screen w-full flex-col p-4 gap-2">
       <h2 className="text-titleLarge font-bold mb-4">Dashboard</h2>
@@ -71,6 +71,23 @@ export default function PageView({ inventory, expenses, recentsales, lowstock, t
               </p>
             </CardContent>
           </Card>
+          {/* <Card x-chunk="dashboard-01-chunk-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Cash At hand
+              </CardTitle>
+              <DollarSign className="h-4 w-4 text-primary500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "KES",
+              }).format(parseFloat(cashathand.toString()))}</div>
+              <p className="text-xs text-muted-foreground">
+                today
+              </p>
+            </CardContent>
+          </Card> */}
           <Card x-chunk="dashboard-01-chunk-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">

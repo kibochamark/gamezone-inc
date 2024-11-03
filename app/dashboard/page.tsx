@@ -75,6 +75,122 @@ async function getsummary() {
     //     }
     // })
 }
+
+async function getCashAtHand() {
+    try {
+
+        const today = new Date()
+        const yesterday = new Date(today)
+
+        yesterday.setDate(yesterday.getDate() - 1)
+
+        const startingbalancefetch = await prisma.assetAccount.aggregate({
+            where: {
+                accounttype: "CASHACCOUNT",
+                OR: [
+                    {
+                        created_at: {
+                            gte: yesterday,
+                            lt: new Date(yesterday.getTime() + 86400000) // Add 1 day to get end of today
+                        },
+                    },
+                    {
+                        updated_at: {
+                            gte: yesterday,
+                            lt: new Date(yesterday.getTime() + 86400000)
+                        }
+                    }
+                ]
+            },
+            _sum: {
+                debitTotal: true,
+                creditTotal: true
+            }
+        })
+        const expensesyesterday = await prisma.newExpenseAccount.aggregate({
+            where: {
+                OR: [
+                    {
+                        created_at: {
+                            gte: yesterday,
+                            lt: new Date(yesterday.getTime() + 86400000) // Add 1 day to get end of today
+                        },
+                    }, {
+                        updated_at: {
+                            gte: yesterday,
+                            lt: new Date(yesterday.getTime() + 86400000)
+                        }
+                    }
+                ]
+            },
+            _sum: {
+                debitTotal: true,
+                creditTotal: true
+            }
+        })
+
+        let expensesforyesterday = (expensesyesterday._sum.debitTotal as number) - (expensesyesterday._sum.creditTotal as number)
+
+
+        let startingbalance = ((startingbalancefetch._sum.debitTotal as number) - (startingbalancefetch._sum.creditTotal as number))-expensesforyesterday
+
+        const cashasoftoday = await prisma.assetAccount.aggregate({
+            where: {
+                accounttype: "CASHACCOUNT",
+                OR: [
+                    {
+                        created_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                        },
+                    },
+                    {
+                        updated_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000)
+                        }
+                    }
+                ]
+            },
+            _sum: {
+                debitTotal: true,
+                creditTotal: true
+            }
+        })
+        let cashtoday = (cashasoftoday._sum.debitTotal as number) - (cashasoftoday._sum.creditTotal as number)
+
+        const expenses = await prisma.newExpenseAccount.aggregate({
+            where: {
+                OR: [
+                    {
+                        created_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                        },
+                    }, {
+                        updated_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000)
+                        }
+                    }
+                ]
+            },
+            _sum: {
+                debitTotal: true,
+                creditTotal: true
+            }
+        })
+
+        let expensesfortoday = (expenses._sum.debitTotal as number) - (expenses._sum.creditTotal as number)
+
+
+        return (startingbalance + cashtoday) - expensesfortoday
+
+
+    } catch (e: any) {
+        return "failed to fetch"
+    }
+}
 const page = async () => {
     const inventory = await getProducts() ?? []
     const sales = await getRecentSales() ?? []
@@ -82,6 +198,7 @@ const page = async () => {
     const lowstock = await getLowStockSummary()
     const totalInv = await getTotalInv()
     const expensesSummary = await getExpenseSummary()
+    const cashathand = await getCashAtHand()
     // const data = await getsummary()
     // const data = await seedData()
     // console.log(data, "aggregated data")
@@ -90,7 +207,7 @@ const page = async () => {
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
                 <Suspense fallback={<Loader className="flex items-center justify-center animate animate-spin" />}>
-                    <PageView inventory={inventory} expenses={expensesSummary} lowstock={lowstock} totalInv={totalInv} salesSummary={salesSummary} recentsales={sales} />
+                    <PageView inventory={inventory} cashathand={cashathand} expenses={expensesSummary} lowstock={lowstock} totalInv={totalInv} salesSummary={salesSummary} recentsales={sales} />
                 </Suspense>
             </div>
 
