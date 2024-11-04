@@ -55,11 +55,12 @@ export default function ShopReports() {
                 })
                 setReportData(formatteddata)
             }else if( reportType === "creditsales"){
+                console.log(value, "ddd")
                 let formatteddata = value.map((inv:any, index:number)=>{
                     return {
                         id:index+1,
-                        "Customer Name": inv?.accountName,
-                        "Balance": (inv?._sum.creditTotal as number) - (inv?._sum.debitTotal as number)
+                        "Customer Name": inv?.customername,
+                        "Balance": (inv?._sum.debitTotal as number) - (inv?._sum.creditTotal as number)
                     }
                 })
                 setReportData(formatteddata)

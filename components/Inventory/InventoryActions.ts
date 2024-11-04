@@ -153,18 +153,24 @@ export const updateInventory = async (inventory: { id: string; name: string; pri
                         productId: inventory.id,
                         creditTotal: {
                             in: [0]
-                        }
+                        },
+
                     }
                 })
 
-                await tx.assetAccount.update({
-                    where: {
-                        accountRef: asset?.accountRef
-                    },
-                    data: {
-                        debitTotal: inventory.buyingprice
-                    }
-                })
+
+                if (asset) {
+                    await tx.assetAccount.update({
+                        where: {
+                            accountRef: asset?.accountRef
+                        },
+                        data: {
+                            debitTotal: inventory.buyingprice
+                        }
+                    })
+                }
+
+
             },
                 {
                     maxWait: 5000, // 5 seconds max wait to connect to prisma
