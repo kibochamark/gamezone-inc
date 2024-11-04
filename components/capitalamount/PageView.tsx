@@ -48,7 +48,7 @@ export default function PageView({ data }: { data: any }) {
 
 
     return (
-        <div className="container mx-auto p-4 max-w-md">
+        <div className="container p-4 w-full">
             <Card>
                 <CardHeader>
                     <CardTitle>Capital Management</CardTitle>
