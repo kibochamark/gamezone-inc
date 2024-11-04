@@ -52,7 +52,7 @@ export default function PageView({ data }: { data: any }) {
             <Card>
                 <CardHeader>
                     <CardTitle>Capital Management</CardTitle>
-                    <CardDescription>View and update your shop's capital</CardDescription>
+                    <CardDescription>View and update your shops capital</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="mb-4">
