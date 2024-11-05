@@ -33,8 +33,6 @@ model Inventory {
 
   CreditedSummary CreditedSummary[]
 
-
-
   AssetAccount      AssetAccount[]
   NewRevenueAccount NewRevenueAccount[]
 
@@ -69,30 +67,28 @@ model Sales {
 }
 
 model Expenses {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
   kindeId     String
   kindeName   String
   expensename String
-  paymenttype  PaymentType @default(CASH)
-  category    Category @relation(fields: [categoryId], references: [id])
-  categoryId  String   @db.ObjectId
+  paymenttype PaymentType @default(CASH)
+  category    Category    @relation(fields: [categoryId], references: [id])
+  categoryId  String      @db.ObjectId
   amount      Float
   description String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @default(now())
-
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @default(now())
 }
 
 model Services {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  kindeId    String   @db.String
-  kindeName  String   @db.String
-  name       String   @db.String
-  price      Float
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  kindeId     String      @db.String
+  kindeName   String      @db.String
+  name        String      @db.String
+  price       Float
   paymenttype PaymentType @default(CASH)
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @default(now())
 
   NewRevenueAccount NewRevenueAccount[]
 }
@@ -179,6 +175,12 @@ model MainAccount {
   updated_at  DateTime @default(now())
 }
 
+model CASHBALANCE {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  amount     Float
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
 
 // Revamped accounts
 model AssetAccount {
@@ -226,16 +228,16 @@ enum EquityAccountType {
 }
 
 model NewRevenueAccount {
-  id          String            @id @default(auto()) @map("_id") @db.ObjectId
-  accountRef  String            @unique
+  id          String             @id @default(auto()) @map("_id") @db.ObjectId
+  accountRef  String             @unique
   accounttype RevenueAccountType
   paymenttype PaymentType
-  productId   String?           @db.ObjectId
-  product     Inventory?        @relation(fields: [productId], references: [id])
-  serviceId   String?           @db.ObjectId
-  service     Services?         @relation(fields: [serviceId], references: [id])
-  debitTotal  Float             @default(0)
-  creditTotal Float             @default(0)
+  productId   String?            @db.ObjectId
+  product     Inventory?         @relation(fields: [productId], references: [id])
+  serviceId   String?            @db.ObjectId
+  service     Services?          @relation(fields: [serviceId], references: [id])
+  debitTotal  Float              @default(0)
+  creditTotal Float              @default(0)
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now())

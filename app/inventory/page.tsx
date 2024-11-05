@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prismaClient'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { $Enums } from '@prisma/client'
 import React, { Suspense } from 'react'
+import { subDays, startOfDay } from 'date-fns';
+
 
 export const dynamic = 'force-dynamic'
 
@@ -27,8 +29,8 @@ async function getInventory() {
     let inventory: any
     try {
         inventory = await prisma.inventory.findMany({
-            orderBy:{
-                created_at:"desc"
+            orderBy: {
+                created_at: "desc"
             }
         }
         ) ?? []
@@ -78,9 +80,9 @@ async function getLowStock() {
     let inventory: any
     try {
         inventory = await prisma.lowStockSummary.findMany({
-           include:{
-            inventory:true
-           }
+            include: {
+                inventory: true
+            }
         }) ?? []
     } catch (e: any) {
         console.log(e.message)
@@ -93,12 +95,12 @@ async function getRevenueSummary() {
     let inventory: any
     try {
         inventory = await prisma.salesSummary.findMany({
-            select:{
-                totalSales:true
+            select: {
+                totalSales: true
             }
         }) ?? 0
 
-        
+
     } catch (e: any) {
         console.log(e.message)
     }
@@ -108,9 +110,9 @@ async function getRevenueSummary() {
 }
 
 const page = async () => {
-    const {isAuthenticated, getPermissions} = await getKindeServerSession()
+    const { isAuthenticated, getPermissions } = await getKindeServerSession()
     const inventory = await getInventory()
-    
+
     const category = await getCatgeories()
     const lowStockSummary = await getLowStockSummary()
     const lowStock = await getLowStock()
@@ -118,7 +120,6 @@ const page = async () => {
 
     const permissions = await getPermissions()
 
-  
 
    
 
@@ -126,7 +127,7 @@ const page = async () => {
         <div className='w-full  rounded-md h-full'>
             <div className='mx-2'>
                 <Suspense fallback="...loading">
-                    <PageView inventory={inventory} lowstock ={lowStock} category={category} lowStockSummary={lowStockSummary} revenue={revenue} permissions={permissions?.permissions}/>
+                    <PageView inventory={inventory} lowstock={lowStock} category={category} lowStockSummary={lowStockSummary} revenue={revenue} permissions={permissions?.permissions} />
                 </Suspense>
             </div>
 
