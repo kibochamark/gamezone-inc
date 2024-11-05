@@ -30,7 +30,7 @@ export default function PageView({ data }: { data: any }) {
             try {
                 const res = await createorupdatecapital(values.amount);
 
-                console.log(res, "res")
+                // console.log(res, "res")
 
                 if (res instanceof Error) {
                     throw res;
@@ -70,11 +70,16 @@ export default function PageView({ data }: { data: any }) {
                     <form onSubmit={formik.handleSubmit}>
                         <div className="space-y-2">
                             <Label htmlFor="newCapital">Add New Capital</Label>
+                            {formik.touched.amount && formik.errors.amount && (
+                                <p className='text-red-400'>{formik.errors.amount}</p>
+                            )}
                             <Input
                                 id="newCapital"
                                 type="number"
-                                value={newCapital}
-                                onChange={(e) => setNewCapital(e.target.value)}
+                                name='amount'
+                                value={formik.values.amount}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
                                 placeholder="Enter amount"
                                 step="0.01"
                                 min="0"
