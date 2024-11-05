@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 export const createorupdatecapital = async (amount:number) => {
     const { isAuthenticated } = await getKindeServerSession()
     const auth = await isAuthenticated()
+    console.log(amount)
 
 
     if (auth) {

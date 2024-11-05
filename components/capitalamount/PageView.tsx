@@ -30,6 +30,8 @@ export default function PageView({ data }: { data: any }) {
             try {
                 const res = await createorupdatecapital(values.amount);
 
+                console.log(res, "res")
+
                 if (res instanceof Error) {
                     throw res;
                 }
