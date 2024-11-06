@@ -227,14 +227,14 @@ async function getCashAtHand() {
                     id:starting.id
                 },
                 data:{
-                   amount:(startingbalance[0].amount + cashtoday) - expensesfortoday,
+                   amount:startingbalance ? (startingbalance.amount + cashtoday) - expensesfortoday : 0,
                    updated_at:today
                 }
             })
         }else{
             await prisma.cASHBALANCE.create({
                 data:{
-                   amount:(startingbalance[0].amount + cashtoday) - expensesfortoday,
+                   amount:startingbalance ? (startingbalance.amount + cashtoday) - expensesfortoday : 0,
                    created_at:today,
                    updated_at:today
                 }
