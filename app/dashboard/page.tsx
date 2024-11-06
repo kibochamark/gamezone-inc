@@ -221,7 +221,7 @@ async function getCashAtHand() {
                 ]
             }
         })
-        if(starting?.amount > 0){
+        if(starting){
             await prisma.cASHBALANCE.update({
                 where:{
                     id:starting.id
