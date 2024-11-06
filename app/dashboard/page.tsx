@@ -80,7 +80,7 @@ async function getCashAtHand() {
     try {
 
         const today = new Date()
-        const yesterday = new Date(today)
+        const yesterdayStart = new Date(today)
 
         yesterday.setDate(yesterday.getDate() - 1)
         yesterday.setHours(0,0,0,0)
