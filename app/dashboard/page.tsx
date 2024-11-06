@@ -137,6 +137,7 @@ console.log(startingbalance, "test");
             }
         })
         let cashtoday = (cashasoftoday._sum.debitTotal as number) - (cashasoftoday._sum.creditTotal as number) 
+        console.log(cashtoday, "test");
 
         const expenses = await prisma.newExpenseAccount.aggregate({
             where: {
@@ -161,6 +162,7 @@ console.log(startingbalance, "test");
         })
 
         let expensesfortoday = (expenses._sum.debitTotal as number) - (expenses._sum.creditTotal as number) 
+        console.log(expensesfortoday, "test");
 
 
         const starting = await prisma.cASHBALANCE.findFirst({
