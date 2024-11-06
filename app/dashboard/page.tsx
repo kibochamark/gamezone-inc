@@ -139,13 +139,13 @@ async function getCashAtHand() {
             {
                 created_at: {
                     gte: yesterday,
-                    lt: new Date(yesterday.getTime() + 86400000) // Add 1 day to get end of today
+                    lt: new Date(today) // Add 1 day to get end of today
                 },
             },
             {
                 updated_at: {
                     gte: yesterday,
-                    lt: new Date(yesterday.getTime() + 86400000)
+                    lt: new Date(today)
                 }
             }
         ]
