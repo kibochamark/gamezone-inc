@@ -135,20 +135,7 @@ async function getCashAtHand() {
         let startingbalance = await prisma.cASHBALANCE.findFirst(
 {
     where:{
-        OR: [
-            {
-                created_at: {
-                    gte: yesterday,
-                    lt: new Date(yesterday.getTime() + 86400000) // Add 1 day to get end of today
-                },
-            },
-            {
-                updated_at: {
-                    gte: yesterday,
-                    lt: new Date(yesterday.getTime() + 86400000)
-                }
-            }
-        ]
+        created_at:yesterday
     }
 }
         )
@@ -221,6 +208,7 @@ async function getCashAtHand() {
                 ]
             }
         })
+
         if(starting){
             await prisma.cASHBALANCE.update({
                 where:{
