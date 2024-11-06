@@ -91,7 +91,7 @@ export default function PageView({ inventory,cashathand, expenses, recentsales, 
           <Card x-chunk="dashboard-01-chunk-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Total expenses <span className="text-green-500 text-sm"> (Inc. cost of goods sold)</>
+                Total expenses <span className="text-green-500 text-sm"> (Inc. cost of goods sold)</span>
               </CardTitle>
               <DollarSign className="h-4 w-4 text-primary500" />
             </CardHeader>
@@ -218,7 +218,7 @@ export default function PageView({ inventory,cashathand, expenses, recentsales, 
           <Card x-chunk="dashboard-01-chunk-2">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Expenses
-              <span className="text-green-500 text-sm"> (Exc. cost of goods sold)</>
+              <span className="text-green-500 text-sm"> (Exc. cost of goods sold)</span>
               </CardTitle>
               <DollarSign className="h-4 w-4 text-primary500" />
             </CardHeader>
