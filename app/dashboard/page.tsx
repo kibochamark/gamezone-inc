@@ -80,6 +80,10 @@ async function getCashAtHand() {
     try {
 
         const today = new Date()
+        today.setHours(0, 0, 0, 0); // Start of today
+
+const endOfToday = new Date(today);
+endOfToday.setDate(today.getDate() + 1);
         const yesterdayStart = new Date(today)
 
         yesterdayStart.setDate(yesterdayStart.getDate() - 1)
@@ -145,12 +149,14 @@ console.log(startingbalance, "test");
                     {
                         created_at: {
                             gte: today,
-                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                                              lt: endOfToday
+                            
+                           
                         },
                     }, {
                         updated_at: {
                             gte: today,
-                            lt: new Date(today.getTime() + 86400000)
+                            lt: endOfToday
                         }
                     }
                 ]
@@ -171,13 +177,13 @@ console.log(startingbalance, "test");
                     {
                         created_at: {
                             gte: today,
-                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                            lt: endOfToday
                         },
                     },
                     {
                         updated_at: {
                             gte: today,
-                            lt: new Date(today.getTime() + 86400000)
+                            lt: endOfToday
                         }
                     }
                 ]
