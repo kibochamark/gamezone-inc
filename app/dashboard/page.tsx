@@ -225,7 +225,7 @@ async function getCashAtHand() {
             await prisma.cASHBALANCE.update({
                 where:{
                     id:starting.id
-                }
+                },
                 data:{
                    amount:(startingbalance[0].amount + cashtoday) - expensesfortoday,
                    updated_at:today
