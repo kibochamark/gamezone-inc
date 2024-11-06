@@ -108,6 +108,23 @@ export default function PageView({ inventory,cashathand, expenses, recentsales, 
           <Card x-chunk="dashboard-01-chunk-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
+                Cash At hand <span className="text-green-500 text-sm"> (Exc. expenses)</span>
+              </CardTitle>
+              <DollarSign className="h-4 w-4 text-primary500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "KES",
+              }).format(parseFloat(cashathand.cashexclusiveexpense.toString()))}</div>
+              <p className="text-xs text-muted-foreground">
+                end of business
+              </p>
+            </CardContent>
+          </Card> 
+          <Card x-chunk="dashboard-01-chunk-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
                 Cash At hand
               </CardTitle>
               <DollarSign className="h-4 w-4 text-primary500" />

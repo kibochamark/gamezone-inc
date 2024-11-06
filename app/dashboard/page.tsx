@@ -214,6 +214,7 @@ console.log(startingbalance, "test");
             startingbalance:startingbalance ? startingbalance.amount : 0,
             expensesfortoday,
             cashtoday,
+            cashexclusiveexpense:startingbalance ? (startingbalance.amount + cashtoday): 0,
             endofdaycash: startingbalance ? (startingbalance.amount + cashtoday) - expensesfortoday  : 0
         } 
 
