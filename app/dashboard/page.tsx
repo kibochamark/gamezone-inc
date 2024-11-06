@@ -246,7 +246,7 @@ async function getCashAtHand() {
             statingbalance:startingbalance ? startingbalance.amount : 0,
             expensesfortoday,
             cashtoday,
-            endofdaycash:(startingbalance[0].amount + cashtoday) - expensesfortoday 
+            endofdaycash: startingbalance ? (startingbalance.amount + cashtoday) - expensesfortoday  : 0
         } 
 
 
