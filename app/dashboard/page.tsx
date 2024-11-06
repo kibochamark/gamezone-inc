@@ -243,7 +243,7 @@ async function getCashAtHand() {
         }
         
         return{
-            statingbalance:startingbalance.amount ?? 0,
+            statingbalance:startingbalance ? startingbalance.amount : 0,
             expensesfortoday,
             cashtoday,
             endofdaycash:(startingbalance[0].amount + cashtoday) - expensesfortoday 
