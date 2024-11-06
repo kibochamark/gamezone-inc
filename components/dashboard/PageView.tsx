@@ -71,7 +71,41 @@ export default function PageView({ inventory,cashathand, expenses, recentsales, 
               </p>
             </CardContent>
           </Card>
-          {/* <Card x-chunk="dashboard-01-chunk-0">
+          <Card x-chunk="dashboard-01-chunk-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Starting balance
+              </CardTitle>
+              <DollarSign className="h-4 w-4 text-primary500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "KES",
+              }).format(parseFloat(startingbalance.toString()))}</div>
+              <p className="text-xs text-muted-foreground">
+                today
+              </p>
+            </CardContent>
+          </Card> 
+          <Card x-chunk="dashboard-01-chunk-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total expenses
+              </CardTitle>
+              <DollarSign className="h-4 w-4 text-primary500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "KES",
+              }).format(parseFloat(expensesfortoday.toString()))}</div>
+              <p className="text-xs text-muted-foreground">
+                today
+              </p>
+            </CardContent>
+          </Card> 
+          <Card x-chunk="dashboard-01-chunk-0">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Cash At hand
@@ -82,12 +116,29 @@ export default function PageView({ inventory,cashathand, expenses, recentsales, 
               <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "KES",
-              }).format(parseFloat(cashathand.toString()))}</div>
+              }).format(parseFloat(endofdaycash.toString()))}</div>
+              <p className="text-xs text-muted-foreground">
+                end of business
+              </p>
+            </CardContent>
+          </Card> 
+          <Card x-chunk="dashboard-01-chunk-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Cash sales and services 
+              </CardTitle>
+              <DollarSign className="h-4 w-4 text-primary500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "KES",
+              }).format(parseFloat(cashtoday.toString()))}</div>
               <p className="text-xs text-muted-foreground">
                 today
               </p>
             </CardContent>
-          </Card> */}
+          </Card> 
           <Card x-chunk="dashboard-01-chunk-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">

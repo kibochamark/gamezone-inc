@@ -132,7 +132,26 @@ async function getCashAtHand() {
         // let expensesforyesterday = (expensesyesterday._sum.debitTotal as number) - (expensesyesterday._sum.creditTotal as number)
 
 
-        let startingbalance = await prisma.cASHBALANCE.findMany()
+        let startingbalance = await prisma.cASHBALANCE.findFirst(
+{
+    where:{
+        OR: [
+            {
+                created_at: {
+                    gte: yesterday,
+                    lt: new Date(yesterday.getTime() + 86400000) // Add 1 day to get end of today
+                },
+            },
+            {
+                updated_at: {
+                    gte: yesterday,
+                    lt: new Date(yesterday.getTime() + 86400000)
+                }
+            }
+        ]
+    }
+}
+        )
 
         const cashasoftoday = await prisma.assetAccount.aggregate({
             where: {
@@ -140,14 +159,14 @@ async function getCashAtHand() {
                 OR: [
                     {
                         created_at: {
-                            gte: yesterday,
-                            lt: new Date(yesterday.getTime() + 86400000) // Add 1 day to get end of today
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
                         },
                     },
                     {
                         updated_at: {
-                            gte: yesterday,
-                            lt: new Date(yesterday.getTime() + 86400000)
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000)
                         }
                     }
                 ]
@@ -157,20 +176,20 @@ async function getCashAtHand() {
                 creditTotal: true
             }
         })
-        let cashtoday = (cashasoftoday._sum.debitTotal as number) - (cashasoftoday._sum.creditTotal as number)
+        let cashtoday = (cashasoftoday._sum.debitTotal as number) - (cashasoftoday._sum.creditTotal as number) ?? 0
 
         const expenses = await prisma.newExpenseAccount.aggregate({
             where: {
                 OR: [
                     {
                         created_at: {
-                            gte: yesterday,
-                            lt: new Date(yesterday.getTime() + 86400000) // Add 1 day to get end of today
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
                         },
                     }, {
                         updated_at: {
-                            gte: yesterday,
-                            lt: new Date(yesterday.getTime() + 86400000)
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000)
                         }
                     }
                 ]
@@ -181,22 +200,54 @@ async function getCashAtHand() {
             }
         })
 
-        let expensesfortoday = (expenses._sum.debitTotal as number) - (expenses._sum.creditTotal as number)
+        let expensesfortoday = (expenses._sum.debitTotal as number) - (expenses._sum.creditTotal as number) ?? 0
 
 
-        const starting = await prisma.cASHBALANCE.create({
-            data:{
-               amount:(startingbalance[0].amount + cashtoday) - expensesfortoday,
-               created_at:yesterday,
-               updated_at:yesterday 
+        const starting = await prisma.cASHBALANCE.findFirst({
+            where:{
+                OR: [
+                    {
+                        created_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000) // Add 1 day to get end of today
+                        },
+                    },
+                    {
+                        updated_at: {
+                            gte: today,
+                            lt: new Date(today.getTime() + 86400000)
+                        }
+                    }
+                ]
             }
         })
-
-
-
-
-
-        return (startingbalance[0].amount + cashtoday) - expensesfortoday
+        if(starting?.amount > 0){
+            await prisma.cASHBALANCE.update({
+                where:{
+                    id:starting.id
+                }
+                data:{
+                   amount:(startingbalance[0].amount + cashtoday) - expensesfortoday,
+                   updated_at:today
+                }
+            })
+        }else{
+            await prisma.cASHBALANCE.create({
+                data:{
+                   amount:(startingbalance[0].amount + cashtoday) - expensesfortoday,
+                   created_at:today,
+                   updated_at:today
+                }
+            })
+    
+        }
+        
+        return{
+            statingbalance:startingbalance.amount ?? 0,
+            expensesfortoday,
+            cashtoday,
+            endofdaycash:(startingbalance[0].amount + cashtoday) - expensesfortoday ?? 0
+        } 
 
 
     } catch (e: any) {
