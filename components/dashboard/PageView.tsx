@@ -82,7 +82,7 @@ export default function PageView({ inventory,cashathand, expenses, recentsales, 
               <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "KES",
-              }).format(parseFloat(startingbalance.toString()))}</div>
+              }).format(parseFloat(cashathand.startingbalance.toString()))}</div>
               <p className="text-xs text-muted-foreground">
                 today
               </p>
@@ -99,7 +99,7 @@ export default function PageView({ inventory,cashathand, expenses, recentsales, 
               <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "KES",
-              }).format(parseFloat(expensesfortoday.toString()))}</div>
+              }).format(parseFloat(cashathand.expensesfortoday.toString()))}</div>
               <p className="text-xs text-muted-foreground">
                 today
               </p>
@@ -116,7 +116,7 @@ export default function PageView({ inventory,cashathand, expenses, recentsales, 
               <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "KES",
-              }).format(parseFloat(endofdaycash.toString()))}</div>
+              }).format(parseFloat(cashathand.endofdaycash.toString()))}</div>
               <p className="text-xs text-muted-foreground">
                 end of business
               </p>
@@ -133,7 +133,7 @@ export default function PageView({ inventory,cashathand, expenses, recentsales, 
               <div className="text-2xl font-bold text-primary600"> {new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: "KES",
-              }).format(parseFloat(cashtoday.toString()))}</div>
+              }).format(parseFloat(cashathand.cashtoday.toString()))}</div>
               <p className="text-xs text-muted-foreground">
                 today
               </p>
