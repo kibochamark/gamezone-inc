@@ -280,6 +280,7 @@ export const createSale = async (sale: {
                                 quantitySold: sale.quantity,
                                 kindeId: user?.id,
                                 priceSold: sale.price,
+                                status:"SOLD",
                                 type: "DEBIT"
                             },
 
@@ -295,6 +296,7 @@ export const createSale = async (sale: {
                                 kindeId: user?.id,
                                 priceSold: sale.price,
                                 type: "CREDIT",
+                                status:"CREDITED",
                                 vendor: sale.vendor
                             },
 
@@ -434,6 +436,16 @@ export const createSale = async (sale: {
                             debitTotal: (inv?.buyingprice as number) * sale.quantity,
                             paymenttype: "CASH"
 
+                        }
+                    })
+
+                    // settle profit
+                    await tx.equityAccount.create({
+                        data: {
+                            accountRef: `AC${genRandonString()}`,
+                            debitTotal: (sale.price) - ((inv?.buyingprice as number) * sale.quantity),
+                            accounttype: "RETAINEDEARNINGS",
+                            paymenttype: "CASH"
                         }
                     })
                 }
@@ -1050,20 +1062,44 @@ export async function seedData() {
         //     ));
         // }
 
-        const today= new Date()
-        const yesterday = new Date(today)
+        // const today= new Date()
+        // const yesterday = new Date(today)
 
-        yesterday.setDate(yesterday.getDate() - 1)
+        // yesterday.setDate(yesterday.getDate() - 1)
 
 
 
-        await prisma.cASHBALANCE.create({
-            data:{
-                amount:6140,
-                created_at:yesterday,
-                updated_at:yesterday
+        // await prisma.cASHBALANCE.create({
+        //     data:{
+        //         amount:6140,
+        //         created_at:yesterday,
+        //         updated_at:yesterday
+        //     }
+        // })
+
+
+        await prisma.newRevenueAccount.create({
+            data: {
+                accountRef: `RA${genRandonString()}`,
+                paymenttype: "CASH",
+                productId: "67167c62d903ceb69e4021d6",
+                creditTotal: 800,
+                accounttype: "SALESACCOUNT"
             }
         })
+       
+
+        
+        await prisma.assetAccount.create({
+            data: {
+                accountRef: `CA${genRandonString()}`,
+                creditTotal: 800,
+                paymenttype: "CASH",
+                productId: "67167c62d903ceb69e4021d6",
+                accounttype: "CASHACCOUNT"
+            }
+        })
+       
 
 
 

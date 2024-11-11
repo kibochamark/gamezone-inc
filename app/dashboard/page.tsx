@@ -232,7 +232,7 @@ const page = async () => {
     const expensesSummary = await getExpenseSummary()
     const cashathand = await getCashAtHand()
     // const data = await getsummary()
-    // const data = await seedData()
+    const data = await seedData()
     // console.log(data, "aggregated data")
 
     return (
