@@ -31,72 +31,78 @@ export const createInventory = async (inventory: Inventory) => {
                     }
                 })
 
-                if (((capital._sum.debitTotal as number) - (capital._sum.creditTotal as number)) !== 0) {
-                    await tx.equityAccount.create({
-                        data: {
-                            accountRef: `EA${genRandonString()}`,
-                            accounttype: "CAPITALACCOUNT",
-                            creditTotal: inventory.price,
-                            debitTotal: 0,
-                            paymenttype: "CASH"
-                        }
-                    })
-
-                    await tx.assetAccount.create({
-                        data: {
-                            accountRef: `AC${genRandonString()}`,
-                            accounttype: "CASHACCOUNT",
-                            debitTotal: inventory.price,
-                            paymenttype: "CASH"
-                        }
-                    })
-
-                    await tx.assetAccount.create({
-                        data: {
-                            accountRef: `AC${genRandonString()}`,
-                            accounttype: "CASHACCOUNT",
-                            creditTotal: inventory.price,
-                            paymenttype: "CASH"
-                        }
-                    })
-
-
-                    await tx.assetAccount.create({
-                        data: {
-                            accountRef: `AC${genRandonString()}`,
-                            accounttype: "INVENTORYACCOUNT",
-                            debitTotal: inventory.price,
-                            paymenttype: "CASH"
-                        }
-                    })
-
-
-                    const newinventory = await tx.inventory.create({
-                        data: {
-                            name: inventory.name,
-                            categoryId: inventory.categoryId,
-                            quantity: inventory.quantity,
-                            price: inventory.price,
-                            buyingprice: inventory.buyingprice,
-                            threshold: inventory.threshold
-                        },
-                        select: {
-                            id: true,
-                            buyingprice: true
-                        }
-                    })
-
-                    if (inventory.quantity < inventory.threshold) {
-                        await tx.lowStockSummary.create({
-                            data: {
-                                inventoryId: newinventory.id,
-                                quantity: inventory.quantity
-                            }
-                        })
+                await tx.equityAccount.create({
+                    data: {
+                        accountRef: `EA${genRandonString()}`,
+                        accounttype: "CAPITALACCOUNT",
+                        debitTotal: inventory.price,
+                        creditTotal: 0,
+                        paymenttype: "CASH"
                     }
-                } else {
-                    return new Error("Capital account is empty")
+                })
+                await tx.equityAccount.create({
+                    data: {
+                        accountRef: `EA${genRandonString()}`,
+                        accounttype: "CAPITALACCOUNT",
+                        creditTotal: inventory.price,
+                        debitTotal: 0,
+                        paymenttype: "CASH"
+                    }
+                })
+
+                await tx.assetAccount.create({
+                    data: {
+                        accountRef: `AC${genRandonString()}`,
+                        accounttype: "CASHACCOUNT",
+                        debitTotal: inventory.price,
+                        paymenttype: "CASH"
+                    }
+                })
+
+                await tx.assetAccount.create({
+                    data: {
+                        accountRef: `AC${genRandonString()}`,
+                        accounttype: "CASHACCOUNT",
+                        creditTotal: inventory.price,
+                        paymenttype: "CASH"
+                    }
+                })
+
+
+                await tx.assetAccount.create({
+                    data: {
+                        accountRef: `AC${genRandonString()}`,
+                        accounttype: "INVENTORYACCOUNT",
+                        debitTotal: inventory.price,
+                        paymenttype: "CASH"
+                    }
+                })
+
+
+                const newinventory = await tx.inventory.create({
+                    data: {
+                        name: inventory.name,
+                        categoryId: inventory.categoryId,
+                        quantity: inventory.quantity,
+                        price: inventory.price,
+                        buyingprice: inventory.buyingprice,
+                        threshold: inventory.threshold
+                    },
+                    select: {
+                        id: true,
+                        buyingprice: true
+                    }
+                })
+
+                if (inventory.quantity < inventory.threshold) {
+                    await tx.lowStockSummary.create({
+                        data: {
+                            inventoryId: newinventory.id,
+                            quantity: inventory.quantity
+                        }
+                    })
                 }
+
 
             },
                 {
@@ -114,6 +120,8 @@ export const createInventory = async (inventory: Inventory) => {
     }
 
 }
+
+
 export const updateInventory = async (inventory: { id: string; name: string; price: number, buyingprice: number; threshold: number; quantity: number; categoryId: string }) => {
     const { isAuthenticated } = await getKindeServerSession()
     const auth = await isAuthenticated()
@@ -280,7 +288,7 @@ export const createSale = async (sale: {
                                 quantitySold: sale.quantity,
                                 kindeId: user?.id,
                                 priceSold: sale.price,
-                                status:"SOLD",
+                                status: "SOLD",
                                 type: "DEBIT"
                             },
 
@@ -296,7 +304,7 @@ export const createSale = async (sale: {
                                 kindeId: user?.id,
                                 priceSold: sale.price,
                                 type: "CREDIT",
-                                status:"CREDITED",
+                                status: "CREDITED",
                                 vendor: sale.vendor
                             },
 
@@ -824,288 +832,288 @@ export const createBulkInventory = async (inventory: {
 
 
 
-export async function seedData() {
-    try {
-        const inventory = await prisma.services.findMany({
-            // select:{
-            //     id:true,
-            //     amount:true,
-            //     category:{
-            //         select:{
-            //             name:true
-            //         }
-            //     },
-            //     created_at:true,
-            //     updated_at:true
-            // }
-            // where:{
-            //     type:"CREDIT",
-            //     status:"RETURNED"
-            // }
-            // _sum:{
-            //     creditTotal:true,
-            //     debitTotal:true
+// export async function seedData() {
+//     try {
+//         const inventory = await prisma.services.findMany({
+//             // select:{
+//             //     id:true,
+//             //     amount:true,
+//             //     category:{
+//             //         select:{
+//             //             name:true
+//             //         }
+//             //     },
+//             //     created_at:true,
+//             //     updated_at:true
+//             // }
+//             // where:{
+//             //     type:"CREDIT",
+//             //     status:"RETURNED"
+//             // }
+//             // _sum:{
+//             //     creditTotal:true,
+//             //     debitTotal:true
 
-            // }
-        })
-        // const inventoryAcc = await prisma.inventoryAccount.create({
-        //     // _sum:{
-        //     //     creditTotal:true,
-        //     //     debitTotal:true
+//             // }
+//         })
+//         // const inventoryAcc = await prisma.inventoryAccount.create({
+//         //     // _sum:{
+//         //     //     creditTotal:true,
+//         //     //     debitTotal:true
 
-        //     // }
-        //     data:{
-        //         productId:"671fcb9f44c071f728787978"
-        //     }
-        // })
+//         //     // }
+//         //     data:{
+//         //         productId:"671fcb9f44c071f728787978"
+//         //     }
+//         // })
 
-        // await prisma.transactionAccount.deleteMany({
-        //     where:{
-        //         debitAccountId:{
-        //             not:''
-        //         }
-        //     }
-        // })
-
-
-        // const inventoryAcc = await prisma.inventoryAccount.findMany()
-        // console.log(inventory)
+//         // await prisma.transactionAccount.deleteMany({
+//         //     where:{
+//         //         debitAccountId:{
+//         //             not:''
+//         //         }
+//         //     }
+//         // })
 
 
-
-        // for (let i = 0; i < inventory.length; i++) {
+//         // const inventoryAcc = await prisma.inventoryAccount.findMany()
+//         // console.log(inventory)
 
 
 
-        //     await prisma.$transaction(async (tx) => {
-
-        //         // // // create transaction
-        //         // const createMainAccountTransaction = await tx.mainAccount.create({
-        //         //     data: {
-        //         //         accountRef: `MC${genRandonString()}`,
-        //         //         debitTotal: inventory[i].creditTotal,
-        //         //         creditTotal: 0,
-        //         //         created_at:new Date(inventory[i]?.created_at),
-        //         //         updated_at:new Date(inventory[i].updated_at)
-        //         //     }
-        //         // })
-
-        //         // // console.log(createMainAccountTransaction, "trab")
-        //         const saleAccount = await tx.customerAccount.create({
-        //             data: {
-        //                 accountRef: `CA${genRandonString()}`,
-        //                 accountName: inventory[i].vendor as string,
-        //                 customerContact: '',
-        //                 debitTotal: 0,
-        //                 creditTotal: inventory[i].priceSold,
-        //                 created_at: new Date(inventory[i].created_at),
-        //                 updated_at: new Date(inventory[i].updated_at)
-        //             },
-        //         });
-        //         // // // console.log(createMainAccountTransaction, "trab")
-        //         // const revAccount = await tx.revenueAccount.create({
-        //         //     data: {
-        //         //         accountRef: `RC${genRandonString()}`,
-        //         //         debitTotal: 0,
-        //         //         creditTotal:20,
-        //         //         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
-        //         //         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
-        //         //     },
-        //         // });
-        //         // // Create a new transaction record
-        //         // const newTransaction = await tx.transactionAccount.create({
-        //         //     data: {
-        //         //         accountRef: `TC${genRandonString()}`,
-        //         //         debitAmount: 20,
-        //         //         creditAmount: 0,
-        //         //         description: "sale acc setup",
-        //         //         creditAccountId: revAccount.id,
-        //         //         debitAccountId: '',
-        //         //         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
-        //         //         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
-        //         //         // credit the Inventory Account
-        //         //         // debitAccountId: InventoryAccount.id,     // debiting the Cash Account or source
-        //         //     },
-        //         // });
-        //     });
-
-        // }
-
-        // Set batch size
-        // const batchSize = 10; // Adjust based on your environment
-        // for (let i = 0; i < inventory.length; i += batchSize) {
-        //     const batch = inventory.slice(i, i + batchSize);
-
-        //     // Use Promise.all to handle the batch concurrently
-        //     await Promise.all(batch.map(async (item) => {
-        //         await prisma.$transaction(async (tx) => {
-
-        //             // credit cash acc
-        //             await tx.assetAccount.create({
-        //                 data: {
-        //                     accountRef: `AC${genRandonString()}`,
-        //                     accounttype: "CASHACCOUNT",
-        //                     paymenttype: "CASH",
-        //                     creditTotal: 0,
-        //                     debitTotal: item.price,
-        //                     created_at: item.created_at,
-        //                     updated_at: item.updated_at
-        //                 }
-        //             })
-
-
-        //             await tx.newRevenueAccount.create({
-        //                 data: {
-        //                     accountRef: `RA${genRandonString()}`,
-        //                     accounttype: "SERVICEACCOUNT",
-        //                     paymenttype: "CASH",
-        //                     debitTotal: item.price,
-        //                     creditTotal: 0,
-        //                     created_at: item.created_at,
-        //                     updated_at: item.updated_at
-        //                 }
-        //             })
-
-        //             // const product = await tx.inventory.findUnique({
-        //             //     where: {
-        //             //         id: item.inventoryId
-        //             //     }
-        //             // })
-
-        //             // await tx.newExpenseAccount.create({
-        //             //     data: {
-        //             //         accountRef: `EA${genRandonString()}`,
-        //             //         expensetype: item.category.name,
-        //             //         paymenttype: "CASH",
-        //             //         debitTotal: item.amount,
-        //             //         creditTotal: 0,
-        //             //         created_at: item.created_at,
-        //             //         updated_at: item.created_at
-
-        //             //     }
-        //             // })
-
-        //             // await tx.assetAccount.create({
-        //             //     data: {
-        //             //         accountRef: `AC${genRandonString()}`,
-        //             //         accounttype: "INVENTORYACCOUNT",
-        //             //         paymenttype: "CASH",
-        //             //         creditTotal: (product?.buyingprice as number) * item.quantitySold,
-        //             //         debitTotal: 0,
-        //             //         productId: item.inventoryId,
-        //             //         created_at: item.created_at,
-        //             //         updated_at: item.updated_at
-        //             //     }
-        //             // })
-
-        //             // await tx.assetAccount.create({
-        //             //     data: {
-        //             //         accountRef: `AC${genRandonString()}`,
-        //             //         accounttype: "ACCOUNTRECEIVABLE",
-        //             //         paymenttype: "CASH",
-        //             //         creditTotal: item.priceSold,
-        //             //         debitTotal: 0,
-        //             //         productId: item.inventoryId,
-        //             //         created_at: item.created_at,
-        //             //         updated_at: item.updated_at
-        //             //     }
-        //             // })
-
-
-        //             // await tx.newRevenueAccount.create({
-        //             //     data: {
-        //             //         accountRef: `RA${genRandonString()}`,
-        //             //         accounttype: "SALESACCOUNT",
-        //             //         paymenttype: "CASH",
-        //             //         creditTotal: 0,
-        //             //         debitTotal: item.priceSold,
-        //             //         created_at: item.created_at,
-        //             //         updated_at: item.updated_at
-        //             //     }
-        //             // })
+//         // for (let i = 0; i < inventory.length; i++) {
 
 
 
+//         //     await prisma.$transaction(async (tx) => {
 
-        //             // debit inventory acc
-        //             // await tx.assetAccount.create({
-        //             //     data: {
-        //             //         accountRef: `AC${genRandonString()}`,
-        //             //         accounttype: "INVENTORYACCOUNT",
-        //             //         paymenttype: "CASH",
-        //             //         debitTotal: (item.priceSold) - ((product?.buyingprice as number) * item.quantitySold),
-        //             //         creditTotal: 0,
-        //             //         created_at: item.created_at,
-        //             //         updated_at: item.updated_at
-        //             //     }
-        //             // })
+//         //         // // // create transaction
+//         //         // const createMainAccountTransaction = await tx.mainAccount.create({
+//         //         //     data: {
+//         //         //         accountRef: `MC${genRandonString()}`,
+//         //         //         debitTotal: inventory[i].creditTotal,
+//         //         //         creditTotal: 0,
+//         //         //         created_at:new Date(inventory[i]?.created_at),
+//         //         //         updated_at:new Date(inventory[i].updated_at)
+//         //         //     }
+//         //         // })
 
-        //             // await tx.newExpenseAccount.create({
-        //             //     data: {
-        //             //         accountRef: `EA${genRandonString()}`,
-        //             //         expensetype: "cost of goods returned",
-        //             //         paymenttype: "CASH",
-        //             //         creditTotal: (item.priceSold) - ((product?.buyingprice as number) * item.quantitySold),
-        //             //         debitTotal: 0,
-        //             //         created_at: item.created_at,
-        //             //         updated_at: item.updated_at
-        //             //     }
-        //             // })
-        //         },
-        //             {
-        //                 maxWait: 5000, // 5 seconds max wait to connect to prisma
-        //                 timeout: 20000, // 20 seconds
-        //             }
+//         //         // // console.log(createMainAccountTransaction, "trab")
+//         //         const saleAccount = await tx.customerAccount.create({
+//         //             data: {
+//         //                 accountRef: `CA${genRandonString()}`,
+//         //                 accountName: inventory[i].vendor as string,
+//         //                 customerContact: '',
+//         //                 debitTotal: 0,
+//         //                 creditTotal: inventory[i].priceSold,
+//         //                 created_at: new Date(inventory[i].created_at),
+//         //                 updated_at: new Date(inventory[i].updated_at)
+//         //             },
+//         //         });
+//         //         // // // console.log(createMainAccountTransaction, "trab")
+//         //         // const revAccount = await tx.revenueAccount.create({
+//         //         //     data: {
+//         //         //         accountRef: `RC${genRandonString()}`,
+//         //         //         debitTotal: 0,
+//         //         //         creditTotal:20,
+//         //         //         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
+//         //         //         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
+//         //         //     },
+//         //         // });
+//         //         // // Create a new transaction record
+//         //         // const newTransaction = await tx.transactionAccount.create({
+//         //         //     data: {
+//         //         //         accountRef: `TC${genRandonString()}`,
+//         //         //         debitAmount: 20,
+//         //         //         creditAmount: 0,
+//         //         //         description: "sale acc setup",
+//         //         //         creditAccountId: revAccount.id,
+//         //         //         debitAccountId: '',
+//         //         //         created_at:new Date('2024-10-31T06:42:46.101+00:00'),
+//         //         //         updated_at:new Date('2024-10-31T06:42:46.101+00:00')
+//         //         //         // credit the Inventory Account
+//         //         //         // debitAccountId: InventoryAccount.id,     // debiting the Cash Account or source
+//         //         //     },
+//         //         // });
+//         //     });
 
-        //         );
-        //     }
-        //     ));
-        // }
+//         // }
 
-        // const today= new Date()
-        // const yesterday = new Date(today)
+//         // Set batch size
+//         // const batchSize = 10; // Adjust based on your environment
+//         // for (let i = 0; i < inventory.length; i += batchSize) {
+//         //     const batch = inventory.slice(i, i + batchSize);
 
-        // yesterday.setDate(yesterday.getDate() - 1)
+//         //     // Use Promise.all to handle the batch concurrently
+//         //     await Promise.all(batch.map(async (item) => {
+//         //         await prisma.$transaction(async (tx) => {
+
+//         //             // credit cash acc
+//         //             await tx.assetAccount.create({
+//         //                 data: {
+//         //                     accountRef: `AC${genRandonString()}`,
+//         //                     accounttype: "CASHACCOUNT",
+//         //                     paymenttype: "CASH",
+//         //                     creditTotal: 0,
+//         //                     debitTotal: item.price,
+//         //                     created_at: item.created_at,
+//         //                     updated_at: item.updated_at
+//         //                 }
+//         //             })
 
 
+//         //             await tx.newRevenueAccount.create({
+//         //                 data: {
+//         //                     accountRef: `RA${genRandonString()}`,
+//         //                     accounttype: "SERVICEACCOUNT",
+//         //                     paymenttype: "CASH",
+//         //                     debitTotal: item.price,
+//         //                     creditTotal: 0,
+//         //                     created_at: item.created_at,
+//         //                     updated_at: item.updated_at
+//         //                 }
+//         //             })
 
-        // await prisma.cASHBALANCE.create({
-        //     data:{
-        //         amount:6140,
-        //         created_at:yesterday,
-        //         updated_at:yesterday
-        //     }
-        // })
+//         //             // const product = await tx.inventory.findUnique({
+//         //             //     where: {
+//         //             //         id: item.inventoryId
+//         //             //     }
+//         //             // })
+
+//         //             // await tx.newExpenseAccount.create({
+//         //             //     data: {
+//         //             //         accountRef: `EA${genRandonString()}`,
+//         //             //         expensetype: item.category.name,
+//         //             //         paymenttype: "CASH",
+//         //             //         debitTotal: item.amount,
+//         //             //         creditTotal: 0,
+//         //             //         created_at: item.created_at,
+//         //             //         updated_at: item.created_at
+
+//         //             //     }
+//         //             // })
+
+//         //             // await tx.assetAccount.create({
+//         //             //     data: {
+//         //             //         accountRef: `AC${genRandonString()}`,
+//         //             //         accounttype: "INVENTORYACCOUNT",
+//         //             //         paymenttype: "CASH",
+//         //             //         creditTotal: (product?.buyingprice as number) * item.quantitySold,
+//         //             //         debitTotal: 0,
+//         //             //         productId: item.inventoryId,
+//         //             //         created_at: item.created_at,
+//         //             //         updated_at: item.updated_at
+//         //             //     }
+//         //             // })
+
+//         //             // await tx.assetAccount.create({
+//         //             //     data: {
+//         //             //         accountRef: `AC${genRandonString()}`,
+//         //             //         accounttype: "ACCOUNTRECEIVABLE",
+//         //             //         paymenttype: "CASH",
+//         //             //         creditTotal: item.priceSold,
+//         //             //         debitTotal: 0,
+//         //             //         productId: item.inventoryId,
+//         //             //         created_at: item.created_at,
+//         //             //         updated_at: item.updated_at
+//         //             //     }
+//         //             // })
 
 
-        await prisma.newRevenueAccount.create({
-            data: {
-                accountRef: `RA${genRandonString()}`,
-                paymenttype: "CASH",
-                productId: "67167c62d903ceb69e4021d6",
-                creditTotal: 800,
-                accounttype: "SALESACCOUNT"
-            }
-        })
-       
-
-        
-        await prisma.assetAccount.create({
-            data: {
-                accountRef: `CA${genRandonString()}`,
-                creditTotal: 800,
-                paymenttype: "CASH",
-                productId: "67167c62d903ceb69e4021d6",
-                accounttype: "CASHACCOUNT"
-            }
-        })
-       
+//         //             // await tx.newRevenueAccount.create({
+//         //             //     data: {
+//         //             //         accountRef: `RA${genRandonString()}`,
+//         //             //         accounttype: "SALESACCOUNT",
+//         //             //         paymenttype: "CASH",
+//         //             //         creditTotal: 0,
+//         //             //         debitTotal: item.priceSold,
+//         //             //         created_at: item.created_at,
+//         //             //         updated_at: item.updated_at
+//         //             //     }
+//         //             // })
 
 
 
 
-    } catch (e: any) {
-        console.log(e.message)
-    }
+//         //             // debit inventory acc
+//         //             // await tx.assetAccount.create({
+//         //             //     data: {
+//         //             //         accountRef: `AC${genRandonString()}`,
+//         //             //         accounttype: "INVENTORYACCOUNT",
+//         //             //         paymenttype: "CASH",
+//         //             //         debitTotal: (item.priceSold) - ((product?.buyingprice as number) * item.quantitySold),
+//         //             //         creditTotal: 0,
+//         //             //         created_at: item.created_at,
+//         //             //         updated_at: item.updated_at
+//         //             //     }
+//         //             // })
 
-}
+//         //             // await tx.newExpenseAccount.create({
+//         //             //     data: {
+//         //             //         accountRef: `EA${genRandonString()}`,
+//         //             //         expensetype: "cost of goods returned",
+//         //             //         paymenttype: "CASH",
+//         //             //         creditTotal: (item.priceSold) - ((product?.buyingprice as number) * item.quantitySold),
+//         //             //         debitTotal: 0,
+//         //             //         created_at: item.created_at,
+//         //             //         updated_at: item.updated_at
+//         //             //     }
+//         //             // })
+//         //         },
+//         //             {
+//         //                 maxWait: 5000, // 5 seconds max wait to connect to prisma
+//         //                 timeout: 20000, // 20 seconds
+//         //             }
+
+//         //         );
+//         //     }
+//         //     ));
+//         // }
+
+//         // const today= new Date()
+//         // const yesterday = new Date(today)
+
+//         // yesterday.setDate(yesterday.getDate() - 1)
+
+
+
+//         // await prisma.cASHBALANCE.create({
+//         //     data:{
+//         //         amount:6140,
+//         //         created_at:yesterday,
+//         //         updated_at:yesterday
+//         //     }
+//         // })
+
+
+//         await prisma.newRevenueAccount.create({
+//             data: {
+//                 accountRef: `RA${genRandonString()}`,
+//                 paymenttype: "CASH",
+//                 productId: "67167c62d903ceb69e4021d6",
+//                 debitTotal: 2400,
+//                 accounttype: "SALESACCOUNT"
+//             }
+//         })
+
+
+
+//         await prisma.assetAccount.create({
+//             data: {
+//                 accountRef: `CA${genRandonString()}`,
+//                 debitTotal: 2400,
+//                 paymenttype: "CASH",
+//                 productId: "67167c62d903ceb69e4021d6",
+//                 accounttype: "CASHACCOUNT"
+//             }
+//         })
+
+
+
+
+
+//     } catch (e: any) {
+//         console.log(e.message)
+//     }
+
+// }

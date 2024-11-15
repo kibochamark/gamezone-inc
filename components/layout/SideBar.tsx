@@ -164,13 +164,13 @@ const SideBar = ({salescount}:{salescount:number}) => {
                                 <LineChart className="h-4 w-4" />
                                 Account Reports
                             </Link>
-                            <Link
+                            {/* <Link
                                 href="/capital-setup"
                                 className={`flex items-center gap-3 ${path.includes("transaction") && "dark:bg-primary100 text-primary bg-primary50 "} rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
                             >
                                 <LineChart className="h-4 w-4" />
                                 Capital Setup
-                            </Link>
+                            </Link> */}
                         </nav>
                     </div>
                     <div className="mt-auto p-4">
