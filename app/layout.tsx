@@ -12,6 +12,7 @@ import { KindeAuthProvider } from "./KindeAuthProvider";
 import { ReduxProvider } from "./ReduxProvider";
 import Footer from "@/components/layout/Footer";
 import { prisma } from "@/lib/prismaClient";
+import ChatBubble from "@/components/agent/chatbubble";
 
 const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -21,19 +22,19 @@ export const metadata: Metadata = {
   description: "we offer cutting edging solutions as well a vast variety of technology products to suit your needs",
 };
 
-async function SalesCount(){
+async function SalesCount() {
   let today = new Date()
-  today.setHours(0,0,0)
+  today.setHours(0, 0, 0)
   const salecount = await prisma.sales.aggregate({
-      where: {
-          created_at: {
-              gte: today,
-              lt: new Date(today.getTime() + 86400000)
-          }
-      },
-      _count:{
-          inventoryId:true
+    where: {
+      created_at: {
+        gte: today,
+        lt: new Date(today.getTime() + 86400000)
       }
+    },
+    _count: {
+      inventoryId: true
+    }
   })
 
 
@@ -49,10 +50,10 @@ export default async function RootLayout({
 }>) {
 
 
-  const salescount= await SalesCount() 
+  const salescount = await SalesCount()
 
 
-  
+
   return (
     <html lang="en">
       <body className={cn("min-h-screen relative bg-primary50", montserrat.className)}>
@@ -84,13 +85,17 @@ export default async function RootLayout({
                 <div className="flex w-full">
                   <div className="">
                     <div className="fixed lg:w-[280px] md:w-[220px]">
-                      <SideBar  salescount={salescount}/>
+                      <SideBar salescount={salescount} />
                     </div>
                   </div>
 
                   <Navbar salescount={salescount}>
                     {children}
+                    <div className="absolute bottom-0 right-0 z-50">
 
+                      <ChatBubble />
+                    </div>
+                    
                     <Footer />
 
                   </Navbar>

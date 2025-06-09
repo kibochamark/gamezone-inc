@@ -9,6 +9,7 @@ import { getExpenseSummary } from '../expenses/page'
 import { genRandonString } from '@/lib/generateAccountRef'
 
 
+
 export const dynamic = 'force-dynamic'
 
 async function getProducts() {
