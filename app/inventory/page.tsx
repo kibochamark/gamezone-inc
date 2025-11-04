@@ -25,7 +25,7 @@ async function getCatgeories() {
 
     return category
 }
-async function getInventory() {
+export async function getInventory() {
     let inventory: any
     try {
         inventory = await prisma.inventory.findMany({

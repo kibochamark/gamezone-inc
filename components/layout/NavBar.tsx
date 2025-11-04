@@ -88,7 +88,7 @@ const Navbar = ({ children, salescount }: { children: ReactNode; salescount: num
     <div className='w-full lg:ml-[280px] md:ml-[220px]'>
 
       <div className="flex flex-col w-full min-h-screen">
-        <header className="fixed top-0 w-full h-16 py-2 flex items-center backdrop-blur-lg gap-4 border-b bg-background z-20 px-4 lg:h-[60px] lg:px-6">
+        <header className="fixed top-0 w-full h-16 py-2 flex items-center justify-between md:justify-end backdrop-blur-lg gap-4 border-b bg-background z-20 px-4 lg:h-[60px] lg:px-6">
 
           <Sheet>
             <SheetTrigger asChild>
@@ -178,7 +178,7 @@ const Navbar = ({ children, salescount }: { children: ReactNode; salescount: num
 
             </SheetContent>
           </Sheet>
-          <div className="w-full flex-1">
+          {/* <div className="w-full flex-1">
             <form>
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -189,8 +189,8 @@ const Navbar = ({ children, salescount }: { children: ReactNode; salescount: num
                 />
               </div>
             </form>
-          </div>
-          <DropdownMenu>
+          </div> */}
+          <DropdownMenu >
             <DropdownMenuTrigger asChild>
               <Button variant="secondary" size="icon" className="rounded-full md:mr-[280px]">
                 {user?.family_name ? (

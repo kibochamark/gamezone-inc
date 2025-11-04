@@ -5,6 +5,7 @@ import {
     Bell,
     CircleDollarSign,
     CircleUser,
+    FileText,
     HandCoins,
     Home,
     LineChart,
@@ -81,7 +82,7 @@ const SideBar = ({salescount}:{salescount:number}) => {
         }
     })
 
-    console.log(data, "salecount")
+    // console.log(data, "salecount")
     return (
         <>
             <div className="hidden h-screen bg-background shadow-md border-r-2 md:block ">
@@ -163,6 +164,13 @@ const SideBar = ({salescount}:{salescount:number}) => {
                             >
                                 <LineChart className="h-4 w-4" />
                                 Account Reports
+                            </Link>
+                            <Link
+                                href="/invoice"
+                                className={`flex items-center gap-3 rounded-lg ${path.includes("expenses") && "dark:bg-primary100 text-primary bg-primary50 "} px-3 py-2 text-muted-foreground transition-all hover:text-primary`}
+                            >
+                                <FileText className="h-4 w-4" />
+                                Invoices
                             </Link>
                             {/* <Link
                                 href="/capital-setup"

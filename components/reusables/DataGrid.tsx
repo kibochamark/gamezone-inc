@@ -52,13 +52,15 @@ interface DataTableProps<TData, TValue> {
         edit: boolean
         delete: boolean
         page:string;
-    }
+    },
+    filtername?:string
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
-    props
+    props,
+    filtername
 }: DataTableProps<TData, TValue>) {
     // states
     const [sorting, setSorting] = useState<SortingState>([])
@@ -113,12 +115,12 @@ export function DataTable<TData, TValue>({
                 <div className="flex gap-2">
                     <div className="flex items-center py-4">
                         <Input
-                            placeholder="Filter products..."
+                            placeholder={`Filter ${filtername ?? 'products'}...`}
                             value={globalFilter}
                             onChange={(event) =>
                                 setGlobalFilter(event.target.value)
                             }
-                            className="md:max-w-md"
+                            className="md:max-w-4xl"
                         />
                     </div>
                     <div className="flex items-center space-x-2">

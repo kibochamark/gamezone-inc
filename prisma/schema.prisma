@@ -37,6 +37,10 @@ model Inventory {
   NewRevenueAccount NewRevenueAccount[]
 
   WriteOffAccount WriteOffAccount[]
+
+  StockReservation StockReservation[]
+
+  InvoiceItem InvoiceItem[]
 }
 
 enum ProductStatus {
@@ -277,4 +281,79 @@ model WriteOffAccount {
 enum WriteOffAccountType {
   DISPOSABLEACCOUNT
   BADDEBT
+}
+
+
+
+
+// invoice model 
+model Invoice {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceNo   String   @unique
+  customerName String
+  customerContact String?
+  createdBy     String // carries kinde id of the user who created the invoice
+  dueDate   DateTime
+  status InvoiceStatus @default(DRAFT)
+  subtotal Float
+  tax Float
+  total Float
+  paidAt DateTime?
+  // paymentMethod String
+  notes String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+
+  InvoiceItem InvoiceItem[]
+
+  StockReservation StockReservation[]
+}
+
+
+model InvoiceItem {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+  invoiceId   String   @db.ObjectId
+  inventory   Inventory? @relation(fields: [inventoryId], references: [id])  
+  inventoryId String?    @db.ObjectId
+  description String
+  quantity    Int
+  unitPrice   Float
+  totalPrice  Float
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+}
+
+
+enum InvoiceStatus {
+  DRAFT
+  PENDING
+  PAID
+  CANCELLED
+  OVERDUE
+}
+
+
+
+model StockReservation {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  invoice   Invoice @relation(fields: [invoiceid], references: [id])
+  invoiceid String    @db.ObjectId
+  inventory   Inventory? @relation(fields: [inventoryId], references: [id])  
+  inventoryId String?    @db.ObjectId
+  quantityReserved    Int
+  status   ReservationStatus @default(RESERVED)
+
+
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+}
+
+
+enum ReservationStatus {
+  RESERVED
+  COMMITTED
+  RELEASED
 }
