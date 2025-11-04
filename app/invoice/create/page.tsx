@@ -8,6 +8,9 @@ import Link from 'next/link'
 import React from 'react'
 
 
+
+
+
 async function generateNextInvoiceNumber() {
     const invoice = await prisma.invoice.findFirst({
         orderBy: {
@@ -26,6 +29,8 @@ async function generateNextInvoiceNumber() {
     
     return `INV${nextNumber}`;
 }
+
+export const dynamic = 'force-dynamic';
 
 const page = async () => {
     const inventory = await getInventory() ?? []
