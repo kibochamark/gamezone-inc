@@ -8,7 +8,7 @@ import Link from 'next/link'
 import React from 'react'
 
 
-export async function generateNextInvoiceNumber() {
+async function generateNextInvoiceNumber() {
     const invoice = await prisma.invoice.findFirst({
         orderBy: {
             created_at: 'desc'
