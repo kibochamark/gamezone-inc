@@ -477,6 +477,105 @@ export const createSale = async (sale: {
 
 }
 
+// Function to create sales from invoices where inventory was already reserved
+export const createSaleFromInvoice = async (
+    tx: any,
+    sale: {
+        inventoryId: string;
+        quantity: number;
+        price: number;
+        kindeId: string;
+        vendor?: string;
+    }
+) => {
+    // Create the sale record
+    await tx.sales.create({
+        data: {
+            inventoryId: sale.inventoryId,
+            quantitySold: sale.quantity,
+            kindeId: sale.kindeId,
+            priceSold: sale.price,
+            status: "SOLD",
+            type: "DEBIT",
+            vendor: sale.vendor,
+        },
+    });
+
+    // Update inventory frequency sold only (quantity already reduced during invoice creation)
+    await tx.inventory.update({
+        where: {
+            id: sale.inventoryId,
+        },
+        data: {
+            frequencySold: {
+                increment: 1,
+            },
+        },
+    });
+
+    // Get inventory buying price for ledger calculations
+    const inv = await tx.inventory.findUnique({
+        where: {
+            id: sale.inventoryId,
+        },
+        select: {
+            buyingprice: true,
+        },
+    });
+
+    // Revenue account - credit sales account with sale price
+    await tx.newRevenueAccount.create({
+        data: {
+            accountRef: `RA${genRandonString()}`,
+            paymenttype: "CASH",
+            debitTotal: sale.price,
+            productId: sale.inventoryId,
+            accounttype: "SALESACCOUNT",
+        },
+    });
+
+    // Asset account - debit cash account with sale price
+    await tx.assetAccount.create({
+        data: {
+            accountRef: `AR${genRandonString()}`,
+            debitTotal: sale.price,
+            paymenttype: "CASH",
+            accounttype: "CASHACCOUNT",
+        },
+    });
+
+    // Asset account - credit inventory account with cost of goods
+    await tx.assetAccount.create({
+        data: {
+            accountRef: `AR${genRandonString()}`,
+            creditTotal: (inv?.buyingprice as number) * sale.quantity,
+            paymenttype: "CASH",
+            productId: sale.inventoryId,
+            accounttype: "INVENTORYACCOUNT",
+        },
+    });
+
+    // Expense account - debit expense for cost of goods sold
+    await tx.newExpenseAccount.create({
+        data: {
+            accountRef: `EA${genRandonString()}`,
+            expensetype: "cost of goods on sold",
+            debitTotal: (inv?.buyingprice as number) * sale.quantity,
+            paymenttype: "CASH",
+        },
+    });
+
+    // Equity account - settle profit to retained earnings
+    await tx.equityAccount.create({
+        data: {
+            accountRef: `AC${genRandonString()}`,
+            debitTotal: sale.price - (inv?.buyingprice as number) * sale.quantity,
+            accounttype: "RETAINEDEARNINGS",
+            paymenttype: "CASH",
+        },
+    });
+}
+
 
 export const updateSale = async (sale: {
     id: string;

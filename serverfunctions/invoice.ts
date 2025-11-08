@@ -1,4 +1,6 @@
 "use server"
+import { createService } from "@/components/services/ServiceActions";
+import { createSaleFromInvoice } from "@/components/Inventory/InventoryActions";
 import { prisma } from "@/lib/prismaClient";
 import { get } from "http";
 import { Inter } from "next/font/google";
@@ -197,59 +199,140 @@ export async function updateInvoiceStatus(id: string, status: "PENDING" | "PAID"
     try {
         if (status === "PAID") {
             const updatedInvoice= await prisma.$transaction(async (tx) => {
+                // Fetch invoice data with all necessary information in a single query
+                const invoicedata = await tx.invoice.findUnique(
+                    {
+                        where: { id },
+                        select:{
+                            invoiceNo:true,
+                            total:true,
+                            createdBy:true,
+                            InvoiceItem:{
+                                select:{
+                                    description:true,
+                                    quantity:true,
+                                    unitPrice:true,
+                                    totalPrice:true,
+                                    inventory:{
+                                        select:{
+                                            id:true,
+                                            name:true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                }
+                )
+
+                // Update invoice status
                 const invoice = await tx.invoice.update({
                     where: { id },
                     data: { status },
                 });
-    
+
+                // Update stock reservations to committed
                 await tx.stockReservation.updateMany({
                     where: { invoiceid: id },
                     data: { status: "COMMITTED" },
                 });
-    
-                return invoice;
+
+                // Process sales for inventory items
+                const inventoryItems = invoicedata?.InvoiceItem.filter(item => item.inventory) || [];
+                const serviceItems = invoicedata?.InvoiceItem.filter(item => !item.inventory) || [];
+
+                // Process inventory items in the transaction
+                for (const item of inventoryItems) {
+                    if (item.inventory) {
+                        await createSaleFromInvoice(tx, {
+                            inventoryId: item.inventory.id,
+                            quantity: item.quantity,
+                            price: item.totalPrice,
+                            kindeId: invoicedata?.createdBy || "",
+                            vendor: invoicedata?.createdBy,
+                        });
+                    }
+                }
+
+                // Process service items outside of the main transaction to avoid timeout
+                // These are independent operations that don't affect inventory
+                if (serviceItems.length > 0) {
+                    // Store service items to process after transaction commits
+                    return { invoice, serviceItems, invoiceNo: invoicedata?.invoiceNo };
+                }
+
+                return { invoice, serviceItems: [], invoiceNo: invoicedata?.invoiceNo };
+            },
+            {
+                maxWait: 10000, // 10 seconds max wait to connect to prisma
+                timeout: 30000, // 30 seconds timeout for the entire transaction
             });
-            return [200,updatedInvoice];
+
+            // Process service items after the main transaction completes
+            if (updatedInvoice.serviceItems && updatedInvoice.serviceItems.length > 0) {
+                for (const item of updatedInvoice.serviceItems) {
+                    try {
+                        await createService({
+                            name: `Sale of ${item.description} from invoice ${updatedInvoice.invoiceNo}`,
+                            price: item.totalPrice,
+                            paymentType: "CASH",
+                        });
+                    } catch (serviceError) {
+                        console.error("Error creating service record:", serviceError);
+                        // Continue processing other services even if one fails
+                    }
+                }
+            }
+
+            return [200, updatedInvoice.invoice];
         }
         else if (status === "CANCELLED") {
             const updatedInvoice= await prisma.$transaction(async (tx) => {
+                // Update invoice status
                 const invoice = await tx.invoice.update({
                     where: { id },
                     data: { status },
                 });
-    
+
+                // Fetch reservations
                 const reservations = await tx.stockReservation.findMany({
                     where: { invoiceid: id },
                 });
-    
+
+                // Update stock reservations to released
                 await tx.stockReservation.updateMany({
                     where: { invoiceid: id },
                     data: { status: "RELEASED" },
                 });
 
-
-                // Filter out any null inventoryIds
-                const validInventoryIds = reservations
-                    .map((res) => res.inventoryId)
-                    .filter((id): id is string => id !== null);
-
-                // Release stock back to inventory
-                if (validInventoryIds.length > 0) {
-                    for (const res of reservations) {
-                        if (res.inventoryId) {
-                            await tx.inventory.update({
-                                where: { id: res.inventoryId },
+                // Batch update inventory quantities using a single query per item
+                // This is more efficient than individual updates
+                if (reservations.length > 0) {
+                    const updatePromises = reservations
+                        .filter(res => res.inventoryId !== null)
+                        .map(res =>
+                            tx.inventory.update({
+                                where: { id: res.inventoryId! },
                                 data: {
                                     quantity: { increment: res.quantityReserved },
                                 },
-                            });
-                        }
-                    }
+                            })
+                        );
+
+                    // Execute all updates in parallel within the transaction
+                    await Promise.all(updatePromises);
                 }
+
                 return invoice;
+            },
+            {
+                maxWait: 10000, // 10 seconds max wait to connect to prisma
+                timeout: 30000, // 30 seconds timeout for the entire transaction
             });
             return [200,updatedInvoice];
         }
+
+        // Simple status update (PENDING, OVERDUE)
         const updatedInvoice = await prisma.invoice.update({
             where: { id },
             data: { status },
