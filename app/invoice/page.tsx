@@ -16,7 +16,7 @@ const page = async () => {
     const innvoicerevenue= await getInvoicesRevenue() ?? 0  
     const invoicesummarytypes =await getInvoicesSummary() ?? []
     const invoices= await getInvoices() ?? []
-    console.log("invoices:", invoices)
+    // console.log("invoices:", invoices)
     const invoicesummary:InvoiceSummary={
         invoicecount,
         innvoicerevenue,
