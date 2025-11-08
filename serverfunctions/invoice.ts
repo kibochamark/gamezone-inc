@@ -209,7 +209,7 @@ export async function updateInvoiceStatus(id: string, status: "PENDING" | "PAID"
     
                 return invoice;
             });
-            return updatedInvoice;
+            return [200,updatedInvoice];
         }
         else if (status === "CANCELLED") {
             const updatedInvoice= await prisma.$transaction(async (tx) => {
@@ -248,16 +248,16 @@ export async function updateInvoiceStatus(id: string, status: "PENDING" | "PAID"
                 }
                 return invoice;
             });
-            return updatedInvoice;
+            return [200,updatedInvoice];
         }
         const updatedInvoice = await prisma.invoice.update({
             where: { id },
             data: { status },
         });
-        return updatedInvoice;
+        return [200,updatedInvoice];
     } catch (error) {
         console.error("Error updating invoice status:", error);
-        throw error;
+        return [400, error];
     }
 }
 

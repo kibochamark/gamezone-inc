@@ -31,15 +31,17 @@ export interface InvoiceData {
   subtotal: number
   tax: number
   total: number
-  invoiceStatus?: "paid"| "pending" | "overdue"
+  invoiceStatus?: "PAID"| "PENDING" | "OVERDUE"
 }
 
 export default function EditInvoicePage({
   products,
   invoicedata,
+  isediting
 }: {
   products: any[] | []
   invoicedata: any // backend invoice object
+  isediting: boolean
 }) {
   const [invoiceData, setInvoiceData] = useState<InvoiceData | null>({
     id: "INV" + Date.now(),
@@ -84,7 +86,7 @@ export default function EditInvoicePage({
         subtotal: invoicedata.subtotal,
         tax: invoicedata.tax,
         total: invoicedata.total,
-        invoiceStatus: invoicedata.status.toLowerCase(),
+        invoiceStatus: invoicedata.status,
       }
 
       setInvoiceData(mappedInvoice)
@@ -128,27 +130,6 @@ export default function EditInvoicePage({
     }
   }
 
-  const formik = useFormik({
-    initialValues: invoiceData || {
-      id: "",
-      invoiceNumber: "",
-      companyName: "",
-      companyEmail: "",
-      companyLogo: null,
-      clientName: "",
-      clientEmail: "",
-      issueDate: "",
-      dueDate: "",
-      items: [],
-      subtotal: 0,
-      tax: 0,
-      total: 0,
-    },
-    enableReinitialize: true,
-    onSubmit: (values: InvoiceData) => {
-      console.log("Form submitted with values:", values)
-    },
-  })
 
   if (!invoiceData) return <p className="p-6 text-center">Loading invoice...</p>
 
@@ -169,6 +150,7 @@ export default function EditInvoicePage({
                 setInvoiceData={setInvoiceData}
                 products={products}
                 generatepdf={convertToPdf}
+                isediting={isediting}
               />
             </Card>
           </div>

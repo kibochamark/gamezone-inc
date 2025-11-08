@@ -258,7 +258,7 @@ export default function InvoicesPage({permissions, invoicesummary,invoices}: {pe
 
                                         <DataTable data={invoices} columns={invoicecolumns} props={
                                             {
-                                                edit: permissions?.includes("edit:access") || false,
+                                                edit: false,
                                                 delete: permissions?.includes("delete:access") || false,
                                                 page: "invoices",
                                                 

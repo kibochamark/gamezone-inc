@@ -25,7 +25,7 @@ export interface InvoiceData {
   companyLogo: string | null
   clientName: string
   clientEmail: string
-  invoiceStatus?: "paid"| "pending" | "overdue"
+  invoiceStatus?: "PAID"| "PENDING" | "OVERDUE"
   issueDate: string
   dueDate: string
   items: InvoiceLineItem[]

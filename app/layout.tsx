@@ -22,26 +22,26 @@ export const metadata: Metadata = {
   description: "we offer cutting edging solutions as well a vast variety of technology products to suit your needs",
 };
 
-async function SalesCount() {
-  let today = new Date()
-  today.setHours(0, 0, 0)
-  const salecount = await prisma.sales.aggregate({
-    where: {
-      created_at: {
-        gte: today,
-        lt: new Date(today.getTime() + 86400000)
-      }
-    },
-    _count: {
-      inventoryId: true
-    }
-  })
+// async function SalesCount() {
+//   let today = new Date()
+//   today.setHours(0, 0, 0)
+//   const salecount = await prisma.sales.aggregate({
+//     where: {
+//       created_at: {
+//         gte: today,
+//         lt: new Date(today.getTime() + 86400000)
+//       }
+//     },
+//     _count: {
+//       inventoryId: true
+//     }
+//   })
 
 
-  // console.log(salecount?._count, 'sal')
+//   // console.log(salecount?._count, 'sal')
 
-  return salecount?._count?.inventoryId || 0
-}
+//   return salecount?._count?.inventoryId || 0
+// }
 
 export default async function RootLayout({
   children,
@@ -50,7 +50,7 @@ export default async function RootLayout({
 }>) {
 
 
-  const salescount = await SalesCount()
+  // const salescount = await SalesCount()
 
 
 
@@ -85,11 +85,11 @@ export default async function RootLayout({
                 <div className="flex w-full">
                   <div className="">
                     <div className="fixed lg:w-[280px] md:w-[220px]">
-                      <SideBar salescount={salescount} />
+                      <SideBar />
                     </div>
                   </div>
 
-                  <Navbar salescount={salescount}>
+                  <Navbar>
                     {children}
                     <div className="absolute bottom-0 right-0 z-50">
 

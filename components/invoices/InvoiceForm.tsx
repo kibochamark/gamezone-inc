@@ -13,18 +13,21 @@ import { Product } from "../Inventory/columns"
 import { useFormik } from "formik"
 import toast from "react-hot-toast"
 import { useMutation } from "@tanstack/react-query"
-import { createInvoice } from "@/serverfunctions/invoice"
+import { createInvoice, updateInvoiceStatus } from "@/serverfunctions/invoice"
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs"
+import { useRouter } from "next/navigation"
 
 interface InvoiceFormProps {
   invoiceData: InvoiceData
   setInvoiceData: (data: InvoiceData) => void,
   products: Product[] | [],
   generatepdf?: () => void
+  isediting?: boolean
 }
 
-export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf }: InvoiceFormProps) {
+export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf , isediting}: InvoiceFormProps) {
   const [showCustomService, setShowCustomService] = useState(false)
+  const router= useRouter();
 
   const handleAddProduct = (product: InvoiceLineItem) => {
     const newItems = [...invoiceData.items, product]
@@ -88,7 +91,19 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
 
   const invoicemutation = useMutation({
     mutationFn: async (data: InvoiceData) => {
-      const response = await createInvoice(
+      if(isediting){
+        const response = await updateInvoiceStatus(
+          
+              data.id,
+              data.invoiceStatus || "PENDING"
+          
+        )
+        if (response[0] != 200) {
+          throw new Error(`Failed to update invoice: ${response[1]}`);
+        }
+        return response[1];
+      }else{
+        const response = await createInvoice(
         {
             invoiceNo:  data.invoiceNumber, 
             customerName :data.clientName,
@@ -114,12 +129,17 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
         throw new Error(`Failed to create invoice: ${response[0]}`);
       }
       return response[0];
+      }
+     
     },
     onSuccess: (data) => {
-      toast.success('Invoice created successfully!');
+      isediting ? toast.success('Invoice updated successfully!') : toast.success('Invoice created successfully!');
+      
       setInvoiceData({} as InvoiceData); // Reset form
       
-      generatepdf && generatepdf();
+      generatepdf && !isediting && generatepdf();
+      
+      router.push('/invoice');
       // Optionally reset the form or redirect
     },
     onError: (error: any) => {
@@ -152,6 +172,7 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
               id="client-name"
               placeholder="John Doe"
               value={invoiceData.clientName}
+              disabled={isediting}
               onChange={(e) => setInvoiceData({ ...invoiceData, clientName: e.target.value })}
             />
           </div>
@@ -162,6 +183,7 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
               type="email"
               placeholder="client@example.com"
               value={invoiceData.clientEmail}
+              disabled={isediting}
               onChange={(e) => setInvoiceData({ ...invoiceData, clientEmail: e.target.value })}
             />
           </div>
@@ -172,6 +194,7 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
                 id="issue-date"
                 type="date"
                 value={invoiceData.issueDate}
+                disabled={isediting}
                 onChange={(e) => setInvoiceData({ ...invoiceData, issueDate: e.target.value })}
               />
             </div>
@@ -181,19 +204,23 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
                 id="due-date"
                 type="date"
                 value={invoiceData.dueDate}
+                disabled={isediting}
                 onChange={(e) => setInvoiceData({ ...invoiceData, dueDate: e.target.value })}
               />
             </div>
-             <div>
+            {isediting && (
+              <div>
               <Label htmlFor="due-date">Invoice status</Label>
-              <select value={invoiceData.invoiceStatus}  onSelectCapture={(e) => setInvoiceData({ ...invoiceData, invoiceStatus: e.currentTarget.value  as "paid"| "pending" | "overdue" })} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <select value={invoiceData.invoiceStatus}  onChange={(e) => setInvoiceData({ ...invoiceData, invoiceStatus: e.currentTarget.value  as "PAID"| "PENDING" | "OVERDUE" })} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <option value=""></option>
-                <option value="pending" disabled>pending</option>
-                <option value="paid">paid</option>
-                <option value="overdue">Overdue</option>
+                <option value="PENDING" disabled>pending</option>
+                <option value="PAID">paid</option>
+                <option value="OVERDUE">Overdue</option>
               </select>
              
             </div>
+            )}
+            
           </div>
         </CardContent>
       </Card>
@@ -204,7 +231,9 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
           <CardTitle className="text-base">Products & Services</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ProductSearch onSelectProduct={handleAddProduct} products={products} />
+          {!isediting && (
+            <>
+            <ProductSearch onSelectProduct={handleAddProduct} products={products}  />
 
           <div className="flex gap-2">
             <Button
@@ -217,6 +246,10 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
           </div>
 
           {showCustomService && <CustomServiceInput onAddService={handleAddProduct} />}
+            
+            </>
+          )}
+          
 
           {/* Line Items Table */}
           {invoiceData.items?.length > 0 && (
@@ -235,13 +268,14 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
                       <Input
                         type="number"
                         min="1"
+                        disabled={isediting}
                         value={item.quantity}
                         onChange={(e) =>
                           handleUpdateItem(item.id, Number.parseInt(e.target.value) || 1, item.unitPrice)
                         }
                         className="w-16 text-center text-sm"
                       />
-                      <Button variant="ghost" size="sm" onClick={() => handleRemoveItem(item.id)}>
+                      <Button variant="ghost" size="sm" onClick={() => handleRemoveItem(item.id)} disabled={isediting}>
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>

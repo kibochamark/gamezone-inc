@@ -45,8 +45,8 @@ const DeleteItems = ({path, deletefunc}:{path: string, deletefunc: (id: string) 
 
 
 
-        } catch (error) {
-            toast.error("Failed to delete. Please try again.");
+        } catch (error:any) {
+            toast.error(error.message || "Error deleting item" );
         }
     }
     return (

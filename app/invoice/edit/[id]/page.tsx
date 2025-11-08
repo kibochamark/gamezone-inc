@@ -43,7 +43,7 @@ const page = async ({params}:{
     const inventory = await getInventory() ?? []
 
 
-    // console.log("Inventory in invoice page:", inventory)
+    // console.log("Inventory in invoice page:", invoicedata)
     return (
         <div className='min-h-screen flex flex-col items-start'>
             <div>
@@ -55,10 +55,15 @@ const page = async ({params}:{
                     </Button>
                 </Link>
             </div>
+            {invoicedata ? ( <div className='my-2 w-full rounded-md'>
+                <EditInvoicePage products={inventory} invoicedata={invoicedata} isediting={true}/>
+            </div>) :(
 
-            <div className='my-2 w-full rounded-md'>
-                <EditInvoicePage products={inventory} invoicedata={invoicedata}/>
-            </div>
+                <div className='my-2 w-full rounded-md'>
+                No data found
+                </div>  
+            )}
+           
             
 
         </div>

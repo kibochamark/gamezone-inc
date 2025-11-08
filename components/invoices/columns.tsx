@@ -24,6 +24,7 @@ export type Invoice = {
 
 import { FilterFn } from "@tanstack/react-table";
 import clsx from "clsx"
+import Link from "next/link"
 
 // date filter
 const dateFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
@@ -81,9 +82,26 @@ export const invoicecolumns: ColumnDef<Invoice>[] = [
     enableSorting: true,
     cell: ({ row }) => {
         const status = row.getValue("status") as string
-        const formatted = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    const formatted =
+      status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
 
-      return <div className={clsx("font-semibold", status.toLocaleLowerCase() == "pending" ? "text-primary600" : status.toLocaleLowerCase() == "paid" ? "text-green-600" :"text-red-600")}>{formatted}</div>
+    const id = row.original.id // assumes each row has an `id` field
+
+    return (
+      <Link
+        href={`/invoice/edit/${id}`}
+        className={clsx(
+          "font-semibold hover:underline cursor-pointer",
+          status.toLowerCase() === "pending"
+            ? "text-primary600"
+            : status.toLowerCase() === "paid"
+            ? "text-green-600"
+            : "text-red-600"
+        )}
+      >
+        {formatted}
+      </Link>
+    )
     },
   },
   {

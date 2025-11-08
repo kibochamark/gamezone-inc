@@ -45,7 +45,7 @@ import { useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 
 
-const SideBar = ({salescount}:{salescount:number}) => {
+const SideBar = () => {
     const path = usePathname()
     // const [sales, setSales]= useState(0)
     // useEffect(()=>{
@@ -58,29 +58,29 @@ const SideBar = ({salescount}:{salescount:number}) => {
 
     // },[path])
 
-    const { data, isLoading: Loading, error: queryError } = useQuery({
-        queryKey: ["getsalescount"],
-        queryFn: async () => {
-            let today = new Date()
-            today.setHours(0,0,0)
-            const salecount = await prisma.sales.aggregate({
-                where: {
-                    created_at: {
-                        gte: today,
-                        lt: new Date(today.getTime() + 86400000)
-                    }
-                },
-                _count:{
-                    inventoryId:true
-                }
-            })
+    // const { data, isLoading: Loading, error: queryError } = useQuery({
+    //     queryKey: ["getsalescount"],
+    //     queryFn: async () => {
+    //         let today = new Date()
+    //         today.setHours(0,0,0)
+    //         const salecount = await prisma.sales.aggregate({
+    //             where: {
+    //                 created_at: {
+    //                     gte: today,
+    //                     lt: new Date(today.getTime() + 86400000)
+    //                 }
+    //             },
+    //             _count:{
+    //                 inventoryId:true
+    //             }
+    //         })
 
 
-            console.log(salecount?._count, 'sal')
+    //         console.log(salecount?._count, 'sal')
 
-            return salecount?._count.inventoryId
-        }
-    })
+    //         return salecount?._count.inventoryId
+    //     }
+    // })
 
     // console.log(data, "salecount")
     return (
@@ -113,11 +113,11 @@ const SideBar = ({salescount}:{salescount:number}) => {
                             >
                                 <ShoppingCart className="h-4 w-4" />
                                 Sales
-                                {Loading ? (<Loader className="text-white animate animate-spin rounded-full" />) : (
+                                {/* {Loading ? (<Loader className="text-white animate animate-spin rounded-full" />) : (
                                     <Badge className="ml- bg-primary800 text-white flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                                         {salescount}
                                     </Badge>
-                                )}
+                                )} */}
                                 {/* <Badge className="ml- bg-primary800 text-background flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                                     {sales}
                                 </Badge> */}

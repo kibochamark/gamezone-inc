@@ -44,7 +44,7 @@ import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { prisma } from '@/lib/prismaClient'
 
-const Navbar = ({ children, salescount }: { children: ReactNode; salescount: number }) => {
+const Navbar = ({ children }: { children: ReactNode;}) => {
   const path = usePathname()
   const {
     isLoading,
@@ -118,11 +118,11 @@ const Navbar = ({ children, salescount }: { children: ReactNode; salescount: num
                   >
                     <ShoppingCart className="h-4 w-4" />
                     Sales
-                    {Loading ? (<Loader className="text-white animate animate-spin rounded-full" />) : (
+                    {/* {Loading ? (<Loader className="text-white animate animate-spin rounded-full" />) : (
                       <Badge className="ml- bg-primary800 text-white flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                         {salescount}
                       </Badge>
-                    )}
+                    )} */}
 
                   </Link>
                   <Link
