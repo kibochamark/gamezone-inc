@@ -25,6 +25,7 @@ export interface InvoiceData {
   companyLogo: string | null
   clientName: string
   clientEmail: string
+  invoiceStatus?: "paid"| "pending" | "overdue"
   issueDate: string
   dueDate: string
   items: InvoiceLineItem[]
@@ -62,26 +63,27 @@ export default function CreateInvoicePage({products, invno}: {products: any[] | 
     // Clone the node to avoid layout shifts or dynamic content flickering
     const clonedContent = content.cloneNode(true) as HTMLElement;
 
-    // Optional: Apply a fixed width for PDF rendering to maintain consistent layout
-    clonedContent.style.width = '800px'; 
-    clonedContent.style.maxWidth = '800px';
-    clonedContent.style.margin = '0 auto';
+    // // Optional: Apply a fixed width for PDF rendering to maintain consistent layout
+    // clonedContent.style.width = '800px'; 
+    // clonedContent.style.maxWidth = '800px';
+    // clonedContent.style.margin = '0 auto';
 
-    // Append cloned content to an offscreen container to preserve styles
+    // // Append cloned content to an offscreen container to preserve styles
     const container = document.createElement('div');
-    container.style.position = 'fixed';
-    container.style.left = '-9999px';
-    container.appendChild(clonedContent);
-    document.body.appendChild(container);
+    // container.style.position = 'fixed';
+    // container.style.left = '-9999px';
+    // container.appendChild(clonedContent);
+    // document.body.appendChild(container);
 
-    // Define better PDF generation options
     const options = {
-      margin: [0.5, 0.5, 0.5, 0.5] as [number, number, number, number], // top, left, bottom, right
+      // Small margins are fine, but ensure the content CSS handles them internally too
+      margin: [0.5, 0.5, 0.5, 0.5] as [number, number, number, number], 
       filename: 'my-document.pdf',
       image: { type: 'jpeg' as const, quality: 1 },
       html2canvas: {
-        scale: 2, // ↑ Higher scale = sharper text and images
-        useCORS: true, // Ensures images from external URLs are rendered properly
+        // ↑ Increased scale for sharper results
+        scale: 3, 
+        useCORS: true,
         logging: false,
         scrollX: 0,
         scrollY: 0,

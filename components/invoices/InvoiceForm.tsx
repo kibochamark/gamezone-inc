@@ -29,7 +29,7 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
   const handleAddProduct = (product: InvoiceLineItem) => {
     const newItems = [...invoiceData.items, product]
     const subtotal = newItems.reduce((sum, item) => sum + item.total, 0)
-    const tax = subtotal * 0.1 // 10% tax
+    const tax = 0 // 10% tax
     const total = subtotal + tax
 
     setInvoiceData({
@@ -44,7 +44,7 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
   const handleRemoveItem = (id: string) => {
     const newItems = invoiceData.items.filter((item) => item.id !== id)
     const subtotal = newItems.reduce((sum, item) => sum + item.total, 0)
-    const tax = subtotal * 0.1 // 10% tax
+    const tax = 0 // 10% tax
     const total = subtotal + tax
 
     setInvoiceData({
@@ -69,7 +69,7 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
       item.id === id ? { ...item, quantity, unitPrice, total: quantity * unitPrice } : item,
     )
     const subtotal = newItems.reduce((sum, item) => sum + item.total, 0)
-    const tax = subtotal * 0.1 // 10% tax
+    const tax = 0// 10% tax  for now we dont have tax
     const total = subtotal + tax
 
     setInvoiceData({
@@ -184,6 +184,16 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
                 onChange={(e) => setInvoiceData({ ...invoiceData, dueDate: e.target.value })}
               />
             </div>
+             <div>
+              <Label htmlFor="due-date">Invoice status</Label>
+              <select value={invoiceData.invoiceStatus}  onSelectCapture={(e) => setInvoiceData({ ...invoiceData, invoiceStatus: e.currentTarget.value  as "paid"| "pending" | "overdue" })} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value=""></option>
+                <option value="pending" disabled>pending</option>
+                <option value="paid">paid</option>
+                <option value="overdue">Overdue</option>
+              </select>
+             
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -218,7 +228,7 @@ export function InvoiceForm({ invoiceData, setInvoiceData, products, generatepdf
                     <div className="flex-1">
                       <p className="font-medium">{item.description}</p>
                       <p className="text-xs text-muted-foreground">
-                        {item.quantity} × ${item.unitPrice.toFixed(2)} = ${item.total.toFixed(2)}
+                        {item.quantity} × ${item?.unitPrice.toFixed(2)} = ${item?.total ? item?.total.toFixed(2) : "0.00"}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">

@@ -1,5 +1,6 @@
 "use server"
 import { prisma } from "@/lib/prismaClient";
+import { get } from "http";
 import { Inter } from "next/font/google";
 
 
@@ -137,6 +138,15 @@ export async function getInvoiceById(id: string) {
 
 export async function deleteInvoice(id: string) {
     try {
+        const getInvoice = await prisma.invoice.findUnique({
+            where: { id },
+        });
+        if (!getInvoice) {
+            throw new Error("Invoice not found");
+        }
+        if(getInvoice.status === "PAID"){
+            throw new Error("Cannot delete a paid invoice");
+        }
         const deletedInvoice = await prisma.$transaction(async (tx) => {
             // Delete invoice items
             await tx.invoiceItem.deleteMany({
@@ -257,6 +267,36 @@ export async function getInvoicesCount() {
         return count;
     } catch (error) {
         console.error("Error counting invoices:", error);
+        throw error;
+    }
+}
+
+export async function getInvoicesRevenue() {
+    try {
+        const sum = await prisma.invoice.aggregate({
+            _sum:{
+                total:true  
+            }
+        });
+        return sum._sum.total || 0;
+    } catch (error) {
+        console.error("Error counting invoices:", error);
+        throw error;
+    }
+}
+
+
+export async function getInvoicesSummary() {
+    try {
+        const summary = await prisma.invoice.groupBy({
+            by:['status'],
+            _sum:{
+                total:true  
+            }
+        });
+        return summary || [];
+    } catch (error) {
+        console.error("Error getting summary invoices:", error);
         throw error;
     }
 }

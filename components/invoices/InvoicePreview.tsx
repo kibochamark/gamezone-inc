@@ -1,4 +1,5 @@
 "use client"
+import { converttocunrrency } from "@/lib/utils"
 import { InvoiceData } from "./CreatePageView"
 import Image from "next/image"
 
@@ -10,10 +11,7 @@ export function InvoicePreview({ invoiceData}: InvoicePreviewProps) {
 
 
 
-  const converttocunrrency = (amount: number | undefined) => {
-    if(!amount) return "KES0.00";
-    return new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES' }).format(amount);
-  }
+  
 
 
 
@@ -24,7 +22,7 @@ export function InvoicePreview({ invoiceData}: InvoicePreviewProps) {
         <div className="flex justify-between items-start pb-6 border-b-2 border-gray-200">
           <div>
             {invoiceData.companyLogo ? (
-              <Image src={invoiceData.companyLogo || "/placeholder.svg"} alt="Company Logo" priority width={300} height={300} className="h-20 w-auto" />
+              <Image src={invoiceData.companyLogo || "/placeholder.svg"} alt="Company Logo" priority width={300} height={500} className="h-20 w-auto" />
             ) : (
               <div className="h-16 w-16 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-400">
                 Logo
@@ -42,11 +40,11 @@ export function InvoicePreview({ invoiceData}: InvoicePreviewProps) {
         <div className="flex justify-between items-start">
           <div>
             <p className="text-gray-600 text-xs font-semibold mb-1">INVOICE</p>
-            <h1 className="text-2xl font-semibold"># {invoiceData.invoiceNumber || "INV00000"}</h1>
+            <h1 className="text-2xl font-semibold">#{invoiceData.invoiceNumber || "INV00000"}</h1>
           </div>
           <div className="text-right">
             <p className="font-semibold text-lg">{invoiceData.clientName || "Company Name"}</p>
-            <p className="text-sm text-gray-600">{invoiceData.clientEmail || "email@company.com"}</p>
+            <p className="text-sm text-gray-600">{invoiceData.clientEmail || ""}</p>
           </div>
         </div>
 
@@ -93,8 +91,8 @@ export function InvoicePreview({ invoiceData}: InvoicePreviewProps) {
                     <td className="py-3 px-2">{index + 1}</td>
                     <td className="py-3 px-2">{item.description}</td>
                     <td className="text-center py-3 px-2">{item.quantity.toFixed(2)}</td>
-                    <td className="text-right py-3 px-2">KES{item.unitPrice.toFixed(2)}</td>
-                    <td className="text-right py-3 px-2 font-medium">KES{item.total.toFixed(2)}</td>
+                    <td className="text-right py-3 px-2">{converttocunrrency(item.unitPrice)}</td>
+                    <td className="text-right py-3 px-2 font-medium">{converttocunrrency(item.total)}</td>
                   </tr>
                 ))
               ) : (
