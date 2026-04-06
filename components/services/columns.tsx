@@ -109,7 +109,7 @@ export const columns: ColumnDef<Service>[] = [
             );
         },
         enableSorting: true
-    }
+    },
     
     {
         accessorKey: "created_at",
