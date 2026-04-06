@@ -8,10 +8,11 @@ import { DataTableColumnHeader } from "../reusables/ColumnHeader"
 export type Service = {
     id: string
     kindeId: string
-    kindeName:string
+    kindeName: string
     name: String
     price: number
-    created_at:Date
+    paymenttype: "CASH" | "Mpesa"
+    created_at: Date
 }
 
 import { FilterFn } from "@tanstack/react-table";
@@ -43,7 +44,7 @@ export const columns: ColumnDef<Service>[] = [
                 <DataTableColumnHeader column={column} title="Service name" />
             )
         },
-        enableSorting:true
+        enableSorting: true
     },
     {
         accessorKey: "kindeName",
@@ -52,14 +53,14 @@ export const columns: ColumnDef<Service>[] = [
                 <DataTableColumnHeader column={column} title="Offered By" />
             )
         },
-        cell:({row})=>{
+        cell: ({ row }) => {
             return (
                 <div className="text-justify font-medium">{row.original.kindeName}</div>
             )
         },
-        enableSorting:true
+        enableSorting: true
     },
-   
+
     {
         accessorKey: "price",
         header: ({ column }) => {
@@ -76,10 +77,39 @@ export const columns: ColumnDef<Service>[] = [
 
             return <div className="text-justify font-medium">{formatted}</div>
         },
-        enableSorting:true
+        enableSorting: true
 
 
     },
+
+    {
+        accessorKey: "paymenttype",
+        header: ({ column }) => {
+            return (
+                <DataTableColumnHeader column={column} title="Payment Type" />
+            )
+        },
+        cell: ({ row }) => {
+            const type = row.original.paymenttype?.toUpperCase();
+
+            const styles = {
+                CASH: "bg-green-100 text-green-700 border-green-300",
+                MPESA: "bg-blue-100 text-blue-700 border-blue-300",
+                DEFAULT: "bg-gray-100 text-gray-700 border-gray-300"
+            };
+
+            const badgeStyle = styles[type] || styles.DEFAULT;
+
+            return (
+                <span
+                    className={`px-2 py-1 rounded-md text-xs font-semibold border ${badgeStyle}`}
+                >
+                    {row.original.paymenttype}
+                </span>
+            );
+        },
+        enableSorting: true
+    }
     
     {
         accessorKey: "created_at",
@@ -100,7 +130,7 @@ export const columns: ColumnDef<Service>[] = [
         },
         sortingFn: "datetime",
         filterFn: dateFilterFn, // or another appropriate filter function
-        enableSorting:true
+        enableSorting: true
     },
 ];
 
