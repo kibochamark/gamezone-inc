@@ -18,6 +18,8 @@ export type Service = {
 import { FilterFn } from "@tanstack/react-table";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs"
 
+type PaymentType = "CASH" | "MPESA";
+
 const dateFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
     const rowValue = row.getValue(columnId) as Date;
 
@@ -90,13 +92,15 @@ export const columns: ColumnDef<Service>[] = [
             )
         },
         cell: ({ row }) => {
-            const type = row.original.paymenttype?.toUpperCase();
+         
 
-            const styles = {
+            const styles: Record<PaymentType | "DEFAULT", string> = {
                 CASH: "bg-green-100 text-green-700 border-green-300",
                 MPESA: "bg-blue-100 text-blue-700 border-blue-300",
                 DEFAULT: "bg-gray-100 text-gray-700 border-gray-300"
             };
+
+            const type = row.original.paymenttype?.toUpperCase() as PaymentType;
 
             const badgeStyle = styles[type] || styles.DEFAULT;
 
@@ -104,7 +108,7 @@ export const columns: ColumnDef<Service>[] = [
                 <span
                     className={`px-2 py-1 rounded-md text-xs font-semibold border ${badgeStyle}`}
                 >
-                    {row.original.paymenttype}
+                    {type}
                 </span>
             );
         },
